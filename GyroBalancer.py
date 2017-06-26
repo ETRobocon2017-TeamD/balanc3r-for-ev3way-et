@@ -34,12 +34,14 @@ def FastWrite(outfile, value):
 
 
 # Function to set the duty cycle of the motors
-def SetDuty(motorDutyFileHandle, duty):
+def SetDuty(motorDutyFileHandle, duty, barance=1):
     # Clamp the value between -100 and 100
-    duty = min(max(duty, -100), 100)
+    duty = min(max(duty, -100), 100)*barance
 
     # Apply the signal to the motor
     FastWrite(motorDutyFileHandle, duty)
+
+    return duty
 
 
 class GyroBalancer(Tank):
@@ -54,8 +56,8 @@ class GyroBalancer(Tank):
                  gainMotorAngle,                  # For every radian we are ahead of the reference,           apply this amount of duty cycle
                  gainMotorAngularSpeed,           # For every radian/s drive faster than the reference value, apply this amount of duty cycle
                  gainMotorAngleErrorAccumulated,  # For every radian x s of accumulated motor angle,          apply this amount of duty cycle
-                 left_motor=OUTPUT_D,
-                 right_motor=OUTPUT_A):
+                 left_motor=OUTPUT_C,
+                 right_motor=OUTPUT_B):
         Tank.__init__(self, left_motor, right_motor)
 
         # magic numbers
@@ -69,11 +71,12 @@ class GyroBalancer(Tank):
         self.gyro = GyroSensor()
         self.gyro.mode = self.gyro.MODE_GYRO_RATE
         self.touch = TouchSensor()
-        self.remote = RemoteControl(channel=1)
+        self.battery = PowerSupply()
+        # self.remote = RemoteControl(channel=1)
 
-        if not self.remote.connected:
-            log.error("%s is not connected" % self.remote)
-            sys.exit(1)
+        # if not self.remote.connected:
+        #     log.error("%s is not connected" % self.remote)
+        #     sys.exit(1)
 
         # Motor setup
         self.left_motor.reset()
@@ -88,10 +91,10 @@ class GyroBalancer(Tank):
         self.blue_up   = False
         self.blue_down = False
         self.STEER_SPEED = 20
-        self.remote.on_red_up    = self.make_move('red_up')
-        self.remote.on_red_down  = self.make_move('red_down')
-        self.remote.on_blue_up   = self.make_move('blue_up')
-        self.remote.on_blue_down = self.make_move('blue_down')
+        # self.remote.on_red_up    = self.make_move('red_up')
+        # self.remote.on_red_down  = self.make_move('red_down')
+        # self.remote.on_blue_up   = self.make_move('blue_up')
+        # self.remote.on_blue_down = self.make_move('blue_down')
 
     def make_move(self, button):
         def move(state):
@@ -160,6 +163,7 @@ class GyroBalancer(Tank):
         def shutdown():
             touchSensorValueRaw.close()
             gyroSensorValueRaw.close()
+            batteryVoltageRaw.close()
             motorEncoderLeft.close()
             motorEncoderRight.close()
             motorDutyCycleLeft.close()
@@ -177,7 +181,7 @@ class GyroBalancer(Tank):
             ########################################################################
 
             # Timing settings for the program
-            loopTimeMilliSec        = 10                       # Time of each loop, measured in miliseconds.
+            loopTimeMilliSec        = 15                       # Time of each loop, measured in miliseconds.
             loopTimeSec             = loopTimeMilliSec/1000.0  # Time of each loop, measured in seconds.
             motorAngleHistoryLength = 3                        # Number of previous motor angles we keep track of.
 
@@ -189,12 +193,12 @@ class GyroBalancer(Tank):
             radiansPerSecondPerRawGyroUnit = degPerSecondPerRawGyroUnit*radiansPerDegree   # Express the above as the rate in rad/s per gyro unit
             degPerRawMotorUnit             = 1                                             # For the LEGO EV3 Large Motor 1 unit = 1 deg
             radiansPerRawMotorUnit         = degPerRawMotorUnit*radiansPerDegree           # Express the above as the angle in rad per motor unit
-            RPMperPerPercentSpeed          = 1.7                                           # On the EV3, "1% speed" corresponds to 1.7 RPM (if speed control were enabled)
-            degPerSecPerPercentSpeed       = RPMperPerPercentSpeed*360/60                  # Convert this number to the speed in deg/s per "percent speed"
-            radPerSecPerPercentSpeed       = degPerSecPerPercentSpeed * radiansPerDegree   # Convert this number to the speed in rad/s per "percent speed"
+            RPMperPerPercentSpeed          = 1.7                                           # On the EV3, "1% speed" corresponds to 1.7 RPM (if speed control were enabled) EV3では、「speed」を1%とした場合、１分間に1.7回転させる速さであると定義する（※電圧によって変わる）
+            degPerSecPerPercentSpeed       = RPMperPerPercentSpeed*360/60                  # Convert this number to the speed in deg/s per "percent speed" 「speed」を回転角速度(deg)に変換する係数
+            radPerSecPerPercentSpeed       = degPerSecPerPercentSpeed * radiansPerDegree   # Convert this number to the speed in rad/s per "percent speed" 「speed」を回転角速度(rad)に変換する係数
 
-            # The rate at which we'll update the gyro offset (precise definition given in docs)
-            gyroDriftCompensationRate      = 0.1 * loopTimeSec * radiansPerSecondPerRawGyroUnit
+            # The rate at which we'll update the gyro offset (precise definition given in docs) ジャイロ値を補正するオフセット値の更新に使用する。調節する必要がある。
+            gyroDriftCompensationRate      = 0.45 * loopTimeSec * radiansPerSecondPerRawGyroUnit
 
             # A deque (a fifo array) which we'll use to keep track of previous motor positions, which we can use to calculate the rate of change (speed)
             motorAngleHistory = deque([0], motorAngleHistoryLength)
@@ -206,6 +210,12 @@ class GyroBalancer(Tank):
             gainMotorAngularSpeed          = self.gainMotorAngularSpeed
             gainMotorAngleErrorAccumulated = self.gainMotorAngleErrorAccumulated
 
+            battery_gain = 0.001089  # PWM出力算出用バッテリ電圧補正係数
+            battery_offset = 0.625  # PWM出力算出用バッテリ電圧補正オフセット
+
+            a_d = 1.0 - 0.45 #0.51 #0.47  # ローパスフィルタ係数(左右車輪の平均回転角度用)。左右モーターの平均回転角速度(rad/sec)の算出時にのみ使用する。小さいほど角速度の変化に過敏になる。0.45〜0.70あたりで調節したい。
+            a_r = 0.985 #0.98  # ローパスフィルタ係数(左右車輪の目標平均回転角度用)。左右モーターの目標平均回転角度(rad)の算出時に使用する。小さいほど前進・後退する反応が早くなる。
+
             # Variables representing physical signals (more info on these in the docs)
             # The angle of "the motor", measured in raw units (degrees for the
             # EV3). We will take the average of both motor positions as "the motor"
@@ -214,6 +224,9 @@ class GyroBalancer(Tank):
 
             # The angle of the motor, converted to radians (2*pi radians equals 360 degrees).
             motorAngle                 = 0
+
+            # 1ループ前に算出した左右車輪回転角度
+            motorAngleLast             = 0
 
             # The reference angle of the motor. The robot will attempt to drive
             # forward or backward, such that its measured position equals this
@@ -255,10 +268,29 @@ class GyroBalancer(Tank):
             # it is moving even when it is perfectly still. We keep track of this offset.
             gyroOffset                 = 0
 
+            # 現在のバッテリー電圧
+            voltageRaw = 0
+
+            # ログ記録用
+            logs = ["" for _ in range(10000)]
+            log_pointer = 0
+
+
+            A4_2 = 203.1578
+            A4_3 = 39.2835
+            A4_4 = -39.2835
+            B4 = -38.1817
+            u = 0
+            b = 0
+            gyroAsseletion = 0
+            gyroRateEst = 0
+
+
             # filehandles for fast reads/writes
             # =================================
             touchSensorValueRaw = open(self.touch._path + "/value0", "rb")
             gyroSensorValueRaw  = open(self.gyro._path + "/value0", "rb")
+            batteryVoltageRaw = open(self.battery._path + "/voltage_now", "rb")
 
             # Open motor files for (fast) reading
             motorEncoderLeft    = open(self.left_motor._path + "/position", "rb")
@@ -278,16 +310,23 @@ class GyroBalancer(Tank):
 
             #As you hold the robot still, determine the average sensor value of 100 samples
             gyroRateCalibrateCount = 100
+            gyroRateSquareds = 0
             for i in range(gyroRateCalibrateCount):
-                gyroOffset = gyroOffset + FastRead(gyroSensorValueRaw)
+                gyroRateRaw = FastRead(gyroSensorValueRaw)
+                gyroRateSquareds = gyroRateSquareds + pow(gyroRateRaw,2)
+                gyroOffset = gyroOffset + gyroRateRaw
                 time.sleep(0.01)
             gyroOffset = gyroOffset/gyroRateCalibrateCount
+            p_bar = gyroRateSquareds/gyroRateCalibrateCount #ジャイロセンサーの事前予測の分散値 #初期値
 
             # Print the result
             print("GyroOffset: %s" % gyroOffset)
             print("-----------------------------------")
             print("GO!")
             print("-----------------------------------")
+
+            #self.speed = 62.5 # 前進・後退速度。62.5〜-62.5の間で入力
+            #self.steering = -1 * self.STEER_SPEED * 0.5 # 旋回速度。他の係数をいじったせいか、今の値でも少々不安定になっている。もう少し下げたほうがいいかも
 
             ########################################################################
             ##
@@ -299,6 +338,8 @@ class GyroBalancer(Tank):
             touchSensorPressed = FastRead(touchSensorValueRaw)
 
             while not touchSensorPressed:
+            #while ((gyroRate < 5) and (gyroRate > -5)):
+            #for _ in range(1000):
 
                 ###############################################################
                 ##  Loop info
@@ -308,70 +349,125 @@ class GyroBalancer(Tank):
                 ###############################################################
                 ##  Reading the Remote Control
                 ###############################################################
-                self.remote.process()
+                # self.remote.process()
 
                 ###############################################################
                 ##  Reading the Gyro.
                 ###############################################################
                 gyroRateRaw = FastRead(gyroSensorValueRaw)
-                gyroRate = (gyroRateRaw - gyroOffset)*radiansPerSecondPerRawGyroUnit
+                gyroRate = (gyroRateRaw - gyroOffset) * radiansPerSecondPerRawGyroUnit # 躯体の角速度(rad/sec)。ジャイロから得た角速度をオフセット値で調整している
+                # k = (p_bar/(p_bar + pow(gyroOffset,2)))
+                # gyroRate = (((1 - k) * gyroRateEst) + (k * gyroRateRaw)) * radiansPerSecondPerRawGyroUnit
+
+                # logs[log_pointer] = "%s   %s   %s   %s   %s   %s   %s" % (
+                #     gyroRateRaw,
+                #     gyroRateEst/radiansPerSecondPerRawGyroUnit,
+                #     gyroRateOld/radiansPerSecondPerRawGyroUnit,
+                #     gyroRate/radiansPerSecondPerRawGyroUnit,
+                #     motorAngularSpeed,
+                #     u,
+                #     gyroAsseletion)
+                # log_pointer += 1
 
                 ###############################################################
                 ##  Reading the Motor Position
                 ###############################################################
-                motorAngleRaw = (FastRead(motorEncoderLeft) + FastRead(motorEncoderRight))/2
-                motorAngle = motorAngleRaw*radiansPerRawMotorUnit
+                motorAngleLast = motorAngle
+                motorAngleRaw = (FastRead(motorEncoderLeft) + FastRead(motorEncoderRight)) * 0.5
+                motorAngle = (motorAngleRaw * radiansPerRawMotorUnit) + gyroEstimatedAngle # 左右モーターの現在の平均回転角度(rad) + 躯体の(推定)回転角度
 
-                motorAngularSpeedReference = self.speed * radPerSecPerPercentSpeed
-                motorAngleReference = motorAngleReference + motorAngularSpeedReference * loopTimeSec
+                #motorAngularSpeedReference = self.speed * radPerSecPerPercentSpeed # 左右モーターの目標平均回転角速度(rad/sec)。入力値speedを角速度(rad)に変換したもの。
+                motorAngularSpeedReference = (((1.0 - a_r) * self.speed * 0.075)) + (a_r * motorAngularSpeedReference)
+                motorAngleReference = motorAngleReference + (motorAngularSpeedReference * loopTimeSec) # 左右モーターの目標平均回転角度(rad)。初期値は0になる。入力値speedがずっと0でも0になる
 
-                motorAngleError = motorAngle - motorAngleReference
+                motorAngleError = motorAngle - motorAngleReference # 左右モーターの現在の平均回転角度と目標平均回転角度との誤差(rad)
 
                 ###############################################################
                 ##  Computing Motor Speed
                 ###############################################################
-                motorAngularSpeed = (motorAngle - motorAngleHistory[0])/(motorAngleHistoryLength * loopTimeSec)
-                motorAngularSpeedError = motorAngularSpeed - motorAngularSpeedReference
-                motorAngleHistory.append(motorAngle)
+                #motorAngularSpeed = (motorAngle - motorAngleHistory[0])/(motorAngleHistoryLength * loopTimeSec) # 左右モーターの平均回転角速度(rad/sec)。３代前の左右モーターの平均回転角度と現在の平均回転角度の差分を、周期*3で割ったもの
+                motorAngularSpeed = (((1.0 - a_d) * motorAngle) + (a_d * motorAngleLast) - motorAngleLast) / loopTimeSec # 左右モーターの平均回転角速度(rad/sec)。左右モーターの現在平均回転角度をローパスフィルターに通して、前回の平均回転角度との差分を周期で割っている。
+                motorAngularSpeedError = motorAngularSpeed - motorAngularSpeedReference # 左右モーターの現在の平均回転角速度と目標平均回転角速度との誤差(rad/sec)
+                #motorAngleHistory.append(motorAngle) # 左右モーターの現在の平均回転角度を記録
+
+                ###############################################################
+                ##  Reading the Voltage.
+                ###############################################################
+                voltageRaw = FastRead(batteryVoltageRaw) #バッテリー電圧(μV)
 
                 ###############################################################
                 ##  Computing the motor duty cycle value
                 ###############################################################
-                motorDutyCycle =(gainGyroAngle  * gyroEstimatedAngle
-                               + gainGyroRate   * gyroRate
-                               + gainMotorAngle * motorAngleError
-                               + gainMotorAngularSpeed * motorAngularSpeedError
-                               + gainMotorAngleErrorAccumulated * motorAngleErrorAccumulated)
+                u = ((gainGyroAngle  * gyroEstimatedAngle)
+                   + (gainGyroRate   * gyroRate)
+                   + (gainMotorAngle * motorAngleError)
+                   + (gainMotorAngularSpeed * motorAngularSpeedError)
+                   + (gainMotorAngleErrorAccumulated * motorAngleErrorAccumulated))
+                b = (battery_gain * voltageRaw/1000 - battery_offset)
+                motorDutyCycle =(u / b) * 100
 
                 ###############################################################
                 ##  Apply the signal to the motor, and add steering
                 ###############################################################
                 SetDuty(motorDutyCycleRight, motorDutyCycle + self.steering)
-                SetDuty(motorDutyCycleLeft, motorDutyCycle - self.steering)
+                duty = SetDuty(motorDutyCycleLeft, motorDutyCycle - self.steering, 0.975) # 右車輪のモーター出力が弱いので、左車輪のPWM値を3つ目の引数で調節(%)してる。まだ偏ってるので調節必要
+
+                # 推定躯体角速度の算出
+                # gyroAsseletion = ((A4_2 * gyroEstimatedAngle)
+                #                 + (A4_3 * motorAngularSpeed)
+                #                 + (A4_4 * gyroRate)
+                #                 + (B4*2 * u / 100))
+                # gyroRateEst = gyroRate + (gyroAsseletion * loopTimeSec)
 
                 ###############################################################
                 ##  Update angle estimate and Gyro Offset Estimate
                 ###############################################################
-                gyroEstimatedAngle = gyroEstimatedAngle + gyroRate * loopTimeSec
-                gyroOffset = (1 - gyroDriftCompensationRate) * gyroOffset + gyroDriftCompensationRate * gyroRateRaw
+                gyroEstimatedAngle = gyroEstimatedAngle + (gyroRate * loopTimeSec) # 次回の躯体の（推定）回転角度(rad)
+                gyroOffset = ((1 - gyroDriftCompensationRate) * gyroOffset) + (gyroDriftCompensationRate * gyroRateRaw) # ジャイロの角速度を補正するオフセット値(rad/sec)の更新。 現状gyroDriftCompensationRateが極小なので、ほぼほぼ前回算出したオフセット値寄りになる
 
                 ###############################################################
                 ##  Update Accumulated Motor Error
                 ###############################################################
-                motorAngleErrorAccumulated = motorAngleErrorAccumulated + motorAngleError * loopTimeSec
+                motorAngleErrorAccumulated = motorAngleErrorAccumulated + (motorAngleError * loopTimeSec) # モーター角度誤差累積(rad*t) もしかして積分？ 前回の累積に、今回の目標平均回転角度との誤差を周期でかけたものを足している
 
                 ###############################################################
                 ##  Read the touch sensor (the kill switch)
                 ###############################################################
                 touchSensorPressed = FastRead(touchSensorValueRaw)
 
+                # 実行時間、PWM値(duty cycle value)に関わる値をログに出力
+                # logs[log_pointer] = "%s, %s, %s, %s, %s, %s" % ((time.clock() - tLoopStart),
+                #     gyroEstimatedAngle,
+                #     gyroRate,
+                #     motorAngleError,
+                #     motorAngularSpeedError,
+                #     motorAngleErrorAccumulated)
+                # log_pointer += 1
+                print("%s   %s   %s   %s   %s   %s   %s" % (time.clock() - tLoopStart,
+                    gyroEstimatedAngle,
+                    gyroRate,
+                    motorAngleError,
+                    motorAngularSpeedError,
+                    motorAngleErrorAccumulated,
+                    duty))
+                # print("%s, %s" %
+                #     (gyroEstimatedAngle, gyroRate))
+
+                # logs[log_pointer] = "%s   %s" % (gyroRateRaw, gyroOffset, gyroEstimatedAngle)
+                # log_pointer += 1
+                # print("%s   %s   %s   %s" %
+                #      ((time.clock() - tLoopStart), gyroRateRaw, gyroOffset, gyroEstimatedAngle))
+
                 ###############################################################
                 ##  Busy wait for the loop to complete
                 ###############################################################
-                while ((time.clock() - tLoopStart) <  loopTimeSec):
+                while ((time.clock() - tLoopStart) < loopTimeSec):
                     time.sleep(0.0001)
 
             shutdown()
+            for log_ in logs:
+                if log_ != "":
+                    print(str(log_))
 
         # Exit cleanly so that all motors are stopped
         except (KeyboardInterrupt, Exception) as e:
