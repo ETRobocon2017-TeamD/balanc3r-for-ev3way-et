@@ -215,6 +215,7 @@ class GyroBalancer(Tank):
 
             a_d = 1.0 - 0.45 #0.51 #0.47  # ローパスフィルタ係数(左右車輪の平均回転角度用)。左右モーターの平均回転角速度(rad/sec)の算出時にのみ使用する。小さいほど角速度の変化に過敏になる。0.45〜0.70あたりで調節したい。
             a_r = 0.985 #0.98  # ローパスフィルタ係数(左右車輪の目標平均回転角度用)。左右モーターの目標平均回転角度(rad)の算出時に使用する。小さいほど前進・後退する反応が早くなる。
+            a_b = 0.85 #ローパスフィルタ係数(最大モーター電圧b用）
 
             # Variables representing physical signals (more info on these in the docs)
             # The angle of "the motor", measured in raw units (degrees for the
@@ -268,9 +269,6 @@ class GyroBalancer(Tank):
             # it is moving even when it is perfectly still. We keep track of this offset.
             gyroOffset                 = 0
 
-            # 現在のバッテリー電圧
-            voltageRaw = 0
-
             # ログ記録用
             logs = ["" for _ in range(10000)]
             log_pointer = 0
@@ -299,6 +297,10 @@ class GyroBalancer(Tank):
             # Open motor files for (fast) writing
             motorDutyCycleLeft  = open(self.left_motor._path + "/duty_cycle_sp", "w")
             motorDutyCycleRight = open(self.right_motor._path + "/duty_cycle_sp", "w")
+
+            # 現在のバッテリー電圧
+            voltageRaw = FastRead(batteryVoltageRaw)
+            voltage = FastRead(batteryVoltageRaw)
 
             ########################################################################
             ##
@@ -393,7 +395,10 @@ class GyroBalancer(Tank):
                 ###############################################################
                 ##  Reading the Voltage.
                 ###############################################################
-                voltageRaw = FastRead(batteryVoltageRaw) #バッテリー電圧(μV)
+                voltageRaw = ((1 - a_b) * FastRead(batteryVoltageRaw)) + a_b * voltageRaw
+                #voltage = voltageRaw
+                voltage = voltage + (min(max((voltageRaw - voltage), -10000), 10000)) #バッテリー電圧(μV)
+                #voltageRaw = FastRead(batteryVoltageRaw) #バッテリー電圧(μV)
 
                 ###############################################################
                 ##  Computing the motor duty cycle value
@@ -403,7 +408,7 @@ class GyroBalancer(Tank):
                    + (gainMotorAngle * motorAngleError)
                    + (gainMotorAngularSpeed * motorAngularSpeedError)
                    + (gainMotorAngleErrorAccumulated * motorAngleErrorAccumulated))
-                b = (battery_gain * voltageRaw/1000 - battery_offset)
+                b = (battery_gain * voltage/1000) - battery_offset
                 motorDutyCycle =(u / b) * 100
 
                 ###############################################################
@@ -443,13 +448,14 @@ class GyroBalancer(Tank):
                 #     motorAngularSpeedError,
                 #     motorAngleErrorAccumulated)
                 # log_pointer += 1
-                print("%s   %s   %s   %s   %s   %s   %s" % (time.clock() - tLoopStart,
+                print("%s   %s   %s   %s   %s   %s   %s   %s" % (time.clock() - tLoopStart,
                     gyroEstimatedAngle,
                     gyroRate,
                     motorAngleError,
                     motorAngularSpeedError,
                     motorAngleErrorAccumulated,
-                    duty))
+                    duty,
+                    voltage))
                 # print("%s, %s" %
                 #     (gyroEstimatedAngle, gyroRate))
 
