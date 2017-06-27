@@ -198,7 +198,7 @@ class GyroBalancer(Tank):
             radPerSecPerPercentSpeed       = degPerSecPerPercentSpeed * radiansPerDegree   # Convert this number to the speed in rad/s per "percent speed" 「speed」を回転角速度(rad)に変換する係数
 
             # The rate at which we'll update the gyro offset (precise definition given in docs) ジャイロ値を補正するオフセット値の更新に使用する。調節する必要がある。
-            gyroDriftCompensationRate      = 0.45 * loopTimeSec * radiansPerSecondPerRawGyroUnit
+            gyroDriftCompensationRate      = 0.3 * loopTimeSec * radiansPerSecondPerRawGyroUnit
 
             # A deque (a fifo array) which we'll use to keep track of previous motor positions, which we can use to calculate the rate of change (speed)
             motorAngleHistory = deque([0], motorAngleHistoryLength)
