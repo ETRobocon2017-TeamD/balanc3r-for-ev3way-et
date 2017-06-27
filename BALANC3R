@@ -14,7 +14,7 @@ class BALANC3R(GyroBalancer):
                               gainGyroAngle=31.7653,#30.2153, #900, # K_F[1]
                               gainGyroRate=3.5353,#3.3269, #110, # K_F[3]
                               gainMotorAngle=0.3949,#0.1606, #9, # K_F[0]
-                              gainMotorAngularSpeed=1.1491*0.875,#1.0796 * 0.882625, # 妥当な係数は8.5〜9.0くらい？ # K_F[2]
+                              gainMotorAngularSpeed=1.1491*0.85,#1.0796 * 0.882625, # 妥当な係数は8.5〜9.0くらい？ # K_F[2] #
                               gainMotorAngleErrorAccumulated=0.1225*0.1)#0.4472)#0.0224) #3) # K_I
 
 
