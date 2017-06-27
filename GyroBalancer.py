@@ -184,6 +184,7 @@ class GyroBalancer(Tank):
             loopTimeMilliSec        = 15                       # Time of each loop, measured in miliseconds.
             loopTimeSec             = loopTimeMilliSec/1000.0  # Time of each loop, measured in seconds.
             motorAngleHistoryLength = 3                        # Number of previous motor angles we keep track of.
+            batteryHistoryLength = 5                        # Number of previous motor angles we keep track of.
 
             # Math constants
             radiansPerDegree               = math.pi/180       # The number of radians in a degree.
@@ -301,6 +302,9 @@ class GyroBalancer(Tank):
             # 現在のバッテリー電圧
             voltageRaw = FastRead(batteryVoltageRaw)
             voltage = FastRead(batteryVoltageRaw)
+            batteryHistory = deque([0,0,0,0,0], batteryHistoryLength)
+            for i in range(batteryHistoryLength):
+                batteryHistory[i] = voltage
 
             ########################################################################
             ##
@@ -395,10 +399,15 @@ class GyroBalancer(Tank):
                 ###############################################################
                 ##  Reading the Voltage.
                 ###############################################################
-                voltageRaw = ((1 - a_b) * FastRead(batteryVoltageRaw)) + a_b * voltageRaw
+                #voltageRaw = ((1 - a_b) * FastRead(batteryVoltageRaw)) + a_b * voltageRaw
+                voltageRaw = FastRead(batteryVoltageRaw) #バッテリー電圧(μV)
                 #voltage = voltageRaw
-                voltage = voltage + (min(max((voltageRaw - voltage), -10000), 10000)) #バッテリー電圧(μV)
-                #voltageRaw = FastRead(batteryVoltageRaw) #バッテリー電圧(μV)
+                #voltage = voltage + (min(max((voltageRaw - voltage), -10000), 10000)) #バッテリー電圧(μV)
+                voltage = ((0.0641418 * batteryHistory[0])
+                    + (0.206 * batteryHistory[1])
+                    + (0.0641418 * batteryHistory[2]))
+
+                batteryHistory.append(voltageRaw)
 
                 ###############################################################
                 ##  Computing the motor duty cycle value
@@ -408,7 +417,8 @@ class GyroBalancer(Tank):
                    + (gainMotorAngle * motorAngleError)
                    + (gainMotorAngularSpeed * motorAngularSpeedError)
                    + (gainMotorAngleErrorAccumulated * motorAngleErrorAccumulated))
-                b = (battery_gain * voltage/1000) - battery_offset
+                #b = (battery_gain * voltage/1000) - battery_offset
+                b = (0.003089 * voltage/1000) - battery_offset
                 motorDutyCycle =(u / b) * 100
 
                 ###############################################################
