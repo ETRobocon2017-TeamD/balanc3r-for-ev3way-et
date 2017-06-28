@@ -199,7 +199,7 @@ class GyroBalancer(Tank):
             radPerSecPerPercentSpeed       = degPerSecPerPercentSpeed * radiansPerDegree   # Convert this number to the speed in rad/s per "percent speed" 「speed」を回転角速度(rad)に変換する係数
 
             # The rate at which we'll update the gyro offset (precise definition given in docs) ジャイロ値を補正するオフセット値の更新に使用する。調節する必要がある。
-            gyroDriftCompensationRate      = 0.3 * loopTimeSec * radiansPerSecondPerRawGyroUnit
+            gyroDriftCompensationRate      = 0.25 * loopTimeSec * radiansPerSecondPerRawGyroUnit
 
             # A deque (a fifo array) which we'll use to keep track of previous motor positions, which we can use to calculate the rate of change (speed)
             motorAngleHistory = deque([0], motorAngleHistoryLength)
@@ -211,7 +211,7 @@ class GyroBalancer(Tank):
             gainMotorAngularSpeed          = self.gainMotorAngularSpeed
             gainMotorAngleErrorAccumulated = self.gainMotorAngleErrorAccumulated
 
-            battery_gain = 0.001089  # PWM出力算出用バッテリ電圧補正係数
+            battery_gain = 0.003239  # PWM出力算出用バッテリ電圧補正係数
             battery_offset = 0.625  # PWM出力算出用バッテリ電圧補正オフセット
 
             a_d = 1.0 - 0.45 #0.51 #0.47  # ローパスフィルタ係数(左右車輪の平均回転角度用)。左右モーターの平均回転角速度(rad/sec)の算出時にのみ使用する。小さいほど角速度の変化に過敏になる。0.45〜0.70あたりで調節したい。
@@ -417,8 +417,7 @@ class GyroBalancer(Tank):
                    + (gainMotorAngle * motorAngleError)
                    + (gainMotorAngularSpeed * motorAngularSpeedError)
                    + (gainMotorAngleErrorAccumulated * motorAngleErrorAccumulated))
-                #b = (battery_gain * voltage/1000) - battery_offset
-                b = (0.003089 * voltage/1000) - battery_offset
+                b = (battery_gain * voltage/1000) - battery_offset
                 motorDutyCycle =(u / b) * 100
 
                 ###############################################################
