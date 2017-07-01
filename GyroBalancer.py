@@ -84,6 +84,9 @@ class GyroBalancer(Tank):
         self.left_motor.run_direct()
         self.right_motor.run_direct()
 
+        #しっぽモーター
+        self.tail_moder = Motor('outA')
+
         self.speed     = 0
         self.steering  = 0
         self.red_up    = False
@@ -329,6 +332,7 @@ class GyroBalancer(Tank):
             print("GyroOffset: %s" % gyroOffset)
             print("-----------------------------------")
             print("GO!")
+            self.tail_moder.run_timed(time_sp=250, speed_sp=-300) # しっぽモーター上に上げる
             print("-----------------------------------")
 
             #self.speed = 62.5 # 前進・後退速度。62.5〜-62.5の間で入力
