@@ -118,7 +118,7 @@ class GyroBalancer(Tank):
             ########################################################################
 
             # Timing settings for the program
-            loopTimeMilliSec     = 15                       # Time of each loop, measured in miliseconds.
+            loopTimeMilliSec     = 25                       # Time of each loop, measured in miliseconds.
             loopTimeSec          = loopTimeMilliSec/1000.0  # Time of each loop, measured in seconds.
             batteryHistoryLength = 5                        # Number of previous motor angles we keep track of.
 
