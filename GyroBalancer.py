@@ -370,7 +370,7 @@ class GyroBalancer(Tank):
                 ###############################################################
                 ##  Busy wait for the loop to complete
                 ###############################################################
-                while ((time.clock() - tLoopStart) < loopTimeSec):
+                while ((time.clock() - tLoopStart) < loopTimeSec): # clock()の値にはsleep中の経過時間が含まれないので、このwhileの条件文の算出時間をsleep代わりにしている(算出時間はバラバラ…)
                     time.sleep(0.0001)
 
             shutdown()
