@@ -72,7 +72,11 @@ class GyroBalancer(Tank):
         self.gyro.mode = self.gyro.MODE_GYRO_RATE
         self.touch = TouchSensor()
         self.battery = PowerSupply()
+        self.color = ColorSensor()
         # self.remote = RemoteControl(channel=1)
+
+        # カラーセンサーを赤色に変換（後で消す）
+        self.color.reflected_light_intensity
 
         # if not self.remote.connected:
         #     log.error("%s is not connected" % self.remote)
@@ -308,6 +312,9 @@ class GyroBalancer(Tank):
             batteryHistory = deque([0,0,0,0,0], batteryHistoryLength)
             for i in range(batteryHistoryLength):
                 batteryHistory[i] = voltage
+            voltage = ((0.0641418 * batteryHistory[0])
+                + (0.206 * batteryHistory[1])
+                + (0.0641418 * batteryHistory[2]))
 
             ########################################################################
             ##
@@ -346,6 +353,13 @@ class GyroBalancer(Tank):
 
             # Initial touch sensor value
             touchSensorPressed = FastRead(touchSensorValueRaw)
+
+            # スタートの目標にカラーセンサーのモード切り替え(後で消す)
+            self.color.ambient_light_intensity
+
+            # 倒立振子スタート時の時間取得
+            tStart = time.clock()
+
 
             while not touchSensorPressed:
             #while ((gyroRate < 5) and (gyroRate > -5)):
@@ -461,14 +475,6 @@ class GyroBalancer(Tank):
                 #     motorAngularSpeedError,
                 #     motorAngleErrorAccumulated)
                 # log_pointer += 1
-                print("%s   %s   %s   %s   %s   %s   %s   %s" % (time.clock() - tLoopStart,
-                    gyroEstimatedAngle,
-                    gyroRate,
-                    motorAngleError,
-                    motorAngularSpeedError,
-                    motorAngleErrorAccumulated,
-                    duty,
-                    voltage))
                 # print("%s, %s" %
                 #     (gyroEstimatedAngle, gyroRate))
 
@@ -476,6 +482,27 @@ class GyroBalancer(Tank):
                 # log_pointer += 1
                 # print("%s   %s   %s   %s" %
                 #      ((time.clock() - tLoopStart), gyroRateRaw, gyroOffset, gyroEstimatedAngle))
+                # print("%s   %s   %s   %s   %s   %s   %s   %s" % (time.clock(),
+                #     gyroEstimatedAngle,
+                #     gyroRate,
+                #     motorAngleError,
+                #     motorAngularSpeedError,
+                #     motorAngleErrorAccumulated,
+                #     duty,
+                #     voltage))
+                logs[log_pointer] = "%s¥t%s¥t%s¥t%s¥t%s¥t%s¥t%s¥t%s¥t%s¥t%s¥t%s¥t%s" % (time.clock() - tStart,
+                    time.clock() - tLoopStart,
+                    gyroRateRaw,
+                    motorAngleRaw,
+                    gyroEstimatedAngle,
+                    gyroRate,
+                    motorAngleError,
+                    motorAngularSpeedError,
+                    motorAngleErrorAccumulated,
+                    duty,
+                    voltage,
+                    voltageRaw)
+                log_pointer += 1
 
                 ###############################################################
                 ##  Busy wait for the loop to complete
