@@ -20,7 +20,7 @@ QQ = [
     1, 0, 0, 0, 0
     0, 3e1, 0, 0, 0
     0, 0, 1, 0, 0
-    0, 0, 0, 15, 0
+    0, 0, 0, 150, 0
     0, 0, 0, 0, 3e1 ];
 RR = 1e3 * eye(2);
 KK = dlqr(A_BAR, B_BAR, QQ, RR);
@@ -33,11 +33,11 @@ k_f(3) = k_f(3) * 0.85;
     """
     def __init__(self):
         GyroBalancer.__init__(self, # Q=[1,0,0,0,0;0,1,0,0,0;0,0,1,0,0;0,0,0,1,0;0,0,0,0,4e2],R=1e3*eye(3)でデジタルな方法で算出したゲインを使用
-                              gainGyroAngle=43.4663, #900, # K_F[1]
-                              gainGyroRate=5.1657, #110, # K_F[3]
-                              gainMotorAngle=2.9958, #9, # K_F[0]
-                              gainMotorAngularSpeed=1.7023, # 妥当な係数は8.5〜9.0くらい？ # K_F[2] #
-                              gainMotorAngleErrorAccumulated=0.0975)#0.0224) #3) # K_I
+                              gainGyroAngle=43.2979*1.35, #900, # K_F[1]
+                              gainGyroRate=5.1467*1.25, #110, # K_F[3] 係数が1.2あたり
+                              gainMotorAngle=2.9773, #9, # K_F[0]
+                              gainMotorAngularSpeed=1.6959*0.9, # 妥当な係数は8.5〜9.0くらい？ # K_F[2] # 係数0.9〜
+                              gainMotorAngleErrorAccumulated=0.0968*0.9)#0.0224) #3) # K_I
 
 
 if __name__ == '__main__':
