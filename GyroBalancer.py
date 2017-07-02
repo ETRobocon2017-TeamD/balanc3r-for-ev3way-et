@@ -147,7 +147,7 @@ class GyroBalancer(Tank):
             battery_gain = 0.001089  # PWM出力算出用バッテリ電圧補正係数
             battery_offset = 0.625  # PWM出力算出用バッテリ電圧補正オフセット
 
-            a_d = 1.0 - 0.49 #0.51 #0.47  # ローパスフィルタ係数(左右車輪の平均回転角度用)。左右モーターの平均回転角速度(rad/sec)の算出時にのみ使用する。小さいほど角速度の変化に過敏になる。〜0.4951
+            a_d = 1.0 - 0.51 #0.51 #0.47  # ローパスフィルタ係数(左右車輪の平均回転角度用)。左右モーターの平均回転角速度(rad/sec)の算出時にのみ使用する。小さいほど角速度の変化に過敏になる。〜0.4951
             a_r = 0.985 #0.98  # ローパスフィルタ係数(左右車輪の目標平均回転角度用)。左右モーターの目標平均回転角度(rad)の算出時に使用する。小さいほど前進・後退する反応が早くなる。
             a_b = 0.85 #ローパスフィルタ係数(最大モーター電圧b用）
 
@@ -197,7 +197,7 @@ class GyroBalancer(Tank):
 
             # 現在のバッテリー電圧
             voltageRaw = 0
-            
+
             # The gyro doesn't measure the angle of the robot, but we can estimate
             # this angle by keeping track of the gyroRate value in time
             gyroEstimatedAngle         = 0
@@ -233,7 +233,7 @@ class GyroBalancer(Tank):
             voltageRaw = FastRead(batteryVoltageRaw) # 単位(μV)
             # 現在のバッテリー電圧をもとに、PWMデューティ値を100%にしたとき、モータが受け取る推定電圧を求める。
             # 6.2 アクチュエータ　(6.1)式 バッテリ電圧とモータ回転速度(rpm)の関係式
-            voltageEstimateMax = (battery_gain * voltageRaw / 1000) - battery_offset 
+            voltageEstimateMax = (battery_gain * voltageRaw / 1000) - battery_offset
 
             ########################################################################
             ##
