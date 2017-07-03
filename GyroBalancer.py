@@ -135,7 +135,7 @@ class GyroBalancer(Tank):
             radPerSecPerPercentSpeed       = degPerSecPerPercentSpeed * radiansPerDegree   # Convert this number to the speed in rad/s per "percent speed" 「speed」を回転角速度(rad)に変換する係数
 
             # The rate at which we'll update the gyro offset (precise definition given in docs) ジャイロ値を補正するオフセット値の更新に使用する。調節する必要がある。
-            gyroDriftCompensationRate      = 0.1 * loopTimeSec * radiansPerSecondPerRawGyroUnit
+            gyroDriftCompensationRate      = 0.075 * loopTimeSec * radiansPerSecondPerRawGyroUnit
 
             # State feedback control gains (aka the magic numbers)
             gainGyroAngle                  = self.gainGyroAngle
@@ -147,7 +147,7 @@ class GyroBalancer(Tank):
             battery_gain = 0.001089  # PWM出力算出用バッテリ電圧補正係数
             battery_offset = 0.625  # PWM出力算出用バッテリ電圧補正オフセット
 
-            a_d = 1.0 - 0.51 #0.51 #0.47  # ローパスフィルタ係数(左右車輪の平均回転角度用)。左右モーターの平均回転角速度(rad/sec)の算出時にのみ使用する。小さいほど角速度の変化に過敏になる。〜0.4951
+            a_d = 1.0 - 0.53 #0.51 #0.47  # ローパスフィルタ係数(左右車輪の平均回転角度用)。左右モーターの平均回転角速度(rad/sec)の算出時にのみ使用する。小さいほど角速度の変化に過敏になる。〜0.4951
             a_r = 0.985 #0.98  # ローパスフィルタ係数(左右車輪の目標平均回転角度用)。左右モーターの目標平均回転角度(rad)の算出時に使用する。小さいほど前進・後退する反応が早くなる。
             a_b = 0.85 #ローパスフィルタ係数(最大モーター電圧b用）
 
