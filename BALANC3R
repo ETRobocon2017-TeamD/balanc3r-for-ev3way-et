@@ -33,10 +33,10 @@ k_f(3) = k_f(3) * 0.85;
     """
     def __init__(self):
         GyroBalancer.__init__(self, # Q=[1,0,0,0,0;0,1,0,0,0;0,0,1,0,0;0,0,0,1,0;0,0,0,0,4e2],R=1e3*eye(3)でデジタルな方法で算出したゲインを使用
-                              gainGyroAngle=30.2153, #900, # K_F[1]
-                              gainGyroRate=3.3269*1.02, #110, # K_F[3]
-                              gainMotorAngle=0.1606*1.1, #9, # K_F[0]
-                              gainMotorAngularSpeed=1.0796*0.88262, # 妥当な係数は8.5〜9.0くらい？ # K_F[2]
+                              gainGyroAngle=30.2153*1.039, #900, # K_F[1]
+                              gainGyroRate=3.3269*1.039, #110, # K_F[3]
+                              gainMotorAngle=0.1606*1.08, #9, # K_F[0]
+                              gainMotorAngularSpeed=1.0796*0.87, # 妥当な係数は8.5〜9.0くらい？ # K_F[2]
                               gainMotorAngleErrorAccumulated=0.4472)#0.0224) #3) # K_I
 
 
