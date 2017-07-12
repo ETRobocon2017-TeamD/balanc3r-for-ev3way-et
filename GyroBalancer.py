@@ -328,6 +328,8 @@ class GyroBalancer(Tank):
                    + (gainMotorAngleErrorAccumulated * motorAngleErrorAccumulated))
                 voltageEstimateMax = (battery_gain * voltageRaw / 1000) - battery_offset
                 motorDutyCycle = (voltageTarget / voltageEstimateMax) * 100
+                #HACK
+                motorDutyCycle *= 0.8
 
                 ###############################################################
                 ##  Apply the signal to the motor, and add steering
@@ -365,13 +367,14 @@ class GyroBalancer(Tank):
                     motorAngleErrorAccumulated,
                     duty,
                     voltageRaw)
-                log_pointer += 1
+                #log_pointer += 1
 
                 ###############################################################
                 ##  Busy wait for the loop to complete
                 ###############################################################
                 while ((time.clock() - tLoopStart) < loopTimeSec): # clock()の値にはsleep中の経過時間が含まれないので、このwhileの条件文の算出時間をsleep代わりにしている(算出時間はバラバラ…)
-                    time.sleep(0.0001)
+                    #time.sleep(0.0001)
+                    pass
 
             shutdown()
             for log_ in logs:
