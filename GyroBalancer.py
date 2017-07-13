@@ -261,7 +261,7 @@ class GyroBalancer(Tank):
             self.tail_motor.run_timed(time_sp=250, speed_sp=-300) # しっぽモーター上に上げる
             print("-----------------------------------")
 
-            #self.speed = 62.5 # 前進・後退速度。62.5〜-62.5の間で入力
+            self.speed = 100 # 前進・後退速度。62.5〜-62.5の間で入力
             #self.steering = -1 * self.STEER_SPEED * 0.5 # 旋回速度。他の係数をいじったせいか、今の値でも少々不安定になっている。もう少し下げたほうがいいかも
 
             ########################################################################
@@ -328,8 +328,6 @@ class GyroBalancer(Tank):
                    + (gainMotorAngleErrorAccumulated * motorAngleErrorAccumulated))
                 voltageEstimateMax = (battery_gain * voltageRaw / 1000) - battery_offset
                 motorDutyCycle = (voltageTarget / voltageEstimateMax) * 100
-                #HACK
-                motorDutyCycle *= 0.8
 
                 ###############################################################
                 ##  Apply the signal to the motor, and add steering
