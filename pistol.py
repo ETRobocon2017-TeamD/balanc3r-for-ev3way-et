@@ -341,15 +341,12 @@ def runner():
         print("Calibrating...")
 
         #As you hold the robot still, determine the average sensor value of 100 samples
-        gyro_rate_calibrate_count = 100
-        gyro_rate_squareds = 0
+        gyro_rate_calibrate_count = 200
         for _ in range(gyro_rate_calibrate_count):
             gyro_rate_raw = fast_read(gyro_sensor_value_raw)
-            gyro_rate_squareds = gyro_rate_squareds + pow(gyro_rate_raw, 2)
             gyro_offset = gyro_offset + gyro_rate_raw
             time.sleep(0.01)
         gyro_offset = gyro_offset / gyro_rate_calibrate_count
-        #p_bar = gyro_rate_squareds / gyro_rate_calibrate_count #ジャイロセンサーの事前予測の分散値 #初期値
 
         # Print the result
         print("GyroOffset: %s" % gyro_offset)
