@@ -120,8 +120,9 @@ def guide():
         ###############################################################
         ##  Busy wait for the loop to complete
         ###############################################################
-        while ((time.clock() - tLoopStart) < loopTimeSec):
-            time.sleep(0.0001)
+        # while ((time.clock() - tLoopStart) < loopTimeSec):
+        #     time.sleep(0.0001)
+        time.sleep(loopTimeSec - (time.clock() - tLoopStart))
 
 
 ########################################################################
@@ -133,15 +134,15 @@ def runner():
     print('Im Runner')
 
     def shutdown_child(signum=None,frame=None):
+        left_motor.stop()
+        right_motor.stop()
+
         gyroSensorValueRaw.close()
         batteryVoltageRaw.close()
         motorEncoderLeft.close()
         motorEncoderRight.close()
         motorDutyCycleLeft.close()
         motorDutyCycleRight.close()
-
-        left_motor.stop()
-        right_motor.stop()
 
         for log_ in logs:
             if log_ != "":
@@ -202,11 +203,11 @@ def runner():
         gyroDriftCompensationRate      = 0.075 * loopTimeSec * radiansPerSecondPerRawGyroUnit
 
         # State feedback control gains (aka the magic numbers)
-        gainGyroAngle                  = 30.2153*2.5 # K_F[1]
-        gainGyroRate                   = 3.3269*2 # K_F[3]
-        gainMotorAngle                 = 0.1606*3 # K_F[0]
-        gainMotorAngularSpeed          = 1.0796*1.27 # K_F[2]
-        gainMotorAngleErrorAccumulated = 0.4472 # K_I
+        gainGyroAngle                  = 30.2153*2.5*0.85 # K_F[1]
+        gainGyroRate                   = 3.3269*2*0.85 # K_F[3]
+        gainMotorAngle                 = 0.1606*3*0.85 # K_F[0]
+        gainMotorAngularSpeed          = 1.0796*1.7*0.85 # K_F[2]
+        gainMotorAngleErrorAccumulated = 0.4472*0.85 # K_I
 
         battery_gain = 0.001089  # PWM出力算出用バッテリ電圧補正係数
         battery_offset = 0.625  # PWM出力算出用バッテリ電圧補正オフセット
@@ -429,8 +430,9 @@ def runner():
             ###############################################################
             ##  Busy wait for the loop to complete
             ###############################################################
-            while ((time.clock() - tLoopStart) < loopTimeSec): # clock()の値にはsleep中の経過時間が含まれないので、このwhileの条件文の算出時間をsleep代わりにしている(算出時間はバラバラ…)
-                time.sleep(0.0001)
+            # while ((time.clock() - tLoopStart) < (loopTimeSec - 0.011)): # clock()の値にはsleep中の経過時間が含まれないので、このwhileの条件文の算出時間をsleep代わりにしている(算出時間はバラバラ…)
+                # time.sleep(0.0001)
+            time.sleep(loopTimeSec - (time.clock() - tLoopStart))
 
     except (KeyboardInterrupt, Exception) as e:
         log.exception(e)
@@ -547,7 +549,7 @@ def runner_stub():
             ###############################################################
             ##  Busy wait for the loop to complete
             ###############################################################
-            while ((time.clock() - tLoopStart) < loopTimeSec): # clock()の値にはsleep中の経過時間が含まれないので、このwhileの条件文の算出時間をsleep代わりにしている(算出時間はバラバラ…)
+            while ((time.clock() - tLoopStart) < loopTimeSec ): # clock()の値にはsleep中の経過時間が含まれないので、このwhileの条件文の算出時間をsleep代わりにしている(算出時間はバラバラ…)
                 time.sleep(0.0001)
 
     except (KeyboardInterrupt, Exception) as e:
@@ -599,7 +601,7 @@ if __name__ == '__main__':
         touchSensorPressed = FastRead(touchSensorValueRaw)
 
         while not touchSensorPressed:
-            time.sleep(0.1)
+            time.sleep(0.2)
             touchSensorPressed = FastRead(touchSensorValueRaw)
             writeTouchSensorValue(touchSensorPressed)
 
