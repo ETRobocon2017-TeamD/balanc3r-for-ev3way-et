@@ -8,6 +8,7 @@ import math
 from collections import deque
 from ev3dev.auto import *
 from ev3dev.helper import Tank
+from guide import LineTracer
 # import runner, guide
 
 log = logging.getLogger(__name__)
@@ -38,14 +39,21 @@ def fast_write(outfile, value):
 MMAP_SIZE = 18 # マップするバイト数
 
 # mmapオブジェクト読み取り用関数
-def mmap_read(shmemd):
-    shmemd.seek(0)
-    return int(shmemd.read().decode().strip())
+def mmap_read(mem_fd):
+    mem_fd.seek(0)
+    bts = mem_fd.read()
+    length = bts[0]
+    idx_end = 1 + length
+    return int.from_bytes(bts[1:idx_end], byteorder='little', signed=True)
 
 # mmapオブジェクト書き込み用関数
-def mmap_write(shmemd, value):
-    shmemd.seek(0)
-    shmemd.write(str(int(value)).encode().rjust(MMAP_SIZE, b"0"))
+def mmap_write(mem_fd, value):
+    mem_fd.seek(0)
+    val_length = value.bit_length()
+    bts = bytearray(1 + val_length)
+    bts[0] = val_length
+    bts[1:] = value.to_bytes(val_length, byteorder='little', signed=True)
+    mem_fd.write(bytes(bts))
 
 ########################################################################
 ##
@@ -58,37 +66,48 @@ motor_encoder_left_shmem = mmap.mmap(-1, MMAP_SIZE)
 mmap_write(motor_encoder_left_shmem, 0)
 motor_encoder_left_shmem = mmap.mmap(-1, MMAP_SIZE)
 mmap_write(motor_encoder_left_shmem, 0)
+
 def read_motor_encoder_left():
     return mmap_read(motor_encoder_left_shmem)
+
 def read_motor_encoder_right():
     return mmap_read(motor_encoder_left_shmem)
+
 def write_motor_encoder_left(value):
     mmap_write(motor_encoder_left_shmem, value)
+
 def write_motor_encoder_right(value):
     mmap_write(motor_encoder_left_shmem, value)
 
 # タッチセンサーの値をmmapで共有
 touch_sensor_value_shmem = mmap.mmap(-1, MMAP_SIZE)
 mmap_write(touch_sensor_value_shmem, 0)
+
 def read_touch_sensor_value():
     return mmap_read(touch_sensor_value_shmem)
+
 def write_touch_sensor_value(value):
     mmap_write(touch_sensor_value_shmem, value)
 
 # 前進後退スピード、旋回スピードの値をmmapで共有
 speed_value_shmem = mmap.mmap(-1, MMAP_SIZE)
 mmap_write(speed_value_shmem, 0)
-steering_value_shmem = mmap.mmap(-1, MMAP_SIZE)
-mmap_write(steering_value_shmem, 0)
+
 def read_speed_value():
     return mmap_read(speed_value_shmem)
-def read_steering_value():
-    return mmap_read(steering_value_shmem)
+
 def write_speed_value(value):
     mmap_write(speed_value_shmem, value)
-def write_steering_value(value):
-    mmap_write(steering_value_shmem, value)
 
+steering_value_shmem = mmap.mmap(-1, MMAP_SIZE)
+mmap_write(steering_value_shmem, 0)
+
+def read_steering_value():
+    return mmap_read(steering_value_shmem)
+
+def write_steering_value(value):
+    # FIXME: 入ってくるvalueの値がバグっている。修正すること
+    mmap_write(steering_value_shmem, -value)
 
 ########################################################################
 ##
@@ -104,10 +123,17 @@ def guide():
     # Time of each loop, measured in seconds.
     loop_time_sec = loop_time_millisec / 1000.0
 
+    print('Calibrate ColorSensor ...')
+    line_tracer = LineTracer()
+    line_tracer.calibrate_color_sensor()
+
     # タッチセンサー押し待ち
     print('Guide Waiting ...')
     while not read_touch_sensor_value():
         time.sleep(0.1)
+
+    speed = 0
+    direction = 0
 
     while True:
         ###############################################################
@@ -116,14 +142,15 @@ def guide():
         t_loop_start = time.clock()
 
         # ここでライントレースする
+        speed, direction = line_tracer.line_tracing()
 
         # 左右モーターの角度は下記のように取得
         # print(read_motor_encoder_left())
         # print(read_motor_encoder_right())
 
         # 前進後退・旋回スピードは下記のように入力
-        # write_speed_value(15)
-        # write_steering_value(5)
+        write_speed_value(speed)
+        write_steering_value(int(round(direction)))
 
         ###############################################################
         ##  Busy wait for the loop to complete
@@ -131,7 +158,6 @@ def guide():
         # while ((time.clock() - t_loop_start) < loop_time_sec):
         #     time.sleep(0.0001)
         time.sleep(loop_time_sec - (time.clock() - t_loop_start))
-
 
 ########################################################################
 ##
@@ -192,9 +218,9 @@ def runner():
 
         # Timing settings for the program
         ## Time of each loop, measured in miliseconds.
-        loop_time_millisec     = 25
+        loop_time_millisec = 25
         ## Time of each loop, measured in seconds.
-        loop_time_sec          = loop_time_millisec / 1000.0
+        loop_time_sec      = loop_time_millisec / 1000.0
 
         # Math constants
         ## The number of radians in a degree.
@@ -211,7 +237,7 @@ def runner():
 
         # The rate at which we'll update the gyro offset (precise definition given in docs) 
         # ジャイロ値を補正するオフセット値の更新に使用する。調節する必要がある。
-        gyro_drift_compensation_rate      = 0.075 * loop_time_sec * rad_per_second_per_raw_gyro_unit
+        gyro_drift_compensation_rate = 0.075 * loop_time_sec * rad_per_second_per_raw_gyro_unit
 
         # State feedback control gains (aka the magic numbers)
         gain_motor_angle                   = 0.1606 * 3 * 0.85    # K_F[0]
@@ -450,10 +476,11 @@ def runner():
 ########################################################################
 ##
 ## Runner_stub：Runnerのスタブ
+## ライントレーサー開発等で倒立振子ライブラリを使いたくない場合はrunner_stub()を使用すること
 ##
 ########################################################################
 def runner_stub():
-    print('Im Runner')
+    print('Im Runner Stub')
 
     def shutdown_child(signum=None, frame=None):
         motor_encoder_left.close()
@@ -493,7 +520,7 @@ def runner_stub():
 
         # Timing settings for the program
         # Time of each loop, measured in miliseconds.
-        loop_time_millisec = 25 
+        loop_time_millisec = 100
         # Time of each loop, measured in seconds.
         loop_time_sec = loop_time_millisec / 1000.0  
 
@@ -504,11 +531,11 @@ def runner_stub():
         # =================================
 
         # Open motor files for (fast) reading
-        motor_encoder_left    = open(left_motor._path + "/position", "rb")
-        motor_encoder_right   = open(right_motor._path + "/position", "rb")
+        motor_encoder_left = open(left_motor._path + "/position", "rb")
+        motor_encoder_right = open(right_motor._path + "/position", "rb")
 
         # Open motor files for (fast) writing
-        motor_duty_cycle_left  = open(left_motor._path + "/duty_cycle_sp", "w")
+        motor_duty_cycle_left = open(left_motor._path + "/duty_cycle_sp", "w")
         motor_duty_cycle_right = open(right_motor._path + "/duty_cycle_sp", "w")
 
         speed = read_speed_value()
@@ -558,8 +585,8 @@ def runner_stub():
             ###############################################################
             ##  Busy wait for the loop to complete
             ###############################################################
-            while ((time.clock() - t_loop_start) < loop_time_sec ): # clock()の値にはsleep中の経過時間が含まれないので、このwhileの条件文の算出時間をsleep代わりにしている(算出時間はバラバラ…)
-                time.sleep(0.0001)
+            # clock()の値にはsleep中の経過時間が含まれないので、このwhileの条件文の算出時間をsleep代わりにしている(算出時間はバラバラ…)
+            time.sleep(loop_time_sec - (time.clock() - t_loop_start))
 
     except (KeyboardInterrupt, Exception) as ex:
         log.exception(ex)
@@ -576,14 +603,14 @@ if __name__ == '__main__':
     def shutdown():
         os.kill(guide_pid, signal.SIGKILL)
         os.kill(runner_pid, signal.SIGTERM)
-        touch_sensor_value_raw.close()
+        touch_sensor_value_fd.close()
         print('Done')
 
     try:
         # touchSensorの読み込み
         touch = TouchSensor()
-        touch_sensor_value_raw = open(touch._path + "/value0", "rb")
-        touch_sensor_pressed = fast_read(touch_sensor_value_raw)
+        touch_sensor_value_fd = open(touch._path + "/value0", "rb")
+        touch_sensor_pressed = fast_read(touch_sensor_value_fd)
 
         # TODO: ガイドが提示する前進後退・旋回スピードもmmapで共有する
 
@@ -591,7 +618,7 @@ if __name__ == '__main__':
 
         if runner_pid == 0:
             # NOTE: 倒立振子ライブラリを使う場合はrunner()を、ライントレーサー開発等で倒立振子ライブラリを使いたくない場合はrunner_stub()を使用すること
-            runner()
+            runner_stub()
             print('Runner Done')
             sys.exit()
 
@@ -603,16 +630,16 @@ if __name__ == '__main__':
             sys.exit()
 
         while not touch_sensor_pressed:
-            time.sleep(0.025)
-            touch_sensor_pressed = fast_read(touch_sensor_value_raw)
+            time.sleep(0.1)
+            touch_sensor_pressed = fast_read(touch_sensor_value_fd)
             write_touch_sensor_value(touch_sensor_pressed)
 
         time.sleep(1)
-        touch_sensor_pressed = fast_read(touch_sensor_value_raw)
+        touch_sensor_pressed = fast_read(touch_sensor_value_fd)
 
         while not touch_sensor_pressed:
             time.sleep(0.2)
-            touch_sensor_pressed = fast_read(touch_sensor_value_raw)
+            touch_sensor_pressed = fast_read(touch_sensor_value_fd)
             write_touch_sensor_value(touch_sensor_pressed)
 
         print('Im Pistol')
