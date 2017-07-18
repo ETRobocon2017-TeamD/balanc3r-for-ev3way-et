@@ -5,6 +5,8 @@ import time
 import signal
 import logging
 import math
+import subprocess
+import re
 from collections import deque
 from ev3dev.auto import *
 from ev3dev.helper import Tank
