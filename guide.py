@@ -16,10 +16,10 @@ class LineTracer:
         self.delta_t = 0.025 # 10msec
         # TODO: P係数(要調整)
         self.k_p = 0.3
-        # TODO: I係数(要調整) 
+        # TODO: I係数(要調整)
         self.k_i = 0.1
         # TODO: D係数(要調整)
-        self.k_d = 0.1
+        self.k_d = 0.05
         # 前回偏差
         self.e_b = 0.0
         # 前回までの積分値
