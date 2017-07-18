@@ -134,7 +134,7 @@ def guide():
     while not read_touch_sensor_value():
         time.sleep(0.1)
 
-    speed = 0
+    speed_reference = 0
     direction = 0
 
     while True:
@@ -144,14 +144,14 @@ def guide():
         t_loop_start = time.clock()
 
         # ここでライントレースする
-        speed, direction = line_tracer.line_tracing()
+        speed_reference, direction = line_tracer.line_tracing()
 
         # 左右モーターの角度は下記のように取得
         # print(read_motor_encoder_left())
         # print(read_motor_encoder_right())
 
         # 前進後退・旋回スピードは下記のように入力
-        write_speed_value(speed)
+        write_speed_value(speed_reference)
         write_steering_value(int(round(direction)))
 
         ###############################################################
@@ -254,6 +254,7 @@ def runner():
         a_d = 1.0 - 0.55 #0.51 #0.47  # ローパスフィルタ係数(左右車輪の平均回転角度用)。左右モーターの平均回転角速度(rad/sec)の算出時にのみ使用する。小さいほど角速度の変化に過敏になる。〜0.4951
         a_r = 0.985 #0.98  # ローパスフィルタ係数(左右車輪の目標平均回転角度用)。左右モーターの目標平均回転角度(rad)の算出時に使用する。小さいほど前進・後退する反応が早くなる。
         a_b = 0.85 #ローパスフィルタ係数(最大モーター電圧b用）
+        k_theta_dot = 7.5 # モータ目標回転角速度係数
 
         # Variables representing physical signals (more info on these in the docs)
         # The angle of "the motor", measured in raw units (degrees for the
@@ -353,10 +354,10 @@ def runner():
         # Print the result
         print("GyroOffset: %s" % gyro_offset)
 
-        speed = read_speed_value()
+        speed_reference = read_speed_value()
         steering = read_steering_value()
 
-        #speed = 62.5 # 前進・後退速度。62.5〜-62.5の間で入力
+        #speed_reference = 62.5 # 前進・後退速度。62.5〜-62.5の間で入力
         #steering = -1 * self.STEER_SPEED * 0.5 # 旋回速度。他の係数をいじったせいか、今の値でも少々不安定になっている。もう少し下げたほうがいいかも
 
         ########################################################################
@@ -395,13 +396,12 @@ def runner():
             motor_angle_raw = (fast_read(motor_encoder_left) + fast_read(motor_encoder_right)) * 0.5
             motor_angle = (motor_angle_raw * radians_per_raw_motor_unit) + gyro_estimated_angle # 左右モーターの現在の平均回転角度(rad) + 躯体の(推定)回転角度
 
-            speed = read_speed_value()
+            speed_reference = read_speed_value()
 
-            #motor_angular_speed_reference = speed * rad_per_sec_per_percent_speed # 左右モーターの目標平均回転角速度(rad/sec)。入力値speedを角速度(rad)に変換したもの。
-            # K_THETA_DOT(7.5): 最大モーター角速度だと思われる値。 speed(モータ最大角速度を100%とする、目標割合)にかけ合わせて
-            # FIXME: speedは現在 0 が前提になるように実装されてしまっている。
-            motor_angular_speed_reference = ((1.0 - a_r) * ((speed / 100.0) * 7.5)) + (a_r * motor_angular_speed_reference)
-            motor_angle_reference = motor_angle_reference + (motor_angular_speed_reference * loop_time_sec) # 左右モーターの目標平均回転角度(rad)。初期値は0になる。入力値speedがずっと0でも0になる
+            #motor_angular_speed_reference = speed_reference * rad_per_sec_per_percent_speed # 左右モーターの目標平均回転角速度(rad/sec)。入力値speed_referenceを角速度(rad)に変換したもの。
+            # K_THETA_DOT(7.5): 最大モーター角速度だと思われる値。 speed_reference(モータ最大角速度を100%とする、目標割合)にかけ合わせて
+            motor_angular_speed_reference = ((1.0 - a_r) * ((speed_reference / 100.0) * k_theta_dot)) + (a_r * motor_angular_speed_reference)
+            motor_angle_reference = motor_angle_reference + (motor_angular_speed_reference * loop_time_sec) # 左右モーターの目標平均回転角度(rad)。初期値は0になる。入力値speed_referenceがずっと0でも0になる
 
             motor_angle_error = motor_angle - motor_angle_reference # 左右モーターの現在の平均回転角度と目標平均回転角度との誤差(rad)
 
@@ -537,7 +537,7 @@ def runner_stub():
         motor_duty_cycle_left = open(left_motor._path + "/duty_cycle_sp", "w")
         motor_duty_cycle_right = open(right_motor._path + "/duty_cycle_sp", "w")
 
-        speed = read_speed_value()
+        speed_reference = read_speed_value()
         steering = read_steering_value()
 
         ########################################################################
@@ -572,14 +572,14 @@ def runner_stub():
             write_motor_encoder_left(motor_angle_raw_left)
             write_motor_encoder_right(motor_angle_raw_right)
 
-            speed = read_speed_value()
+            speed_reference = read_speed_value()
 
             ###############################################################
             ##  Apply the signal to the motor, and add steering
             ###############################################################
             steering = read_steering_value()
-            set_duty(motor_duty_cycle_right, speed + steering)
-            duty = set_duty(motor_duty_cycle_left, speed - steering, 0.975)
+            set_duty(motor_duty_cycle_right, speed_reference + steering)
+            duty = set_duty(motor_duty_cycle_left, speed_reference - steering, 0.975)
 
             ###############################################################
             ##  Busy wait for the loop to complete
