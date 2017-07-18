@@ -466,7 +466,7 @@ def runner():
             ###############################################################
             # while ((time.clock() - t_loop_start) < (loop_time_sec - 0.011)): # clock()の値にはsleep中の経過時間が含まれないので、このwhileの条件文の算出時間をsleep代わりにしている(算出時間はバラバラ…)
                 # time.sleep(0.0001)
-            time.sleep(loop_time_sec - (time.clock() - t_loop_start))
+            time.sleep(max(loop_time_sec - (gyro_rate*0.0005) - (time.clock() - t_loop_start), 0.002))
 
     except (KeyboardInterrupt, Exception) as e:
         log.exception(e)
