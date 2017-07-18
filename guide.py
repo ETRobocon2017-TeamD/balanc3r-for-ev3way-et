@@ -45,8 +45,8 @@ class LineTracer:
         refrection_raw = self._read_fd(self.color_reflection_fd)
 
         #指示値を取得
-        direction = self._calc_direction(refrection_raw)
-        speed = 50 #固定値
+        direction = 0 #self._calc_direction(refrection_raw)
+        speed = 0 #固定値
 
         return speed, direction
 
@@ -77,7 +77,7 @@ class LineTracer:
         self.e_b = error
         self.i_b = i_n
 
-        return direction
+        return -direction
 
     # Function for fast reading from sensor files
     @staticmethod
