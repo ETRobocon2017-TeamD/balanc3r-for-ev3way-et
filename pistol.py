@@ -623,8 +623,34 @@ if __name__ == '__main__':
 
         if guide_pid == 0:  # In a child process
             guide()
+            # write_speed_value(50)
+            # write_steering_value(50)
             print('Guide Done')
             sys.exit()
+
+        time.sleep(0.1)
+
+        ###############################################################
+        ## 直接デバイスのメモリ操作をしているkworkerのpidを特定
+        ###############################################################
+        fast_read(touch_sensor_value_fd)
+        kworker_psdels_bytes = subprocess.check_output("ps aux | grep [k]worker/0:", shell=True)
+        kworker_psdels_str = kworker_psdels_bytes.decode()
+        kworker_psdels = {}
+        kworker_psdels_str_splited = kworker_psdels_str.split("\n")
+        kworker_psdels_str_splited.pop()
+        for psdel in kworker_psdels_str_splited:
+            psdel_arry = re.split("\s*", psdel)
+            # print(psdel)
+            # print("pid:%s, CPU:%s" % (psdel_arry[1], psdel_arry[2]))
+            # CPU使用率をkeyに、valueをpidに。
+            kworker_psdels[float(psdel_arry[2])] = psdel_arry[1]
+            subprocess.check_output(("renice -13 -p %s" % psdel_arry[1]), shell=True)
+        # kworker_psdels_sortedkeys = sorted(kworker_psdels.keys())
+        # kworker_target_pid = kworker_psdels[kworker_psdels_sortedkeys[-1]]
+        # subprocess.check_output(("renice -13 -p %s" % kworker_target_pid), shell=True)
+
+        print('Im Pistol')
 
         while not touch_sensor_pressed:
             time.sleep(0.1)
@@ -638,8 +664,6 @@ if __name__ == '__main__':
             time.sleep(0.2)
             touch_sensor_pressed = fast_read(touch_sensor_value_fd)
             write_touch_sensor_value(touch_sensor_pressed)
-
-        print('Im Pistol')
 
         shutdown()
 
