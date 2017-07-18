@@ -617,7 +617,7 @@ if __name__ == '__main__':
 
         if runner_pid == 0:
             # NOTE: 倒立振子ライブラリを使う場合はrunner()を、ライントレーサー開発等で倒立振子ライブラリを使いたくない場合はrunner_stub()を使用すること
-            runner_stub()
+            runner()
             print('Runner Done')
             sys.exit()
 
