@@ -1,18 +1,15 @@
 # balanc3r-for-ev3way
 
-Robot balancing program for EV3way-ET. This program made by Python.
+Robot balancing program for EV3way-ET. This program made by Python.<br>
 You can see the self-balancing robot like segway in youtube.
 
 https://www.youtube.com/watch?v=sKaeCxrSDG8
-
 
 
 # Prerequisite
 
 - Body: [EV3Way-ET](https://github.com/ETrobocon/etroboEV3/wiki)
 - OS: [ev3dev-jessie-2017-06-09](https://github.com/ev3dev/ev3dev/archive/ev3dev-jessie-2017-06-09.zip)
-
-
 
 
 # How to use
@@ -99,7 +96,6 @@ F   UID   PID  PPID PRI  NI    VSZ   RSS WCHAN  STAT TTY        TIME COMMAND
 0  1000   545   543  20   0   3576  2804 wait   Ss   pts/0      0:00 -bash
 5     0   556     1  20   0  21024  4484 -      Ss   ?          0:00 /usr/sbin/nmbd -D
 0  1000   586   545  20   0   2624  1404 -      R+   pts/0      0:00 ps lax
-
 ```
 
 And execute "renice" for all displayed processes to give "0" nice value.
@@ -151,7 +147,6 @@ $ sudo nice -n -12 python3 pistol.py
 ```
 
 
-
 # Reference
 
 - [SC4050+ Integration Project: Balancing Robot](http://laurensvalk.com/files/Bos_Valk_SC4050_Balancing_Robot.pdf)
@@ -163,8 +158,6 @@ $ sudo nice -n -12 python3 pistol.py
 - [制御のためのMATLAB (in Japanese)](http://www.tdupress.jp/bd/isbn/9784501327606/)
 - [MATLAB/Simulinkによるやさしいシステム制御工学 (in Japanese)](https://www.morikita.co.jp/books/book/2355)
 - [倒立振子で学ぶ制御工学 (in Japanese)](http://www.morikita.co.jp/books/book/3110)
-
-
 
 
 # Acknowledgements

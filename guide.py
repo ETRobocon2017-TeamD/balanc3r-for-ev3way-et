@@ -48,7 +48,8 @@ class LineTracer:
         direction = self._calc_direction(refrection_raw)
         speed = 50 #固定値
 
-        return speed, direction
+        # NOTE: ライン左端を基準に走行させるために、旋回方向を - で反転している
+        return speed, -direction
 
     def shutdown(self):
         self.color_reflection_fd.close()
@@ -81,6 +82,6 @@ class LineTracer:
 
     # Function for fast reading from sensor files
     @staticmethod
-    def _read_fd(infile):
-        infile.seek(0)
-        return int(infile.read().decode().strip())
+    def _read_fd(fd):
+        fd.seek(0)
+        return int(fd.read().decode().strip())

@@ -22,15 +22,15 @@ log = logging.getLogger(__name__)
 ########################################################################
 
 # Function for fast reading from sensor files
-def fast_read(infile):
-    infile.seek(0)
-    return int(infile.read().decode().strip())
+def read_device(fd):
+    fd.seek(0)
+    return int(fd.read().decode().strip())
 
 # Function for fast writing to motor files
-def fast_write(outfile, value):
-    outfile.truncate(0)
-    outfile.write(str(int(value)))
-    outfile.flush()
+def write_device(fd, value):
+    fd.truncate(0)
+    fd.write(str(int(value)))
+    fd.flush()
 
 ########################################################################
 ##
@@ -41,21 +41,29 @@ def fast_write(outfile, value):
 MMAP_SIZE = 18 # マップするバイト数
 
 # mmapオブジェクト読み取り用関数
-def mmap_read(mem_fd):
-    mem_fd.seek(0)
-    bts = mem_fd.read()
+def read_anon_mem(memfd):
+    memfd.seek(0)
+    bts = memfd.read()
     length = bts[0]
     idx_end = 1 + length
     return int.from_bytes(bts[1:idx_end], byteorder='little', signed=True)
 
 # mmapオブジェクト書き込み用関数
-def mmap_write(mem_fd, value):
-    mem_fd.seek(0)
+def write_anon_mem(memfd, value):
+    memfd.seek(0)
     val_length = value.bit_length()
     bts = bytearray(1 + val_length)
     bts[0] = val_length
     bts[1:] = value.to_bytes(val_length, byteorder='little', signed=True)
-    mem_fd.write(bytes(bts))
+    memfd.write(bytes(bts))
+
+# Function to set the duty cycle of the motors
+def set_duty(motor_duty_devfd, duty, barance=1):
+    # Clamp the value between -100 and 100
+    duty = min(max(duty, -100), 100) * barance
+    # Apply the signal to the motor
+    write_device(motor_duty_devfd, duty)
+    return duty
 
 ########################################################################
 ##
@@ -64,52 +72,51 @@ def mmap_write(mem_fd, value):
 ########################################################################
 
 # 左右モーターの値をmmapで共有
-motor_encoder_left_shmem = mmap.mmap(-1, MMAP_SIZE)
-mmap_write(motor_encoder_left_shmem, 0)
-motor_encoder_left_shmem = mmap.mmap(-1, MMAP_SIZE)
-mmap_write(motor_encoder_left_shmem, 0)
+motor_encoder_left_memfd = mmap.mmap(-1, MMAP_SIZE)
+write_anon_mem(motor_encoder_left_memfd, 0)
+motor_encoder_left_memfd = mmap.mmap(-1, MMAP_SIZE)
+write_anon_mem(motor_encoder_left_memfd, 0)
 
-def read_motor_encoder_left():
-    return mmap_read(motor_encoder_left_shmem)
+def read_motor_encoder_left_mem():
+    return read_anon_mem(motor_encoder_left_memfd)
 
-def read_motor_encoder_right():
-    return mmap_read(motor_encoder_left_shmem)
+def read_motor_encoder_right_mem():
+    return read_anon_mem(motor_encoder_left_memfd)
 
-def write_motor_encoder_left(value):
-    mmap_write(motor_encoder_left_shmem, value)
+def write_motor_encoder_left_mem(value):
+    write_anon_mem(motor_encoder_left_memfd, value)
 
-def write_motor_encoder_right(value):
-    mmap_write(motor_encoder_left_shmem, value)
+def write_motor_encoder_right_mem(value):
+    write_anon_mem(motor_encoder_left_memfd, value)
 
 # タッチセンサーの値をmmapで共有
-touch_sensor_value_shmem = mmap.mmap(-1, MMAP_SIZE)
-mmap_write(touch_sensor_value_shmem, 0)
+touch_sensor_memfd = mmap.mmap(-1, MMAP_SIZE)
+write_anon_mem(touch_sensor_memfd, 0)
 
-def read_touch_sensor_value():
-    return mmap_read(touch_sensor_value_shmem)
+def read_touch_sensor_mem():
+    return read_anon_mem(touch_sensor_memfd)
 
-def write_touch_sensor_value(value):
-    mmap_write(touch_sensor_value_shmem, value)
+def write_touch_sensor_mem(value):
+    write_anon_mem(touch_sensor_memfd, value)
 
 # 前進後退スピード、旋回スピードの値をmmapで共有
-speed_value_shmem = mmap.mmap(-1, MMAP_SIZE)
-mmap_write(speed_value_shmem, 0)
+speed_memfd = mmap.mmap(-1, MMAP_SIZE)
+write_anon_mem(speed_memfd, 0)
 
-def read_speed_value():
-    return mmap_read(speed_value_shmem)
+def read_speed_mem():
+    return read_anon_mem(speed_memfd)
 
-def write_speed_value(value):
-    mmap_write(speed_value_shmem, value)
+def write_speed_mem(value):
+    write_anon_mem(speed_memfd, value)
 
-steering_value_shmem = mmap.mmap(-1, MMAP_SIZE)
-mmap_write(steering_value_shmem, 0)
+steering_memfd = mmap.mmap(-1, MMAP_SIZE)
+write_anon_mem(steering_memfd, 0)
 
-def read_steering_value():
-    return mmap_read(steering_value_shmem)
+def read_steering_mem():
+    return read_anon_mem(steering_memfd)
 
-def write_steering_value(value):
-    # FIXME: 入ってくるvalueの値がバグっている。修正すること
-    mmap_write(steering_value_shmem, -value)
+def write_steering_mem(value):
+    write_anon_mem(steering_memfd, value)
 
 ########################################################################
 ##
@@ -131,7 +138,7 @@ def guide():
 
     # タッチセンサー押し待ち
     print('Guide Waiting ...')
-    while not read_touch_sensor_value():
+    while not read_touch_sensor_mem():
         time.sleep(0.1)
 
     speed_reference = 0
@@ -147,12 +154,12 @@ def guide():
         speed_reference, direction = line_tracer.line_tracing()
 
         # 左右モーターの角度は下記のように取得
-        # print(read_motor_encoder_left())
-        # print(read_motor_encoder_right())
+        # print(read_motor_encoder_left_mem())
+        # print(read_motor_encoder_right_mem())
 
         # 前進後退・旋回スピードは下記のように入力
-        write_speed_value(speed_reference)
-        write_steering_value(int(round(direction)))
+        write_speed_mem(speed_reference)
+        write_steering_mem(int(round(direction)))
 
         ###############################################################
         ##  Busy wait for the loop to complete
@@ -173,12 +180,12 @@ def runner():
         left_motor.stop()
         right_motor.stop()
 
-        gyro_sensor_value_raw.close()
-        battery_voltage_raw.close()
-        motor_encoder_left.close()
-        motor_encoder_right.close()
-        motor_duty_cycle_left.close()
-        motor_duty_cycle_right.close()
+        gyro_sensor_devfd.close()
+        battery_voltage_devfd.close()
+        motor_encoder_left_devfd.close()
+        motor_encoder_right_devfd.close()
+        motor_duty_cycle_left_devfd.close()
+        motor_duty_cycle_right_devfd.close()
 
         for log_ in logs:
             if log_ != "":
@@ -187,14 +194,6 @@ def runner():
         sys.exit()
 
     signal.signal(signal.SIGTERM, shutdown_child)
-
-    # Function to set the duty cycle of the motors
-    def set_duty(motor_duty_file_handle, duty, barance=1):
-        # Clamp the value between -100 and 100
-        duty = min(max(duty, -100), 100) * barance
-        # Apply the signal to the motor
-        fast_write(motor_duty_file_handle, duty)
-        return duty
 
     try:
         # Sensor setup
@@ -320,19 +319,19 @@ def runner():
 
         # filehandles for fast reads/writes
         # =================================
-        gyro_sensor_value_raw = open(gyro._path + "/value0", "rb")
-        battery_voltage_raw = open(battery._path + "/voltage_now", "rb")
+        gyro_sensor_devfd = open(gyro._path + "/value0", "rb")
+        battery_voltage_devfd = open(battery._path + "/voltage_now", "rb")
 
         # Open motor files for (fast) reading
-        motor_encoder_left = open(left_motor._path + "/position", "rb")
-        motor_encoder_right = open(right_motor._path + "/position", "rb")
+        motor_encoder_left_devfd = open(left_motor._path + "/position", "rb")
+        motor_encoder_right_devfd = open(right_motor._path + "/position", "rb")
 
         # Open motor files for (fast) writing
-        motor_duty_cycle_left = open(left_motor._path + "/duty_cycle_sp", "w")
-        motor_duty_cycle_right = open(right_motor._path + "/duty_cycle_sp", "w")
+        motor_duty_cycle_left_devfd = open(left_motor._path + "/duty_cycle_sp", "w")
+        motor_duty_cycle_right_devfd = open(right_motor._path + "/duty_cycle_sp", "w")
 
         # バッテリー電圧
-        voltage_raw = fast_read(battery_voltage_raw) # 単位(μV)
+        voltage_raw = read_device(battery_voltage_devfd) # 単位(μV)
         # 現在のバッテリー電圧をもとに、PWMデューティ値を100%にしたとき、モータが受け取る推定電圧を求める。
         # 6.2 アクチュエータ　(6.1)式 バッテリ電圧とモータ回転速度(rpm)の関係式
         voltage_estimate_max = (battery_gain * voltage_raw / 1000) - battery_offset
@@ -346,7 +345,7 @@ def runner():
         #As you hold the robot still, determine the average sensor value of 100 samples
         gyro_rate_calibrate_count = 200
         for _ in range(gyro_rate_calibrate_count):
-            gyro_rate_raw = fast_read(gyro_sensor_value_raw)
+            gyro_rate_raw = read_device(gyro_sensor_devfd)
             gyro_offset = gyro_offset + gyro_rate_raw
             time.sleep(0.01)
         gyro_offset = gyro_offset / gyro_rate_calibrate_count
@@ -354,8 +353,8 @@ def runner():
         # Print the result
         print("GyroOffset: %s" % gyro_offset)
 
-        speed_reference = read_speed_value()
-        steering = read_steering_value()
+        speed_reference = read_speed_mem()
+        steering = read_steering_mem()
 
         #speed_reference = 62.5 # 前進・後退速度。62.5〜-62.5の間で入力
         #steering = -1 * self.STEER_SPEED * 0.5 # 旋回速度。他の係数をいじったせいか、今の値でも少々不安定になっている。もう少し下げたほうがいいかも
@@ -364,7 +363,7 @@ def runner():
         ## タッチセンサー押し待ち
         ########################################################################
         print('Runner Waiting ...')
-        while not read_touch_sensor_value():
+        while not read_touch_sensor_mem():
             time.sleep(0.025)
 
         print("-----------------------------------")
@@ -386,17 +385,17 @@ def runner():
             ###############################################################
             ##  Reading the Gyro.
             ###############################################################
-            gyro_rate_raw = fast_read(gyro_sensor_value_raw)
+            gyro_rate_raw = read_device(gyro_sensor_devfd)
             gyro_rate = (gyro_rate_raw - gyro_offset) * rad_per_second_per_raw_gyro_unit # 躯体の角速度(rad/sec)。ジャイロから得た角速度をオフセット値で調整している
 
             ###############################################################
             ##  Reading the Motor Position
             ###############################################################
             motor_angle_last = motor_angle
-            motor_angle_raw = (fast_read(motor_encoder_left) + fast_read(motor_encoder_right)) * 0.5
+            motor_angle_raw = (read_device(motor_encoder_left_devfd) + read_device(motor_encoder_right_devfd)) * 0.5
             motor_angle = (motor_angle_raw * radians_per_raw_motor_unit) + gyro_estimated_angle # 左右モーターの現在の平均回転角度(rad) + 躯体の(推定)回転角度
 
-            speed_reference = read_speed_value()
+            speed_reference = read_speed_mem()
 
             #motor_angular_speed_reference = speed_reference * rad_per_sec_per_percent_speed # 左右モーターの目標平均回転角速度(rad/sec)。入力値speed_referenceを角速度(rad)に変換したもの。
             # K_THETA_DOT(7.5): 最大モーター角速度だと思われる値。 speed_reference(モータ最大角速度を100%とする、目標割合)にかけ合わせて
@@ -414,7 +413,7 @@ def runner():
             ###############################################################
             ##  Reading the Voltage.
             ###############################################################
-            voltage_raw = fast_read(battery_voltage_raw) #バッテリー電圧(μV)
+            voltage_raw = read_device(battery_voltage_devfd) #バッテリー電圧(μV)
 
             ###############################################################
             ##  Computing the motor duty cycle value
@@ -430,9 +429,9 @@ def runner():
             ###############################################################
             ##  Apply the signal to the motor, and add steering
             ###############################################################
-            steering = read_steering_value()
-            set_duty(motor_duty_cycle_right, motor_duty_cycle + steering)
-            duty = set_duty(motor_duty_cycle_left, motor_duty_cycle - steering, 0.975) # 右車輪のモーター出力が弱いので、左車輪のPWM値を3つ目の引数で調節(%)してる。まだ偏ってるので調節必要
+            steering = read_steering_mem()
+            set_duty(motor_duty_cycle_right_devfd, motor_duty_cycle + steering)
+            duty = set_duty(motor_duty_cycle_left_devfd, motor_duty_cycle - steering, 0.975) # 右車輪のモーター出力が弱いので、左車輪のPWM値を3つ目の引数で調節(%)してる。まだ偏ってるので調節必要
 
             ###############################################################
             ##  Update angle estimate and Gyro Offset Estimate
@@ -482,10 +481,10 @@ def runner_stub():
     print('Im Runner Stub')
 
     def shutdown_child(signum=None, frame=None):
-        motor_encoder_left.close()
-        motor_encoder_right.close()
-        motor_duty_cycle_left.close()
-        motor_duty_cycle_right.close()
+        motor_encoder_left_devfd.close()
+        motor_encoder_right_devfd.close()
+        motor_duty_cycle_left_devfd.close()
+        motor_duty_cycle_right_devfd.close()
 
         left_motor.stop()
         right_motor.stop()
@@ -493,14 +492,6 @@ def runner_stub():
         sys.exit()
 
     signal.signal(signal.SIGTERM, shutdown_child)
-
-    # Function to set the duty cycle of the motors
-    def set_duty(motor_duty_file_handle, duty, barance=1):
-        # Clamp the value between -100 and 100
-        duty = min(max(duty, -100), 100) * barance
-        # Apply the signal to the motor
-        fast_write(motor_duty_file_handle, duty)
-        return duty
 
     try:
         # Motor setup
@@ -530,21 +521,21 @@ def runner_stub():
         # =================================
 
         # Open motor files for (fast) reading
-        motor_encoder_left = open(left_motor._path + "/position", "rb")
-        motor_encoder_right = open(right_motor._path + "/position", "rb")
+        motor_encoder_left_devfd = open(left_motor._path + "/position", "rb")
+        motor_encoder_right_devfd = open(right_motor._path + "/position", "rb")
 
         # Open motor files for (fast) writing
-        motor_duty_cycle_left = open(left_motor._path + "/duty_cycle_sp", "w")
-        motor_duty_cycle_right = open(right_motor._path + "/duty_cycle_sp", "w")
+        motor_duty_cycle_left_devfd = open(left_motor._path + "/duty_cycle_sp", "w")
+        motor_duty_cycle_right_devfd = open(right_motor._path + "/duty_cycle_sp", "w")
 
-        speed_reference = read_speed_value()
-        steering = read_steering_value()
+        speed_reference = read_speed_mem()
+        steering = read_steering_mem()
 
         ########################################################################
         ## タッチセンサー押し待ち
         ########################################################################
         print('Runner Waiting ...')
-        while not read_touch_sensor_value():
+        while not read_touch_sensor_mem():
             time.sleep(0.025)
 
         print("-----------------------------------")
@@ -567,19 +558,19 @@ def runner_stub():
             ##  Reading the Motor Position
             ###############################################################
 
-            motor_angle_raw_left = fast_read(motor_encoder_left)
-            motor_angle_raw_right = fast_read(motor_encoder_right)
-            write_motor_encoder_left(motor_angle_raw_left)
-            write_motor_encoder_right(motor_angle_raw_right)
+            motor_angle_raw_left = read_device(motor_encoder_left_devfd)
+            motor_angle_raw_right = read_device(motor_encoder_right_devfd)
+            write_motor_encoder_left_mem(motor_angle_raw_left)
+            write_motor_encoder_right_mem(motor_angle_raw_right)
 
-            speed_reference = read_speed_value()
+            speed_reference = read_speed_mem()
 
             ###############################################################
             ##  Apply the signal to the motor, and add steering
             ###############################################################
-            steering = read_steering_value()
-            set_duty(motor_duty_cycle_right, speed_reference + steering)
-            duty = set_duty(motor_duty_cycle_left, speed_reference - steering, 0.975)
+            steering = read_steering_mem()
+            set_duty(motor_duty_cycle_right_devfd, speed_reference + steering)
+            duty = set_duty(motor_duty_cycle_left_devfd, speed_reference - steering, 0.975)
 
             ###############################################################
             ##  Busy wait for the loop to complete
@@ -602,14 +593,14 @@ if __name__ == '__main__':
     def shutdown():
         os.kill(guide_pid, signal.SIGKILL)
         os.kill(runner_pid, signal.SIGTERM)
-        touch_sensor_value_fd.close()
+        touch_sensor_devfd.close()
         print('Done')
 
     try:
         # touchSensorの読み込み
         touch = TouchSensor()
-        touch_sensor_value_fd = open(touch._path + "/value0", "rb")
-        touch_sensor_pressed = fast_read(touch_sensor_value_fd)
+        touch_sensor_devfd = open(touch._path + "/value0", "rb")
+        touch_sensor_pressed = read_device(touch_sensor_devfd)
 
         # TODO: ガイドが提示する前進後退・旋回スピードもmmapで共有する
 
@@ -625,8 +616,8 @@ if __name__ == '__main__':
 
         if guide_pid == 0:  # In a child process
             guide()
-            # write_speed_value(50)
-            # write_steering_value(50)
+            # write_speed_mem(50)
+            # write_steering_mem(50)
             print('Guide Done')
             sys.exit()
 
@@ -635,7 +626,7 @@ if __name__ == '__main__':
         ###############################################################
         ## 直接デバイスのメモリ操作をしているkworkerのpidを特定
         ###############################################################
-        fast_read(touch_sensor_value_fd)
+        read_device(touch_sensor_devfd)
         kworker_psdels_bytes = subprocess.check_output("ps aux | grep [k]worker/0:", shell=True)
         kworker_psdels_str = kworker_psdels_bytes.decode()
         kworker_psdels = {}
@@ -656,16 +647,16 @@ if __name__ == '__main__':
 
         while not touch_sensor_pressed:
             time.sleep(0.1)
-            touch_sensor_pressed = fast_read(touch_sensor_value_fd)
-            write_touch_sensor_value(touch_sensor_pressed)
+            touch_sensor_pressed = read_device(touch_sensor_devfd)
+            write_touch_sensor_mem(touch_sensor_pressed)
 
         time.sleep(1)
-        touch_sensor_pressed = fast_read(touch_sensor_value_fd)
+        touch_sensor_pressed = read_device(touch_sensor_devfd)
 
         while not touch_sensor_pressed:
             time.sleep(0.2)
-            touch_sensor_pressed = fast_read(touch_sensor_value_fd)
-            write_touch_sensor_value(touch_sensor_pressed)
+            touch_sensor_pressed = read_device(touch_sensor_devfd)
+            write_touch_sensor_mem(touch_sensor_pressed)
 
         shutdown()
 
