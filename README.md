@@ -21,19 +21,38 @@ In host shell,  login your EV3Way-ET by ssh.
 $ ssh username@xxx.xxx.xxx.xxx
 ```
 
+In EV3(ev3dev) shell, Execute "ps lax" to find processes given "-20" nice value.
 
+```shell
+$ ps lax | grep -- [-]20
 
-In EV3(ev3dev) shell, get this repository and execute balancing program "BALANC3R".
+  UID   PID  PPID CPU PRI NI  VSZ       RSS  WCHAN  STAT   TT    TIME    COMMAND
+  0     120  0    0   31  -20 2480868   8768 -      Ss     ??    2:32.12 hogehoge
+```
+
+And execute "renice" for all displayed processes to give "0" nice value.
+
+```shell
+$ sudo renice 0 -p 120
+```
+
+Then, Get this repository and execute "stop_deamons.sh".
 
 ```shell
 $ git clone https://github.com/ETRobocon2017-TeamD/balanc3r-for-ev3way-et.git
 $ cd balanc3r-for-ev3way-et
-$ python3 BALANC3R
+$ sudo chmod 577 stop_daemons.sh
+$ ./stop_daemons.sh
+```
+
+After, Execute "pistol.py" by "nice" command to give "-12" nice value.
+
+```shell
+$ sudo nice -n -12 python3 pistol.py
 ```
 
 
-
-# Reference 
+# Reference
 
 - [SC4050+ Integration Project: Balancing Robot](http://laurensvalk.com/files/Bos_Valk_SC4050_Balancing_Robot.pdf)
 - [NXTWay-GS(Self-Balancing Tow-Wheeled Robot) Controller Design](http://jp.mathworks.com/matlabcentral/fileexchange/19147-nxtway-gs--self-balancing-two-wheeled-robot--controller-design)
