@@ -591,8 +591,10 @@ def runner_stub():
 if __name__ == '__main__':
 
     def shutdown():
-        os.kill(guide_pid, signal.SIGKILL)
-        os.kill(runner_pid, signal.SIGTERM)
+        if ('guide_pid' in globals()) or ('guide_pid' in locals()):
+            os.kill(guide_pid, signal.SIGKILL)
+        if ('runner_pid' in globals()) or ('runner_pid' in locals()):
+            os.kill(runner_pid, signal.SIGTERM)
         touch_sensor_devfd.close()
         print('Done')
 
