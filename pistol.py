@@ -180,6 +180,8 @@ def runner():
         left_motor.stop()
         right_motor.stop()
 
+        time.sleep(0.2)
+
         gyro_sensor_devfd.close()
         battery_voltage_devfd.close()
         motor_encoder_left_devfd.close()
@@ -187,9 +189,11 @@ def runner():
         motor_duty_cycle_left_devfd.close()
         motor_duty_cycle_right_devfd.close()
 
+        log_file = open('./log/log_runner_%s.txt' % time.time(),'w')
         for log_ in logs:
             if log_ != "":
-                print(log_)
+                log_file.write("%s\n" % log_)
+        log_file.close()
 
         sys.exit()
 
