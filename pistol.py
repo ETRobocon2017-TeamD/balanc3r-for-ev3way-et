@@ -586,6 +586,18 @@ def runner_stub():
         log.exception(ex)
         shutdown()
 
+###############################################################
+## カーネル空間をデバイスのkworkerのpidを特定
+###############################################################
+def renice_driver_kworkers():
+    kworkers_bytes = subprocess.check_output("ps aux | grep [k]worker/0:", shell=True)
+    kworkers_text = kworkers_bytes.decode()
+    kworker_lines = kworkers_text.split("\n")
+    # 最終行は無効なので消去する
+    kworker_lines.pop()
+    for ps_line in kworker_lines:
+        ps_columns = re.split("\s*", ps_line)
+        subprocess.check_output(("renice -13 -p {}".format(ps_columns[1])), shell=True)
 
 ########################################################################
 ##
@@ -629,25 +641,7 @@ if __name__ == '__main__':
 
         time.sleep(0.1)
 
-        ###############################################################
-        ## 直接デバイスのメモリ操作をしているkworkerのpidを特定
-        ###############################################################
-        read_device(touch_sensor_devfd)
-        kworker_psdels_bytes = subprocess.check_output("ps aux | grep [k]worker/0:", shell=True)
-        kworker_psdels_str = kworker_psdels_bytes.decode()
-        kworker_psdels = {}
-        kworker_psdels_str_splited = kworker_psdels_str.split("\n")
-        kworker_psdels_str_splited.pop()
-        for psdel in kworker_psdels_str_splited:
-            psdel_arry = re.split("\s*", psdel)
-            # print(psdel)
-            # print("pid:%s, CPU:%s" % (psdel_arry[1], psdel_arry[2]))
-            # CPU使用率をkeyに、valueをpidに。
-            kworker_psdels[float(psdel_arry[2])] = psdel_arry[1]
-            subprocess.check_output(("renice -13 -p %s" % psdel_arry[1]), shell=True)
-        # kworker_psdels_sortedkeys = sorted(kworker_psdels.keys())
-        # kworker_target_pid = kworker_psdels[kworker_psdels_sortedkeys[-1]]
-        # subprocess.check_output(("renice -13 -p %s" % kworker_target_pid), shell=True)
+        renice_driver_kworkers()
 
         print('Im Pistol')
 
