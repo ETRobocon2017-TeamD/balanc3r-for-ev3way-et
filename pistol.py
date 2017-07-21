@@ -178,9 +178,6 @@ def runner():
     print('Im Runner')
 
     def shutdown_child(signum=None, frame=None):
-        left_motor.stop()
-        right_motor.stop()
-
         time.sleep(0.2)
 
         gyro_sensor_devfd.close()
@@ -190,10 +187,15 @@ def runner():
         motor_duty_cycle_left_devfd.close()
         motor_duty_cycle_right_devfd.close()
 
+        left_motor.stop()
+        right_motor.stop()
+
+        if not os.path.exists('./log/'):
+            os.mkdir('./log/')
         log_file = open('./log/log_runner_%s.txt' % time.time(),'w')
-        for log_ in logs:
-            if log_ != "":
-                log_file.write("%s\n" % log_)
+        for log in logs:
+            if log != "":
+                log_file.write("{}\n".format(log))
         log_file.close()
 
         sys.exit()
