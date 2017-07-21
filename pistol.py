@@ -127,47 +127,89 @@ def write_steering_mem(value):
 def guide():
     print('Im Guide')
 
-    # ここで変数定義などの事前準備を行う
-    # Time of each loop, measured in miliseconds.
-    loop_time_millisec = 25
-    # Time of each loop, measured in seconds.
-    loop_time_sec = loop_time_millisec / 1000.0
+    def shutdown_child(signum=None, frame=None):
+        time.sleep(0.2)
 
-    print('Calibrate ColorSensor ...')
-    line_tracer = LineTracer()
-    line_tracer.calibrate_color_sensor()
+        log_file = open('./log/log_guide_%s.txt' % time.time(),'w')
+        for log in logs:
+            if log != "":
+                log_file.write("{}\n".format(log))
+        log_file.close()
 
-    # タッチセンサー押し待ち
-    print('Guide Waiting ...')
-    while not read_touch_sensor_mem():
-        time.sleep(0.1)
+        line_tracer.shutdown()
+        sys.exit()
 
-    speed_reference = 0
-    direction = 0
+    signal.signal(signal.SIGTERM, shutdown_child)
 
-    while True:
-        ###############################################################
-        ##  Loop info
-        ###############################################################
-        t_loop_start = time.clock()
+    try:
+        # ここで変数定義などの事前準備を行う
+        # Time of each loop, measured in miliseconds.
+        loop_time_millisec = 25
+        # Time of each loop, measured in seconds.
+        loop_time_sec = loop_time_millisec / 1000.0
 
-        # ここでライントレースする
-        speed_reference, direction = line_tracer.line_tracing()
+        # ログ記録用
+        logs = ["" for _ in range(10000)]
+        log_pointer = 0
 
-        # 左右モーターの角度は下記のように取得
-        # print(read_motor_encoder_left_mem())
-        # print(read_motor_encoder_right_mem())
+        print('Calibrate ColorSensor ...')
+        line_tracer = LineTracer()
+        line_tracer.calibrate_color_sensor()
 
-        # 前進後退・旋回スピードは下記のように入力
-        write_speed_mem(speed_reference)
-        write_steering_mem(int(round(direction)))
+        # タッチセンサー押し待ち
+        print('Guide Waiting ...')
+        while not read_touch_sensor_mem():
+            time.sleep(0.1)
 
-        ###############################################################
-        ##  Busy wait for the loop to complete
-        ###############################################################
-        # while ((time.clock() - t_loop_start) < loop_time_sec):
-        #     time.sleep(0.0001)
-        time.sleep(loop_time_sec - (time.clock() - t_loop_start))
+        speed_reference = 0
+        direction = 0
+        refrection_raw = 0
+
+        # スタート時の時間取得
+        t_line_trace_start = time.clock()
+
+
+        while True:
+            ###############################################################
+            ##  Loop info
+            ###############################################################
+            t_loop_start = time.clock()
+
+            # ここでライントレースする
+            speed_reference, direction, refrection_raw = line_tracer.line_tracing()
+
+            # 左右モーターの角度は下記のように取得
+            # print(read_motor_encoder_left_mem())
+            # print(read_motor_encoder_right_mem())
+
+            # 前進後退・旋回スピードは下記のように入力
+            write_speed_mem(speed_reference)
+            write_steering_mem(int(round(direction)))
+
+            # 実行時間、PID制御に関わる値をログに出力
+            t_loop_end = time.clock()
+            logs[log_pointer] = "{}   {}   {}   {}   {}   {}   {}   {}".format(
+                t_loop_end - t_line_trace_start,
+                t_loop_end - t_loop_start,
+                speed_reference,
+                direction,
+                refrection_raw,
+                line_tracer.p_b,
+                line_tracer.i_b,
+                line_tracer.d_b)
+            log_pointer += 1
+
+
+            ###############################################################
+            ##  Busy wait for the loop to complete
+            ###############################################################
+            # while ((time.clock() - t_loop_start) < loop_time_sec):
+            #     time.sleep(0.0001)
+            time.sleep(loop_time_sec - (time.clock() - t_loop_start))
+
+    except (KeyboardInterrupt, Exception) as e:
+        log.exception(e)
+        shutdown()
 
 ########################################################################
 ##
@@ -190,8 +232,6 @@ def runner():
         left_motor.stop()
         right_motor.stop()
 
-        if not os.path.exists('./log/'):
-            os.mkdir('./log/')
         log_file = open('./log/log_runner_%s.txt' % time.time(),'w')
         for log in logs:
             if log != "":
@@ -611,13 +651,17 @@ if __name__ == '__main__':
 
     def shutdown():
         if ('guide_pid' in globals()) or ('guide_pid' in locals()):
-            os.kill(guide_pid, signal.SIGKILL)
+            os.kill(guide_pid, signal.SIGTERM)
         if ('runner_pid' in globals()) or ('runner_pid' in locals()):
             os.kill(runner_pid, signal.SIGTERM)
         touch_sensor_devfd.close()
         print('Done')
 
     try:
+        # logフォルダの生成
+        if not os.path.exists('./log/'):
+            os.mkdir('./log/')
+
         # touchSensorの読み込み
         touch = TouchSensor()
         touch_sensor_devfd = open(touch._path + "/value0", "rb")

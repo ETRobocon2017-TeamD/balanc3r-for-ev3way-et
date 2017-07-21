@@ -22,8 +22,12 @@ class LineTracer:
         self.k_d = 0.05
         # 前回偏差
         self.e_b = 0.0
+        # 前回までの偏差値
+        self.p_b = 0.0
         # 前回までの積分値
         self.i_b = 0.0
+        # 前回までの微分値
+        self.d_b = 0.0
 
         self.color = ColorSensor()
         self.color.mode = self.color.MODE_REF_RAW #raw値
@@ -49,7 +53,7 @@ class LineTracer:
         speed = 50 #固定値
 
         # NOTE: ライン左端を基準に走行させるために、旋回方向を - で反転している
-        return speed, -direction
+        return speed, -direction, refrection_raw
 
     def shutdown(self):
         self.color_reflection_fd.close()
@@ -76,7 +80,9 @@ class LineTracer:
 
         # 値の保存
         self.e_b = error
+        self.p_b = p_n
         self.i_b = i_n
+        self.d_b = d_n
 
         return direction
 
