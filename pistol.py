@@ -71,7 +71,7 @@ def set_duty(motor_duty_devfd, duty, barance=1):
 ##
 ########################################################################
 
-# 左右モーターの値をmmapで共有
+# 左右モーターの値をanonymous memoryで共有
 motor_encoder_left_memfd = mmap.mmap(-1, MMAP_SIZE)
 write_anon_mem(motor_encoder_left_memfd, 0)
 motor_encoder_left_memfd = mmap.mmap(-1, MMAP_SIZE)
@@ -89,7 +89,7 @@ def write_motor_encoder_left_mem(value):
 def write_motor_encoder_right_mem(value):
     write_anon_mem(motor_encoder_left_memfd, value)
 
-# タッチセンサーの値をmmapで共有
+# タッチセンサーの値をanonymous memoryで共有
 touch_sensor_memfd = mmap.mmap(-1, MMAP_SIZE)
 write_anon_mem(touch_sensor_memfd, 0)
 
@@ -99,7 +99,7 @@ def read_touch_sensor_mem():
 def write_touch_sensor_mem(value):
     write_anon_mem(touch_sensor_memfd, value)
 
-# 前進後退スピード、旋回スピードの値をmmapで共有
+# 前進後退スピードの値をanonymous memoryで共有
 speed_memfd = mmap.mmap(-1, MMAP_SIZE)
 write_anon_mem(speed_memfd, 0)
 
@@ -109,6 +109,7 @@ def read_speed_mem():
 def write_speed_mem(value):
     write_anon_mem(speed_memfd, value)
 
+# 旋回スピードの値をanonymous memoryで共有
 steering_memfd = mmap.mmap(-1, MMAP_SIZE)
 write_anon_mem(steering_memfd, 0)
 
@@ -620,8 +621,6 @@ if __name__ == '__main__':
         touch_sensor_devfd = open(touch._path + "/value0", "rb")
         touch_sensor_pressed = read_device(touch_sensor_devfd)
 
-        # TODO: ガイドが提示する前進後退・旋回スピードもmmapで共有する
-
         runner_pid = os.fork()
 
         if runner_pid == 0:
@@ -634,6 +633,7 @@ if __name__ == '__main__':
 
         if guide_pid == 0:  # In a child process
             guide()
+            # TODO: ガイドが提示する前進後退・旋回スピードはanonymous memoryで共有する
             # write_speed_mem(50)
             # write_steering_mem(50)
             print('Guide Done')
