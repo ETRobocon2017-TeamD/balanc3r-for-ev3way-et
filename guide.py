@@ -16,7 +16,7 @@ class LineTracer:
         self.refrection_target = 0.0
         self.delta_t = 0.025 # 10msec
         # TODO: P係数(要調整)
-        self.k_p = 0.3
+        self.k_p = 0.26
         # TODO: I係数(要調整)
         self.k_i = 0.1
         # TODO: D係数(要調整)
