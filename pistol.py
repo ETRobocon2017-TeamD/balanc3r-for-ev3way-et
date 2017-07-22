@@ -188,12 +188,14 @@ def guide():
 
             # 実行時間、PID制御に関わる値をログに出力
             t_loop_end = time.clock()
-            logs[log_pointer] = "{}, {}, {}, {}, {}, {}, {}, {}".format(
+            logs[log_pointer] = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}".format(
                 t_loop_end - t_line_trace_start,
                 t_loop_end - t_loop_start,
                 speed_reference,
                 direction,
                 refrection_raw,
+                line_tracer.refrection_target,
+                line_tracer.e_b,
                 line_tracer.p_b,
                 line_tracer.i_b,
                 line_tracer.d_b)
