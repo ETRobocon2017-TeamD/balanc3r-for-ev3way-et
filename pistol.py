@@ -410,6 +410,7 @@ def runner():
         ## タッチセンサー押し待ち
         ########################################################################
         print('Runner Waiting ...')
+        print('-- PLEASE PUSH BUTTON --')
         while not read_touch_sensor_mem():
             time.sleep(0.025)
 
