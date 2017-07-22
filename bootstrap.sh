@@ -7,4 +7,4 @@ systemctl stop nmbd
 
 ps lax | grep -- [-]20 | awk '{print $3}' | xargs sudo renice 0 -p
 
-nice -n -13 python3 pistol.py
+nice -n -15 python3 pistol.py
