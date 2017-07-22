@@ -51,14 +51,15 @@ class LineTracer:
         self.refrection_target = target
         self.previous = target
 
-u"""
-    def pushPrevious(self, val)
+        u"""
+        def pushPrevious(self, val)
         self.previous[0] = self.previous[1]
         self.previous[1] = self.previous[2]
         self.previous[2] = self.previous[3]
         self.previous[3] = self.previous[3]
         self.previous[4] = val
-"""
+        """
+
     def line_tracing(self):
         u""" 速度、旋回値をpwm値として返却 """
         #センサー値を取得
