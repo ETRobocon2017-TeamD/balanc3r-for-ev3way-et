@@ -89,10 +89,10 @@ F   UID   PID  PPID PRI  NI    VSZ   RSS WCHAN  STAT TTY        TIME COMMAND
 4     0   407     1  20   0   7028  4324 -      Ds   ?          0:01 /sbin/wpa_supplicant -u -s -O /run/wpa_supplicant
 5   106   520     1  20   0   5940  3016 -      Ss   ?          0:00 /usr/sbin/ntpd -p /var/run/ntpd.pid -g -u 106:110
 1     0   526     2  20   0      0     0 -      S    ?          0:06 [kworker/0:4]
-4     0   527   391  20   0  12172  5032 -      Ss   ?          0:02 sshd: robot [priv]  
+4     0   527   391  20   0  12172  5032 -      Ss   ?          0:02 sshd: robot [priv]
 4  1000   537     1  20   0   4956  3288 SyS_ep Ss   ?          0:00 /lib/systemd/systemd --user
-5  1000   540   537  20   0  25240  1844 -      S    ?          0:00 (sd-pam)         
-5  1000   543   527  20   0  12172  3524 -      S    ?          0:00 sshd: robot@pts/0   
+5  1000   540   537  20   0  25240  1844 -      S    ?          0:00 (sd-pam)
+5  1000   543   527  20   0  12172  3524 -      S    ?          0:00 sshd: robot@pts/0
 0  1000   545   543  20   0   3576  2804 wait   Ss   pts/0      0:00 -bash
 5     0   556     1  20   0  21024  4484 -      Ss   ?          0:00 /usr/sbin/nmbd -D
 0  1000   586   545  20   0   2624  1404 -      R+   pts/0      0:00 ps lax
@@ -102,7 +102,7 @@ And execute "renice" for all displayed processes to give "0" nice value.
 
 ```shell
 $ ps lax | grep -- [-]20 | awk '{print $3}' | xargs sudo renice 0 -p
-[sudo] password for robot: 
+[sudo] password for robot:
 5 (process ID) old priority -20, new priority 0
 11 (process ID) old priority -20, new priority 0
 12 (process ID) old priority -20, new priority 0
@@ -137,13 +137,13 @@ $ chmod 755 stop_daemons.sh
 $ sudo ./stop_daemons.sh
 [....] Stopping avahi-daemon (via systemctl): avahi-daemon.serviceWarning: Stopping avahi-daemon.service, but it can still be activated by:
   avahi-daemon.socket
-. ok 
+. ok
 ```
 
 After, Execute "pistol.py" by "nice" command to give "-12" nice value.
 
 ```shell
-$ sudo nice -n -12 python3 pistol.py
+$ sudo nice -n -13 python3 pistol.py
 ```
 
 
