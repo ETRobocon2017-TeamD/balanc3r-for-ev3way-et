@@ -130,7 +130,7 @@ def guide():
     def shutdown_child(signum=None, frame=None):
         time.sleep(0.2)
 
-        log_file = open('./log/log_guide_%s.csv' % log_datetime,'w')
+        log_file = open("./log/log_guide_{}.csv".format(log_datetime), 'w')
         for log in logs:
             if log != "":
                 log_file.write("{}\n".format(log))
