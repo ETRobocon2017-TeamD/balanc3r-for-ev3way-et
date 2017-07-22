@@ -290,11 +290,11 @@ def runner():
         gyro_drift_compensation_rate = 0.075 * loop_time_sec * rad_per_second_per_raw_gyro_unit
 
         # State feedback control gains (aka the magic numbers)
-        gain_motor_angle                   = 0.1606 * 3 * 0.85    # K_F[0]
-        gain_gyro_angle                    = 30.2153 * 2.5 * 0.85 # K_F[1]
-        gain_motor_angular_speed           = 1.0796 * 1.7 * 0.85  # K_F[2]
-        gain_gyro_rate                     = 3.3269 * 2 * 0.85    # K_F[3]
-        gain_motor_angle_error_accumulated = 0.4472 * 0.85        # K_I
+        gain_motor_angle                   = 0.1606 * 3 * 0.77    # K_F[0]
+        gain_gyro_angle                    = 30.2153 * 2.5 * 0.77 # K_F[1]
+        gain_motor_angular_speed           = 1.0796 * 1.7 * 0.77  # K_F[2]
+        gain_gyro_rate                     = 3.3269 * 2 * 0.77    # K_F[3]
+        gain_motor_angle_error_accumulated = 0.4472 * 0.77        # K_I
 
         battery_gain = 0.001089  # PWM出力算出用バッテリ電圧補正係数
         battery_offset = 0.625  # PWM出力算出用バッテリ電圧補正オフセット
