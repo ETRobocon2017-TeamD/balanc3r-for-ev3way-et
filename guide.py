@@ -1,6 +1,7 @@
 from ev3dev.auto import *
 from ev3dev.helper import Tank
 import time
+from math import *
 
 class LineTracer:
     u"""PID制御によるライントレース
@@ -28,6 +29,9 @@ class LineTracer:
         self.i_b = 0.0
         # 前回までの微分値
         self.d_b = 0.0
+        # 前回値
+        #self.previous = [0 for _ in range(5) ]
+        self.previous = 0
 
         self.color = ColorSensor()
         self.color.mode = self.color.MODE_REF_RAW #raw値
@@ -36,21 +40,36 @@ class LineTracer:
     def calibrate_color_sensor(self):
         target = 0
         gyro_rate_calibrate_count = 100
+        color_val = 0
         for _ in range(gyro_rate_calibrate_count):
-            target = target + self._read_fd(self.color_reflection_fd)
+            color_val = self._read_fd(self.color_reflection_fd)
+            target = target + color_val
+            #pushPrevious(color_val)
             time.sleep(0.01)
         target = target / gyro_rate_calibrate_count
         #目標値を保管
         self.refrection_target = target
+        self.previous = target
 
+u"""
+    def pushPrevious(self, val)
+        self.previous[0] = self.previous[1]
+        self.previous[1] = self.previous[2]
+        self.previous[2] = self.previous[3]
+        self.previous[3] = self.previous[3]
+        self.previous[4] = val
+"""
     def line_tracing(self):
         u""" 速度、旋回値をpwm値として返却 """
         #センサー値を取得
         refrection_raw = self._read_fd(self.color_reflection_fd)
+        ref_avarage = int(round((self.previous + refrection_raw) / 2))
+        self.previous = refrection_raw
 
         #指示値を取得
-        direction = self._calc_direction(refrection_raw)
+        direction = self._calc_direction(ref_avarage)
         speed = 50 #固定値
+        
 
         # NOTE: ライン左端を基準に走行させるために、旋回方向を - で反転している
         return speed, -direction, refrection_raw
