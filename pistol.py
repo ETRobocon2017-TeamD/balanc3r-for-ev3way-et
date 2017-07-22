@@ -130,7 +130,7 @@ def guide():
     def shutdown_child(signum=None, frame=None):
         time.sleep(0.2)
 
-        log_file = open('./log/log_guide_%s.txt' % time.time(),'w')
+        log_file = open('./log/log_guide_%s.txt' % log_datetime,'w')
         for log in logs:
             if log != "":
                 log_file.write("{}\n".format(log))
@@ -232,7 +232,7 @@ def runner():
         left_motor.stop()
         right_motor.stop()
 
-        log_file = open('./log/log_runner_%s.txt' % time.time(),'w')
+        log_file = open('./log/log_runner_%s.txt' % log_datetime,'w')
         for log in logs:
             if log != "":
                 log_file.write("{}\n".format(log))
@@ -661,6 +661,10 @@ if __name__ == '__main__':
         # logフォルダの生成
         if not os.path.exists('./log/'):
             os.mkdir('./log/')
+        # 日本時間に変更
+        os.environ['TZ'] = "JST-9"
+        time.tzset()
+        log_datetime = time.strftime("%Y%m%d%H%M%S")
 
         # touchSensorの読み込み
         touch = TouchSensor()
