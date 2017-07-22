@@ -478,7 +478,7 @@ def runner():
             ###############################################################
             steering = read_steering_mem()
             set_duty(motor_duty_cycle_right_devfd, motor_duty_cycle + steering)
-            duty = set_duty(motor_duty_cycle_left_devfd, motor_duty_cycle - steering, 0.975) # 右車輪のモーター出力が弱いので、左車輪のPWM値を3つ目の引数で調節(%)してる。まだ偏ってるので調節必要
+            duty = set_duty(motor_duty_cycle_left_devfd, motor_duty_cycle - steering) # 右車輪のモーター出力が弱いので、左車輪のPWM値を3つ目の引数で調節(%)してる。まだ偏ってるので調節必要
 
             ###############################################################
             ##  Update angle estimate and Gyro Offset Estimate
