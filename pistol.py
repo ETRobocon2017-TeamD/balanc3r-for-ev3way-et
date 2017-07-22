@@ -130,7 +130,7 @@ def guide():
     def shutdown_child(signum=None, frame=None):
         time.sleep(0.2)
 
-        log_file = open('./log/log_guide_%s.txt' % log_datetime,'w')
+        log_file = open('./log/log_guide_%s.csv' % log_datetime,'w')
         for log in logs:
             if log != "":
                 log_file.write("{}\n".format(log))
@@ -188,7 +188,7 @@ def guide():
 
             # 実行時間、PID制御に関わる値をログに出力
             t_loop_end = time.clock()
-            logs[log_pointer] = "{}   {}   {}   {}   {}   {}   {}   {}".format(
+            logs[log_pointer] = "{}, {}, {}, {}, {}, {}, {}, {}".format(
                 t_loop_end - t_line_trace_start,
                 t_loop_end - t_loop_start,
                 speed_reference,
@@ -232,7 +232,7 @@ def runner():
         left_motor.stop()
         right_motor.stop()
 
-        log_file = open('./log/log_runner_%s.txt' % log_datetime,'w')
+        log_file = open('./log/log_runner_%s.csv' % log_datetime,'w')
         for log in logs:
             if log != "":
                 log_file.write("{}\n".format(log))
@@ -493,7 +493,7 @@ def runner():
 
             # 実行時間、PWM値(duty cycle value)に関わる値をログに出力
             t_loop_end = time.clock()
-            logs[log_pointer] = "{}   {}   {}   {}   {}   {}   {}   {}   {}   {}   {}".format(
+            logs[log_pointer] = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}".format(
                 t_loop_end - t_balancer_start,
                 t_loop_end - t_loop_start,
                 gyro_rate_raw,
