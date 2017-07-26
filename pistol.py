@@ -536,6 +536,9 @@ def runner_stub():
         motor_duty_cycle_left_devfd.close()
         motor_duty_cycle_right_devfd.close()
 
+        tail_motor.stop_action = tail_motor.STOP_ACTION_COAST
+        tail_motor.stop()
+
         left_motor.stop()
         right_motor.stop()
 
@@ -554,6 +557,10 @@ def runner_stub():
          #しっぽモーター
         tail_motor = Motor('outA')
 
+        # しっぽモーターを固定する
+        tail_motor.stop_action = tail_motor.STOP_ACTION_HOLD
+        tail_motor.stop()
+
         ########################################################################
         ## Definitions and Initialization variables
         ########################################################################
@@ -566,6 +573,10 @@ def runner_stub():
 
         motor_angle_raw_left = 0
         motor_angle_raw_right = 0
+        motor_angular_speed_reference = 0.0
+
+        a_r = 0.985 #0.98  # ローパスフィルタ係数(左右車輪の目標平均回転角度用)。左右モーターの目標平均回転角度(rad)の算出時に使用する。小さいほど前進・後退する反応が早くなる。
+        k_theta_dot = 3.5 # モータ目標回転角速度係数
 
         # filehandles for fast reads/writes
         # =================================
@@ -592,8 +603,6 @@ def runner_stub():
         print("GO!")
         print("-----------------------------------")
 
-        tail_motor.run_timed(time_sp=250, speed_sp=-300) # しっぽモーター上に上げる
-
         # 倒立振子スタート時の時間取得
         t_balancer_start = time.clock()
 
@@ -615,18 +624,25 @@ def runner_stub():
 
             speed_reference = read_speed_mem()
 
+            motor_angular_speed_reference = ((1.0 - a_r) * ((speed_reference / 100.0) * k_theta_dot)) + (a_r * motor_angular_speed_reference)
+
+            ###############################################################
+            ##  Computing the motor duty cycle value
+            ###############################################################
+            motor_duty_cycle = motor_angular_speed_reference
+
             ###############################################################
             ##  Apply the signal to the motor, and add steering
             ###############################################################
             steering = read_steering_mem()
             set_duty(motor_duty_cycle_right_devfd, speed_reference + steering)
-            duty = set_duty(motor_duty_cycle_left_devfd, speed_reference - steering, 0.975)
+            duty = set_duty(motor_duty_cycle_left_devfd, speed_reference - steering)
 
             ###############################################################
             ##  Busy wait for the loop to complete
             ###############################################################
             # clock()の値にはsleep中の経過時間が含まれないので、このwhileの条件文の算出時間をsleep代わりにしている(算出時間はバラバラ…)
-            time.sleep(loop_time_sec - (time.clock() - t_loop_start))
+            time.sleep(max(loop_time_sec - (time.clock() - t_loop_start), 0.002))
 
     except (KeyboardInterrupt, Exception) as ex:
         log.exception(ex)
