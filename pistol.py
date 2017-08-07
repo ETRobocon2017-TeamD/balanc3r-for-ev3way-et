@@ -659,7 +659,7 @@ def renice_driver_kworkers():
     kworker_lines.pop()
     for ps_line in kworker_lines:
         ps_columns = re.split("\s*", ps_line)
-        subprocess.check_output(("renice -15 -p {}".format(ps_columns[1])), shell=True)
+        subprocess.check_output(("renice -20 -p {}".format(ps_columns[1])), shell=True)
 
 ########################################################################
 ##
