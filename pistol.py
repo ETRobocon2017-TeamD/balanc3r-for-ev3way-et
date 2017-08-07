@@ -392,7 +392,7 @@ def runner():
         print("Calibrating...")
 
         #As you hold the robot still, determine the average sensor value of 100 samples
-        gyro_rate_calibrate_count = 200
+        gyro_rate_calibrate_count = 100
         for _ in range(gyro_rate_calibrate_count):
             gyro_rate_raw = read_device(gyro_sensor_devfd)
             gyro_offset = gyro_offset + gyro_rate_raw
