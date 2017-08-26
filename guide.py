@@ -70,7 +70,7 @@ class LineTracer:
         #指示値を取得
         direction = self._calc_direction(ref_avarage)
         speed = 50 #固定値
-        
+
 
         # NOTE: ライン左端を基準に走行させるために、旋回方向を - で反転している
         return speed, -direction, refrection_raw
@@ -88,7 +88,8 @@ class LineTracer:
         # pid演算
         error = self.refrection_target - brightness
         p_n = self.k_p * error
-        i_n = self.k_i * (self.i_b + ((error + self.e_b) / 2.0 * self.delta_t))
+        integral = (self.i_b + ((error + self.e_b) / 2.0 * self.delta_t))
+        i_n = self.k_i * integral
         d_n = self.k_d * (error - self.e_b) / self.delta_t
         direction = (p_n + i_n + d_n)
 
@@ -101,7 +102,7 @@ class LineTracer:
         # 値の保存
         self.e_b = error
         self.p_b = p_n
-        self.i_b = i_n
+        self.i_b = integral
         self.d_b = d_n
 
         return direction
