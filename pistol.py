@@ -209,9 +209,10 @@ def guide():
             #     time.sleep(0.0001)
             time.sleep(loop_time_sec - (time.clock() - t_loop_start))
 
-    except (KeyboardInterrupt, Exception) as e:
+    except Exception as e:
+        print("It's a Guide Exception")
         log.exception(e)
-        shutdown()
+        shutdown_child()
 
 ########################################################################
 ##
@@ -517,9 +518,10 @@ def runner():
                 # time.sleep(0.0001)
             time.sleep(max(loop_time_sec - (gyro_rate*0.0005) - (time.clock() - t_loop_start), 0.002))
 
-    except (KeyboardInterrupt, Exception) as e:
+    except Exception as e:
+        print("It's a Runner Exception")
         log.exception(e)
-        shutdown()
+        shutdown_child()
 
 ########################################################################
 ##
@@ -644,9 +646,10 @@ def runner_stub():
             # clock()の値にはsleep中の経過時間が含まれないので、このwhileの条件文の算出時間をsleep代わりにしている(算出時間はバラバラ…)
             time.sleep(max(loop_time_sec - (time.clock() - t_loop_start), 0.002))
 
-    except (KeyboardInterrupt, Exception) as ex:
+    except Exception as ex:
+        print("It's a Runner Exception")
         log.exception(ex)
-        shutdown()
+        shutdown_child()
 
 ###############################################################
 ## カーネル空間をデバイスのkworkerのpidを特定
@@ -673,8 +676,10 @@ if __name__ == '__main__':
 
     def shutdown():
         if ('guide_pid' in globals()) or ('guide_pid' in locals()):
+            print('Kill Guide')
             os.kill(guide_pid, signal.SIGTERM)
         if ('runner_pid' in globals()) or ('runner_pid' in locals()):
+            print('Kill Runner')
             os.kill(runner_pid, signal.SIGTERM)
         touch_sensor_devfd.close()
         print('Done')
@@ -730,6 +735,21 @@ if __name__ == '__main__':
 
         shutdown()
 
-    except (KeyboardInterrupt, Exception) as ex:
-        log.exception(ex)
-        shutdown()
+    except Exception as ex:
+        if (runner_pid > 0) and (guide_pid > 0):
+            print("It's a Pistol Exception")
+            log.exception(ex)
+            shutdown()
+        elif (runner_pid == 0):
+            print("It's a Runner Exception in shutdown")
+            log.exception(ex)
+        elif (guide_pid == 0):
+            print("It's a Guide Exception in shutdown")
+            log.exception(ex)
+
+    except KeyboardInterrupt as ex:
+        if (runner_pid > 0) and (guide_pid > 0):
+            print("It's a KeyboardInterrupt")
+            shutdown()
+        elif (runner_pid == 0) or (guide_pid == 0):
+            time.sleep(10)
