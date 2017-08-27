@@ -223,7 +223,16 @@ def runner():
     print('Im Runner')
 
     def shutdown_child(signum=None, frame=None):
+        left_motor.stop()
+        right_motor.stop()
+
         time.sleep(0.2)
+
+        log_file = open('./log/log_runner_%s.csv' % log_datetime,'w')
+        for log in logs:
+            if log != "":
+                log_file.write("{}\n".format(log))
+        log_file.close()
 
         gyro_sensor_devfd.close()
         battery_voltage_devfd.close()
@@ -231,15 +240,6 @@ def runner():
         motor_encoder_right_devfd.close()
         motor_duty_cycle_left_devfd.close()
         motor_duty_cycle_right_devfd.close()
-
-        left_motor.stop()
-        right_motor.stop()
-
-        log_file = open('./log/log_runner_%s.csv' % log_datetime,'w')
-        for log in logs:
-            if log != "":
-                log_file.write("{}\n".format(log))
-        log_file.close()
 
         sys.exit()
 
