@@ -652,6 +652,8 @@ def runner_stub():
 ## カーネル空間をデバイスのkworkerのpidを特定
 ###############################################################
 def renice_driver_kworkers():
+    nice_value = -15
+
     kworkers_bytes = subprocess.check_output("ps aux | grep [k]worker/0:", shell=True)
     kworkers_text = kworkers_bytes.decode()
     kworker_lines = kworkers_text.split("\n")
@@ -659,7 +661,8 @@ def renice_driver_kworkers():
     kworker_lines.pop()
     for ps_line in kworker_lines:
         ps_columns = re.split("\s*", ps_line)
-        subprocess.check_output(("renice -15 -p {}".format(ps_columns[1])), shell=True)
+        subprocess.check_output(("renice {} -p {}".format(nice_value, ps_columns[1])), shell=True)
+    os.nice(nice_value) # 自分のnice値も下げる
 
 ########################################################################
 ##
@@ -685,6 +688,8 @@ if __name__ == '__main__':
         time.tzset()
         log_datetime = time.strftime("%Y%m%d%H%M%S")
 
+        renice_driver_kworkers()
+
         # touchSensorの読み込み
         touch = TouchSensor()
         touch_sensor_devfd = open(touch._path + "/value0", "rb")
@@ -707,10 +712,6 @@ if __name__ == '__main__':
             # write_steering_mem(50)
             print('Guide Done')
             sys.exit()
-
-        time.sleep(0.1)
-
-        renice_driver_kworkers()
 
         print('Im Pistol')
 
