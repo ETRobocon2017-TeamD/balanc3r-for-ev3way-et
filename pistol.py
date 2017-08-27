@@ -692,6 +692,7 @@ if __name__ == '__main__':
         os.environ['TZ'] = "JST-9"
         time.tzset()
         log_datetime = time.strftime("%Y%m%d%H%M%S")
+        print("Start time is {}".format(log_datetime))
 
         renice_driver_kworkers()
 
