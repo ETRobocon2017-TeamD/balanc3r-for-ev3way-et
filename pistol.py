@@ -205,9 +205,8 @@ def guide():
             ###############################################################
             ##  Busy wait for the loop to complete
             ###############################################################
-            # while ((time.clock() - t_loop_start) < loop_time_sec):
-            #     time.sleep(0.0001)
-            time.sleep(loop_time_sec - (time.clock() - t_loop_start))
+            time.sleep(max(loop_time_sec - (time.clock() - t_loop_start), 0.002))
+
 
     except Exception as e:
         print("It's a Guide Exception")
