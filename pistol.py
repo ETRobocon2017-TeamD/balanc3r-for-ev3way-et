@@ -439,6 +439,7 @@ def runner():
             gyro_rate = (gyro_rate_raw - gyro_offset) * rad_per_second_per_raw_gyro_unit # 躯体の角速度(rad/sec)。ジャイロから得た角速度をオフセット値で調整している
 
             # ジャイロ角速度が4以上の場合は倒れたとみなす
+            # 倒れた時のログを確認したところ、倒れた時点の角速度が4以上なので
             if abs(gyro_rate) > 4.0:
                 # TODO: 倒れた時用の例外クラスをつくること
                 raise Exception('I fell down!')
