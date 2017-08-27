@@ -675,14 +675,19 @@ def renice_driver_kworkers():
 if __name__ == '__main__':
 
     def shutdown():
-        if ('guide_pid' in globals()) or ('guide_pid' in locals()):
-            print('Kill Guide')
-            os.kill(guide_pid, signal.SIGTERM)
-        if ('runner_pid' in globals()) or ('runner_pid' in locals()):
-            print('Kill Runner')
-            os.kill(runner_pid, signal.SIGTERM)
-        touch_sensor_devfd.close()
-        print('Done')
+        try:
+            if ('guide_pid' in globals()) or ('guide_pid' in locals()):
+                print('Kill Guide')
+                os.kill(guide_pid, signal.SIGTERM)
+            if ('runner_pid' in globals()) or ('runner_pid' in locals()):
+                print('Kill Runner')
+                os.kill(runner_pid, signal.SIGTERM)
+            touch_sensor_devfd.close()
+            print('Done')
+
+        except Exception as ex:
+            print("It's a Pistol Exception in shutdown")
+            log.exception(ex)
 
     try:
         # logフォルダの生成
