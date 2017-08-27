@@ -745,6 +745,13 @@ if __name__ == '__main__':
 
         shutdown()
 
+    except KeyboardInterrupt as ex:
+        if (runner_pid > 0) and (guide_pid > 0):
+            print("It's a KeyboardInterrupt")
+            shutdown()
+        elif (runner_pid == 0) or (guide_pid == 0):
+            time.sleep(10)
+
     except Exception as ex:
         if (runner_pid > 0) and (guide_pid > 0):
             print("It's a Pistol Exception")
@@ -756,10 +763,3 @@ if __name__ == '__main__':
         elif (guide_pid == 0):
             print("It's a Guide Exception in shutdown")
             log.exception(ex)
-
-    except KeyboardInterrupt as ex:
-        if (runner_pid > 0) and (guide_pid > 0):
-            print("It's a KeyboardInterrupt")
-            shutdown()
-        elif (runner_pid == 0) or (guide_pid == 0):
-            time.sleep(10)
