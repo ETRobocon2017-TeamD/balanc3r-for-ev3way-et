@@ -86,17 +86,21 @@ def runner(sh_mem):
         gyro_drift_compensation_rate = 0.075 * loop_time_sec * rad_per_second_per_raw_gyro_unit
 
         # State feedback control gains (aka the magic numbers)
-        gain_motor_angle                   = 0.1606 * 3 * 0.77    # K_F[0]
-        gain_gyro_angle                    = 30.2153 * 2.5 * 0.77 # K_F[1]
-        gain_motor_angular_speed           = 1.0796 * 1.7 * 0.77  # K_F[2]
-        gain_gyro_rate                     = 3.3269 * 2 * 0.77    # K_F[3]
-        gain_motor_angle_error_accumulated = 0.4472 * 0.77        # K_I
+        # 8.5V - 0.60
+        # 8.2V - 0.68
+        # 7.5V - 0.77
+        gain_all                           = 0.68 #0.70 #0.81
+        gain_motor_angle                   = 0.1606 * 3 * gain_all    # K_F[0]
+        gain_gyro_angle                    = 30.2153 * 2.5 * gain_all # K_F[1]
+        gain_motor_angular_speed           = 1.0796 * 1.7 * gain_all  # K_F[2]
+        gain_gyro_rate                     = 3.3269 * 2 * gain_all    # K_F[3]
+        gain_motor_angle_error_accumulated = 0.4472 * gain_all        # K_I
 
         battery_gain = 0.001089  # PWM出力算出用バッテリ電圧補正係数
         battery_offset = 0.625  # PWM出力算出用バッテリ電圧補正オフセット
 
         a_d = 1.0 - 0.55 #0.51 #0.47  # ローパスフィルタ係数(左右車輪の平均回転角度用)。左右モーターの平均回転角速度(rad/sec)の算出時にのみ使用する。小さいほど角速度の変化に過敏になる。〜0.4951
-        a_r = 0.92 # 0.985 #0.98  # ローパスフィルタ係数(左右車輪の目標平均回転角度用)。左右モーターの目標平均回転角度(rad)の算出時に使用する。小さいほど前進・後退する反応が早くなる。
+        a_r = 0.97 # 0.985 #0.98  # ローパスフィルタ係数(左右車輪の目標平均回転角度用)。左右モーターの目標平均回転角度(rad)の算出時に使用する。小さいほど前進・後退する反応が早くなる。
         a_b = 0.85 #ローパスフィルタ係数(最大モーター電圧b用）
         k_theta_dot = 7.5 # モータ目標回転角速度係数
 

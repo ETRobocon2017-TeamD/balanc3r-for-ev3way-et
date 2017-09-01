@@ -15,7 +15,10 @@ class LineTracer:
         self.refrection_target = 0.0
         self.delta_t = 0.025 # 10msec
         # TODO: P係数(要調整)
-        self.k_p = 0.26
+        # 8.5V - 0.31
+        # 8.2V - 0.30
+        # 7.5V - 0.26
+        self.k_p = 0.30 #0.26
         # TODO: I係数(要調整)
         self.k_i = 0.1
         # TODO: D係数(要調整)
@@ -29,8 +32,8 @@ class LineTracer:
         # 前回までの微分値
         self.d_b = 0.0
         # 前回値
-        #self.previous = [0 for _ in range(5) ]
-        self.previous = 0
+        #self.previous_refrection_raw = [0 for _ in range(5) ]
+        self.previous_refrection_raw = 0
 
         self.color = ColorSensor()
         self.color.mode = self.color.MODE_REF_RAW #raw値
@@ -48,7 +51,7 @@ class LineTracer:
         target = target / gyro_rate_calibrate_count
         #目標値を保管
         self.refrection_target = target
-        self.previous = target
+        self.previous_refrection_raw = target
 
         u"""
         def pushPrevious(self, val)
@@ -63,8 +66,8 @@ class LineTracer:
         u""" 速度、旋回値をpwm値として返却 """
         #センサー値を取得
         refrection_raw = read_device(self.color_reflection_fd)
-        ref_avarage = int(round((self.previous + refrection_raw) / 2))
-        self.previous = refrection_raw
+        ref_avarage = int(round((self.previous_refrection_raw + refrection_raw) / 2))
+        self.previous_refrection_raw = refrection_raw
 
         #指示値を取得
         direction = self.__calc_direction(ref_avarage)
@@ -74,20 +77,35 @@ class LineTracer:
         # - direction: 旋回デューティ比
         # - speed: 走行速度デューティ比
         # - a_r: 
-        if direction < -30 or direction > 30:
+        # 7.5V - 30
+        # 8.4V - 20
+        # 8.2V - 25
+        if direction < -25 or direction > 25:
             # 低速値
             # NOTE: 倒れなければ速度を下げる必要がない。倒れない程度に速度を上げる方向で調整。30は7.5Vの時にちょうどよさそう
-            speed = 30
+            # 7.5V - 40
+            # 8.4V - 30
+            # 8.2V - 35
+            speed = 35
             # NOTE: directionの条件は調整中。 コースアウトする場合は、ここの値を小さくするとよい。
             # NOTE: 逆に直線で遅くなる傾向にあれば上げるべき。
-        elif direction < -15 or direction > 15:
+        # 7.5V - 15
+        # 8.4V - 7
+        # 8.2V - 10
+        elif direction < -10 or direction > 10:
             # 中速値
             # NOTE: コースアウトする場合、下げる必要がある。コースアウトしない程度に速度を上げる方向で調整。60はまだ決まった値ではない。
-            speed = 60
+            # 7.5V - 50
+            # 8.4V - 40
+            # 8.2V - 45
+            speed = 45
         else:
             # 高速値
             # NOTE: できるだけ上げたい値。90でちょうどよさそう。7.5Vの時。
-            speed = 90
+            # 7.5V - 60
+            # 8.4V - 50
+            # 8.2V - 55
+            speed = 55
 
         # NOTE: ライン左端を基準に走行させるために、旋回方向を - で反転している
         return speed, -direction, refrection_raw
