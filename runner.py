@@ -96,7 +96,7 @@ def runner(sh_mem):
         battery_offset = 0.625  # PWM出力算出用バッテリ電圧補正オフセット
 
         a_d = 1.0 - 0.55 #0.51 #0.47  # ローパスフィルタ係数(左右車輪の平均回転角度用)。左右モーターの平均回転角速度(rad/sec)の算出時にのみ使用する。小さいほど角速度の変化に過敏になる。〜0.4951
-        a_r = 0.985 #0.98  # ローパスフィルタ係数(左右車輪の目標平均回転角度用)。左右モーターの目標平均回転角度(rad)の算出時に使用する。小さいほど前進・後退する反応が早くなる。
+        a_r = 0.92 # 0.985 #0.98  # ローパスフィルタ係数(左右車輪の目標平均回転角度用)。左右モーターの目標平均回転角度(rad)の算出時に使用する。小さいほど前進・後退する反応が早くなる。
         a_b = 0.85 #ローパスフィルタ係数(最大モーター電圧b用）
         k_theta_dot = 7.5 # モータ目標回転角速度係数
 
@@ -234,9 +234,9 @@ def runner(sh_mem):
             gyro_rate_raw = read_device(gyro_sensor_devfd)
             gyro_rate = (gyro_rate_raw - gyro_offset) * rad_per_second_per_raw_gyro_unit # 躯体の角速度(rad/sec)。ジャイロから得た角速度をオフセット値で調整している
 
-            # ジャイロ角速度が4以上の場合は倒れたとみなす
-            # 倒れた時のログを確認したところ、倒れた時点の角速度が4以上なので
-            if abs(gyro_rate) > 5.0:
+            # 倒れた時のログを確認したところ、倒れた時点の角速度が4以上だった。
+            # TODO: 高速走行中にジャイロ値が4.0を超えるケースがあるようだ。グラフで確認すること。
+            if gyro_rate > 5.0 or gyro_rate < -5.0:
                 # TODO: 倒れた時用の例外クラスをつくること
                 raise Exception('I fell down!')
 
@@ -249,9 +249,9 @@ def runner(sh_mem):
 
             speed_reference = sh_mem.read_speed_mem()
 
-            #motor_angular_speed_reference = speed_reference * rad_per_sec_per_percent_speed # 左右モーターの目標平均回転角速度(rad/sec)。入力値speed_referenceを角速度(rad)に変換したもの。
             # K_THETA_DOT(7.5): 最大モーター角速度だと思われる値。 speed_reference(モータ最大角速度を100%とする、目標割合)にかけ合わせて
-            motor_angular_speed_reference = ((1.0 - a_r) * ((speed_reference / 100.0) * k_theta_dot)) + (a_r * motor_angular_speed_reference)
+            motor_angular_speed_reference_next = (speed_reference / 100.0) * k_theta_dot
+            motor_angular_speed_reference = ((1.0 - a_r) * motor_angular_speed_reference_next) + (a_r * motor_angular_speed_reference)
             motor_angle_reference = motor_angle_reference + (motor_angular_speed_reference * loop_time_sec) # 左右モーターの目標平均回転角度(rad)。初期値は0になる。入力値speed_referenceがずっと0でも0になる
 
             motor_angle_error = motor_angle - motor_angle_reference # 左右モーターの現在の平均回転角度と目標平均回転角度との誤差(rad)
