@@ -1,114 +1,100 @@
-from ev3dev.auto import *
-from ev3dev.helper import Tank
-import time
-from math import *
+import sys
+import logging
+import signal
+from time import sleep, clock, strftime
+from shared_memory import SharedMemory
+from line_tracer import LineTracer
 
-class LineTracer:
-    u"""PID制御によるライントレース
-    キャリブレーション後のカラーセンサー値を目標値として旋回量を制御
-    現時点では前進速度は固定値を想定
-    →走行速度によって係数を調整する必要があるため
-    """
+g_log = logging.getLogger(__name__)
 
-    def __init__(self):
-        # target_v 目標値
-        # delta_t 周回時間
-        self.refrection_target = 0.0
-        self.delta_t = 0.025 # 10msec
-        # TODO: P係数(要調整)
-        self.k_p = 0.26
-        # TODO: I係数(要調整)
-        self.k_i = 0.1
-        # TODO: D係数(要調整)
-        self.k_d = 0.05
-        # 前回偏差
-        self.e_b = 0.0
-        # 前回までの偏差値
-        self.p_b = 0.0
-        # 前回までの積分値
-        self.i_b = 0.0
-        # 前回までの微分値
-        self.d_b = 0.0
-        # 前回値
-        #self.previous = [0 for _ in range(5) ]
-        self.previous = 0
+########################################################################
+##
+## Guide：ラインの状態を感知して、前進後退速度と旋回速度を算出する関数
+##
+########################################################################
+def guide(sh_mem):
+    print('Im Guide')
 
-        self.color = ColorSensor()
-        self.color.mode = self.color.MODE_REF_RAW #raw値
-        self.color_reflection_fd = open(self.color._path + "/value0", "rb")
+    def shutdown_child(signum=None, frame=None):
+        sleep(0.2)
 
-    def calibrate_color_sensor(self):
-        target = 0
-        gyro_rate_calibrate_count = 100
-        color_val = 0
-        for _ in range(gyro_rate_calibrate_count):
-            color_val = self._read_fd(self.color_reflection_fd)
-            target = target + color_val
-            #pushPrevious(color_val)
-            time.sleep(0.01)
-        target = target / gyro_rate_calibrate_count
-        #目標値を保管
-        self.refrection_target = target
-        self.previous = target
+        log_datetime = strftime("%Y%m%d%H%M%S")
+        log_file = open("./log/log_guide_{}.csv".format(log_datetime), 'w')
+        for log in logs:
+            if log != "":
+                log_file.write("{}\n".format(log))
+        log_file.close()
 
-        u"""
-        def pushPrevious(self, val)
-        self.previous[0] = self.previous[1]
-        self.previous[1] = self.previous[2]
-        self.previous[2] = self.previous[3]
-        self.previous[3] = self.previous[3]
-        self.previous[4] = val
-        """
+        line_tracer.shutdown()
+        sys.exit()
 
-    def line_tracing(self):
-        u""" 速度、旋回値をpwm値として返却 """
-        #センサー値を取得
-        refrection_raw = self._read_fd(self.color_reflection_fd)
-        ref_avarage = int(round((self.previous + refrection_raw) / 2))
-        self.previous = refrection_raw
+    signal.signal(signal.SIGTERM, shutdown_child)
 
-        #指示値を取得
-        direction = self._calc_direction(ref_avarage)
-        speed = 50 #固定値
+    try:
+        # ここで変数定義などの事前準備を行う
+        # Time of each loop, measured in miliseconds.
+        loop_time_millisec = 25
+        # Time of each loop, measured in seconds.
+        loop_time_sec = loop_time_millisec / 1000.0
 
+        # ログ記録用
+        logs = ["" for _ in range(10000)]
+        log_pointer = 0
 
-        # NOTE: ライン左端を基準に走行させるために、旋回方向を - で反転している
-        return speed, -direction, refrection_raw
+        print('Calibrate ColorSensor ...')
+        line_tracer = LineTracer()
+        line_tracer.calibrate_color_sensor()
 
-    def shutdown(self):
-        self.color_reflection_fd.close()
+        # タッチセンサー押し待ち
+        print('Guide Waiting ...')
+        while not sh_mem.read_touch_sensor_mem():
+            sleep(0.1)
 
-    def _calc_direction(self, brightness):
-        u"""旋回量取得"""
-        # error 偏差
-        # p_n P制御
-        # i_n I制御
-        # d_n D制御
+        speed_reference = 0
+        direction = 0
+        refrection_raw = 0
 
-        # pid演算
-        error = self.refrection_target - brightness
-        p_n = self.k_p * error
-        integral = (self.i_b + ((error + self.e_b) / 2.0 * self.delta_t))
-        i_n = self.k_i * integral
-        d_n = self.k_d * (error - self.e_b) / self.delta_t
-        direction = (p_n + i_n + d_n)
+        # スタート時の時間取得
+        t_line_trace_start = clock()
 
-        # -100 ～100に収める
-        if direction > 100:
-            direction = 100
-        elif direction < -100:
-            direction = -100
+        while True:
+            ###############################################################
+            ##  Loop info
+            ###############################################################
+            t_loop_start = clock()
 
-        # 値の保存
-        self.e_b = error
-        self.p_b = p_n
-        self.i_b = integral
-        self.d_b = d_n
+            # ここでライントレースする
+            speed_reference, direction, refrection_raw = line_tracer.line_tracing()
 
-        return direction
+            # 左右モーターの角度は下記のように取得
+            # print(read_motor_encoder_left_mem())
+            # print(read_motor_encoder_right_mem())
 
-    # Function for fast reading from sensor files
-    @staticmethod
-    def _read_fd(fd):
-        fd.seek(0)
-        return int(fd.read().decode().strip())
+            # 前進後退・旋回スピードは下記のように入力
+            sh_mem.write_speed_mem(speed_reference)
+            sh_mem.write_steering_mem(int(round(direction)))
+
+            # 実行時間、PID制御に関わる値をログに出力
+            t_loop_end = clock()
+            logs[log_pointer] = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}".format(
+                t_loop_end - t_line_trace_start,
+                t_loop_end - t_loop_start,
+                speed_reference,
+                direction,
+                refrection_raw,
+                line_tracer.refrection_target,
+                line_tracer.e_b,
+                line_tracer.p_b,
+                line_tracer.i_b,
+                line_tracer.d_b)
+            log_pointer += 1
+
+            ###############################################################
+            ##  Busy wait for the loop to complete
+            ###############################################################
+            sleep(max(loop_time_sec - (clock() - t_loop_start), 0.002))
+
+    except Exception as e:
+        print("It's a Guide Exception")
+        g_log.exception(e)
+        shutdown_child()
