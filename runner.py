@@ -96,8 +96,10 @@ def runner(sh_mem):
         gain_gyro_rate                     = 3.3269 * 2 * gain_all    # K_F[3]
         gain_motor_angle_error_accumulated = 0.4472 * gain_all        # K_I
 
-        battery_gain = 0.001089  # PWM出力算出用バッテリ電圧補正係数
-        battery_offset = 0.625  # PWM出力算出用バッテリ電圧補正オフセット
+        battery_gain_left = 0.001276  # PWM出力算出用バッテリ電圧補正係数(左モーター用)
+        battery_offset_left = 1.959  # PWM出力算出用バッテリ電圧補正オフセット(左モーター用)
+        battery_gain_right = 0.000688 * 0.95  # PWM出力算出用バッテリ電圧補正係数(右モーター用)
+        battery_offset_right = -2.712 * 0.95  # PWM出力算出用バッテリ電圧補正オフセット(右モーター用)
 
         a_d = 1.0 - 0.55 #0.51 #0.47  # ローパスフィルタ係数(左右車輪の平均回転角度用)。左右モーターの平均回転角速度(rad/sec)の算出時にのみ使用する。小さいほど角速度の変化に過敏になる。〜0.4951
         a_r = 0.97 # 0.985 #0.98  # ローパスフィルタ係数(左右車輪の目標平均回転角度用)。左右モーターの目標平均回転角度(rad)の算出時に使用する。小さいほど前進・後退する反応が早くなる。
@@ -140,7 +142,8 @@ def runner(sh_mem):
 
         # The 'voltage' signal we send to the motor. We calulate a new value each
         # time, just right to keep the robot upright.
-        motor_duty_cycle = 0
+        motor_duty_cycle_left = 0
+        motor_duty_cycle_right = 0
 
         # The raw value from the gyro sensor in rate mode.
         gyro_rate_raw = 0
@@ -164,7 +167,8 @@ def runner(sh_mem):
         log_pointer = 0
 
         voltage_target = 0
-        voltage_estimate_max = 0
+        voltage_estimate_max_left = 0
+        voltage_estimate_max_right = 0
 
         # filehandles for fast reads/writes
         # =================================
@@ -183,7 +187,8 @@ def runner(sh_mem):
         voltage_raw = read_device(battery_voltage_devfd) # 単位(μV)
         # 現在のバッテリー電圧をもとに、PWMデューティ値を100%にしたとき、モータが受け取る推定電圧を求める。
         # 6.2 アクチュエータ　(6.1)式 バッテリ電圧とモータ回転速度(rpm)の関係式
-        voltage_estimate_max = (battery_gain * voltage_raw / 1000) - battery_offset
+        voltage_estimate_max_left = (battery_gain_left * voltage_raw / 1000) - battery_offset_left
+        voltage_estimate_max_right = (battery_gain_right * voltage_raw / 1000) - battery_offset_right
 
         ########################################################################
         ## Calibrate Gyro
@@ -279,15 +284,17 @@ def runner(sh_mem):
                + (gain_motor_angle * motor_angle_error)
                + (gain_motor_angular_speed * motor_angular_speed_error)
                + (gain_motor_angle_error_accumulated * motor_angle_error_accumulated))
-            voltage_estimate_max = (battery_gain * voltage_raw / 1000) - battery_offset
-            motor_duty_cycle = (voltage_target / voltage_estimate_max) * 100
+            voltage_estimate_max_left = (battery_gain_left * voltage_raw / 1000) - battery_offset_left
+            voltage_estimate_max_right = (battery_gain_right * voltage_raw / 1000) - battery_offset_right
+            motor_duty_cycle_left = (voltage_target / voltage_estimate_max_left) * 100
+            motor_duty_cycle_right = (voltage_target / voltage_estimate_max_right) * 100
 
             ###############################################################
             ##  Apply the signal to the motor, and add steering
             ###############################################################
             steering = sh_mem.read_steering_mem()
-            set_duty(motor_duty_cycle_right_devfd, motor_duty_cycle + steering)
-            duty = set_duty(motor_duty_cycle_left_devfd, motor_duty_cycle - steering) # 右車輪のモーター出力が弱いので、左車輪のPWM値を3つ目の引数で調節(%)してる。まだ偏ってるので調節必要
+            set_duty(motor_duty_cycle_right_devfd, motor_duty_cycle_right + steering)
+            duty = set_duty(motor_duty_cycle_left_devfd, motor_duty_cycle_left - steering) # 右車輪のモーター出力が弱いので、左車輪のPWM値を3つ目の引数で調節(%)してる。まだ偏ってるので調節必要
 
             ###############################################################
             ##  Update angle estimate and Gyro Offset Estimate
