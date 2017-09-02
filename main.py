@@ -87,6 +87,8 @@ if __name__ == '__main__':
 
         pistol(sh_mem)
 
+        shutdown()
+
     except KeyboardInterrupt as ex:
         if (runner_pid > 0) and (guide_pid > 0):
             print("It's a KeyboardInterrupt")
