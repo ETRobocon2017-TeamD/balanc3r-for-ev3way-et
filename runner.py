@@ -152,6 +152,10 @@ def runner(sh_mem, log_datetime):
         motor_duty_cycle_left = 0
         motor_duty_cycle_right = 0
 
+        # ログ出力用のデューティー比用変数
+        duty_left = 0
+        duty_right = 0
+
         # The raw value from the gyro sensor in rate mode.
         gyro_rate_raw = 0
 
@@ -305,8 +309,8 @@ def runner(sh_mem, log_datetime):
             ##  Apply the signal to the motor, and add steering
             ###############################################################
             steering = sh_mem.read_steering_mem()
-            set_duty(motor_duty_cycle_right_devfd, motor_duty_cycle_right + steering)
-            duty = set_duty(motor_duty_cycle_left_devfd, motor_duty_cycle_left - steering) # 右車輪のモーター出力が弱いので、左車輪のPWM値を3つ目の引数で調節(%)してる。まだ偏ってるので調節必要
+            duty_right = set_duty(motor_duty_cycle_right_devfd, motor_duty_cycle_right + steering)
+            duty_left = set_duty(motor_duty_cycle_left_devfd, motor_duty_cycle_left - steering) # 右車輪のモーター出力が弱いので、左車輪のPWM値を3つ目の引数で調節(%)してる。まだ偏ってるので調節必要
 
             ###############################################################
             ##  Update angle estimate and Gyro Offset Estimate
@@ -321,7 +325,7 @@ def runner(sh_mem, log_datetime):
 
             # 実行時間、PWM値(duty cycle value)に関わる値をログに出力
             t_loop_end = clock()
-            logs[log_pointer] = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}".format(
+            logs[log_pointer] = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}".format(
                 t_loop_end - t_balancer_start,
                 t_loop_end - t_loop_start,
                 gyro_rate_raw,
@@ -331,8 +335,14 @@ def runner(sh_mem, log_datetime):
                 motor_angle_error,
                 motor_angular_speed_error,
                 motor_angle_error_accumulated,
-                duty,
-                voltage_raw)
+                duty_left,
+                duty_right,
+                voltage_raw,
+                voltage_estimate_max_left,
+                voltage_estimate_max_right,
+                motor_duty_cycle_left,
+                motor_duty_cycle_right,
+                )
             log_pointer += 1
 
             ###############################################################
