@@ -77,35 +77,20 @@ class LineTracer:
         # - direction: 旋回デューティ比
         # - speed: 走行速度デューティ比
         # - a_r: 
-        # 7.5V - 30
-        # 8.4V - 20
-        # 8.2V - 25
-        if direction < -25 or direction > 25:
+        if direction < -30 or direction > 30:
             # 低速値
             # NOTE: 倒れなければ速度を下げる必要がない。倒れない程度に速度を上げる方向で調整。30は7.5Vの時にちょうどよさそう
-            # 7.5V - 40
-            # 8.4V - 30
-            # 8.2V - 35
-            speed = 35
+            speed = 30
             # NOTE: directionの条件は調整中。 コースアウトする場合は、ここの値を小さくするとよい。
             # NOTE: 逆に直線で遅くなる傾向にあれば上げるべき。
-        # 7.5V - 15
-        # 8.4V - 7
-        # 8.2V - 10
-        elif direction < -10 or direction > 10:
+        elif direction < -15 or direction > 15:
             # 中速値
             # NOTE: コースアウトする場合、下げる必要がある。コースアウトしない程度に速度を上げる方向で調整。60はまだ決まった値ではない。
-            # 7.5V - 50
-            # 8.4V - 40
-            # 8.2V - 45
-            speed = 45
+            speed = 60
         else:
             # 高速値
             # NOTE: できるだけ上げたい値。90でちょうどよさそう。7.5Vの時。
-            # 7.5V - 60
-            # 8.4V - 50
-            # 8.2V - 55
-            speed = 55
+            speed = 90
 
         # NOTE: ライン左端を基準に走行させるために、旋回方向を - で反転している
         return speed, -direction, refrection_raw
