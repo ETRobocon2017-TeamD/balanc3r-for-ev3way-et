@@ -12,21 +12,25 @@ g_log = logging.getLogger(__name__)
 ## Guide：ラインの状態を感知して、前進後退速度と旋回速度を算出する関数
 ##
 ########################################################################
-def guide(sh_mem):
+def guide(sh_mem, log_datetime):
     print('Im Guide')
 
     def shutdown_child(signum=None, frame=None):
-        sleep(0.2)
+        try:
+            sleep(0.2)
 
-        log_datetime = strftime("%Y%m%d%H%M%S")
-        log_file = open("./log/log_guide_{}.csv".format(log_datetime), 'w')
-        for log in logs:
-            if log != "":
-                log_file.write("{}\n".format(log))
-        log_file.close()
+            log_file = open("./log/log_{}_guide.csv".format(log_datetime), 'w')
+            for log in logs:
+                if log != "":
+                    log_file.write("{}\n".format(log))
+            log_file.close()
 
-        line_tracer.shutdown()
-        sys.exit()
+            line_tracer.shutdown()
+            sys.exit()
+
+        except Exception as ex:
+            g_log.exception(e)
+            raise ex
 
     signal.signal(signal.SIGTERM, shutdown_child)
 

@@ -71,14 +71,14 @@ if __name__ == '__main__':
 
         if runner_pid == 0:
             # NOTE: 倒立振子ライブラリを使う場合はrunner()を、ライントレーサー開発等で倒立振子ライブラリを使いたくない場合はrunner_stub()を使用すること
-            runner(sh_mem)
+            runner(sh_mem, log_datetime)
             print('Runner Done')
             sys.exit()
 
         guide_pid = os.fork()
 
         if guide_pid == 0:  # In a child process
-            guide(sh_mem)
+            guide(sh_mem, log_datetime)
             # TODO: ガイドが提示する前進後退・旋回スピードはanonymous memoryで共有する
             # sh_mem.write_speed_mem(50)
             # sh_mem.write_steering_mem(50)

@@ -13,30 +13,35 @@ g_log = logging.getLogger(__name__)
 ## Runner：倒立振子の制御とDuty比の入力を行う関数
 ##
 ########################################################################
-def runner(sh_mem):
+def runner(sh_mem, log_datetime):
     print('Im Runner')
-    log_datetime = strftime("%Y%m%d%H%M%S")
 
     def shutdown_child(signum=None, frame=None):
-        left_motor.stop()
-        right_motor.stop()
+        try:
+            left_motor.stop()
+            right_motor.stop()
 
-        sleep(0.2)
+            sleep(0.2)
 
-        log_file = open('./log/log_runner_%s.csv' % log_datetime,'w')
-        for log in logs:
-            if log != "":
-                log_file.write("{}\n".format(log))
-        log_file.close()
+            log_file = open('./log/log_%s_runner.csv' % log_datetime,'w')
+            for log in logs:
+                if log != "":
+                    log_file.write("{}\n".format(log))
+            log_file.close()
 
-        gyro_sensor_devfd.close()
-        battery_voltage_devfd.close()
-        motor_encoder_left_devfd.close()
-        motor_encoder_right_devfd.close()
-        motor_duty_cycle_left_devfd.close()
-        motor_duty_cycle_right_devfd.close()
+            gyro_sensor_devfd.close()
+            battery_voltage_devfd.close()
+            motor_encoder_left_devfd.close()
+            motor_encoder_right_devfd.close()
+            motor_duty_cycle_left_devfd.close()
+            motor_duty_cycle_right_devfd.close()
 
-        sys.exit()
+            sys.exit()
+
+        except Exception as ex:
+            g_log.exception(e)
+            raise ex
+
 
     signal.signal(signal.SIGTERM, shutdown_child)
 
