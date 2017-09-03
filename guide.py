@@ -60,6 +60,8 @@ def guide(sh_mem, log_datetime):
 
         speed_reference = 0
         direction = 0
+        odometry_speed_reference = 0
+        odometry_direction = 0
         refrection_raw = 0
 
         angle_l = 0
@@ -75,12 +77,12 @@ def guide(sh_mem, log_datetime):
             t_loop_start = clock()
 
             # ここでライントレースする
-            # speed_reference, direction, refrection_raw = line_tracer.line_tracing()
+            speed_reference, direction, refrection_raw = line_tracer.line_tracing()
 
             # 角度を算出してオドメトリーを使用
             angle_l = sh_mem.read_motor_encoder_left_mem()
             angle_r = sh_mem.read_motor_encoder_right_mem()
-            direction , speed = odometry.target_trace(angle_l,angle_r)
+            odometry_direction , odometry_speed_reference = odometry.target_trace(angle_l,angle_r)
 
             # 左右モーターの角度は下記のように取得
             # print(read_motor_encoder_left_mem())
@@ -92,7 +94,7 @@ def guide(sh_mem, log_datetime):
 
             # 実行時間、PID制御に関わる値をログに出力
             t_loop_end = clock()
-            logs[log_pointer] = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}".format(
+            logs[log_pointer] = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}".format(
                 t_loop_end - t_line_trace_start,
                 t_loop_end - t_loop_start,
                 speed_reference,
@@ -106,7 +108,9 @@ def guide(sh_mem, log_datetime):
                 angle_l,
                 angle_r,
                 odometry.pre_pos_x,
-                odometry.pre_pos_y)
+                odometry.pre_pos_y,
+                odometry_direction,
+                odometry_speed_reference)
             log_pointer += 1
 
             ###############################################################
