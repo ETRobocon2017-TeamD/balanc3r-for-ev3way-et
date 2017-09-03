@@ -4,6 +4,7 @@ import signal
 from time import sleep, clock, strftime
 from shared_memory import SharedMemory
 from line_tracer import LineTracer
+from odometry import Odometry
 
 g_log = logging.getLogger(__name__)
 
@@ -49,6 +50,9 @@ def guide(sh_mem, log_datetime):
         line_tracer = LineTracer()
         line_tracer.calibrate_color_sensor()
 
+        print('Configurating Odometry ...')
+        odometry = Odometry()
+
         # タッチセンサー押し待ち
         print('Guide Waiting ...')
         while not sh_mem.read_touch_sensor_mem():
@@ -57,6 +61,9 @@ def guide(sh_mem, log_datetime):
         speed_reference = 0
         direction = 0
         refrection_raw = 0
+
+        angle_l = 0
+        angle_r = 0
 
         # スタート時の時間取得
         t_line_trace_start = clock()
@@ -68,7 +75,12 @@ def guide(sh_mem, log_datetime):
             t_loop_start = clock()
 
             # ここでライントレースする
-            speed_reference, direction, refrection_raw = line_tracer.line_tracing()
+            # speed_reference, direction, refrection_raw = line_tracer.line_tracing()
+
+            # 角度を算出してオドメトリーを使用
+            angle_l = sh_mem.read_motor_encoder_left_mem()
+            angle_r = sh_mem.read_motor_encoder_right_mem()
+            direction , speed = odometry.target_trace(angle_l,angle_r)
 
             # 左右モーターの角度は下記のように取得
             # print(read_motor_encoder_left_mem())
@@ -80,7 +92,7 @@ def guide(sh_mem, log_datetime):
 
             # 実行時間、PID制御に関わる値をログに出力
             t_loop_end = clock()
-            logs[log_pointer] = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}".format(
+            logs[log_pointer] = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}".format(
                 t_loop_end - t_line_trace_start,
                 t_loop_end - t_loop_start,
                 speed_reference,
@@ -90,7 +102,11 @@ def guide(sh_mem, log_datetime):
                 line_tracer.e_b,
                 line_tracer.p_b,
                 line_tracer.i_b,
-                line_tracer.d_b)
+                line_tracer.d_b,
+                angle_l,
+                angle_r,
+                odometry.pre_pos_x,
+                odometry.pre_pos_y)
             log_pointer += 1
 
             ###############################################################

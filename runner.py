@@ -115,6 +115,8 @@ def runner(sh_mem, log_datetime):
         # The angle of "the motor", measured in raw units (degrees for the
         # EV3). We will take the average of both motor positions as "the motor"
         # angle, wich is essentially how far the middle of the robot has traveled.
+        motor_angle_left_raw = 0
+        motor_angle_right_raw = 0
         motor_angle_raw = 0
 
         # The angle of the motor, converted to radians (2*pi radians equals 360 degrees).
@@ -257,8 +259,13 @@ def runner(sh_mem, log_datetime):
             ###############################################################
             ##  Reading the Motor Position
             ###############################################################
+            motor_angle_left_raw = read_device(motor_encoder_left_devfd)
+            motor_angle_right_raw = read_device(motor_encoder_right_devfd)
+            sh_mem.write_motor_encoder_left_mem(motor_angle_left_raw)
+            sh_mem.write_motor_encoder_right_mem(motor_angle_right_raw)
+
             motor_angle_last = motor_angle
-            motor_angle_raw = (read_device(motor_encoder_left_devfd) + read_device(motor_encoder_right_devfd)) * 0.5
+            motor_angle_raw = (motor_angle_left_raw + motor_angle_right_raw) * 0.5
             motor_angle = (motor_angle_raw * radians_per_raw_motor_unit) + gyro_estimated_angle # 左右モーターの現在の平均回転角度(rad) + 躯体の(推定)回転角度
 
             speed_reference = sh_mem.read_speed_mem()
