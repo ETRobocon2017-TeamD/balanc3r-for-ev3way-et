@@ -20,7 +20,7 @@ do
 done
 
 if [ "$FLAG_DAEMON" ]; then
-    echo init
+    echo "Stop daemons"
     systemctl stop ntp
     systemctl stop nmbd
     /etc/init.d/avahi-daemon stop
