@@ -107,7 +107,7 @@ def runner(sh_mem, log_datetime):
         battery_offset_right = -2.712 * 0.95  # PWM出力算出用バッテリ電圧補正オフセット(右モーター用)
 
         a_d = 1.0 - 0.55 #0.51 #0.47  # ローパスフィルタ係数(左右車輪の平均回転角度用)。左右モーターの平均回転角速度(rad/sec)の算出時にのみ使用する。小さいほど角速度の変化に過敏になる。〜0.4951
-        a_r = 0.97 # 0.985 #0.98  # ローパスフィルタ係数(左右車輪の目標平均回転角度用)。左右モーターの目標平均回転角度(rad)の算出時に使用する。小さいほど前進・後退する反応が早くなる。
+        a_r = 0.985 #0.98  # ローパスフィルタ係数(左右車輪の目標平均回転角度用)。左右モーターの目標平均回転角度(rad)の算出時に使用する。小さいほど前進・後退する反応が早くなる。
         a_b = 0.85 #ローパスフィルタ係数(最大モーター電圧b用）
         k_theta_dot = 7.5 # モータ目標回転角速度係数
 
@@ -265,8 +265,8 @@ def runner(sh_mem, log_datetime):
             ###############################################################
             motor_angle_left_raw = read_device(motor_encoder_left_devfd)
             motor_angle_right_raw = read_device(motor_encoder_right_devfd)
-            sh_mem.write_motor_encoder_left_mem(motor_angle_left_raw)
-            sh_mem.write_motor_encoder_right_mem(motor_angle_right_raw)
+            # sh_mem.write_motor_encoder_left_mem(motor_angle_left_raw)
+            # sh_mem.write_motor_encoder_right_mem(motor_angle_right_raw)
 
             motor_angle_last = motor_angle
             motor_angle_raw = (motor_angle_left_raw + motor_angle_right_raw) * 0.5
