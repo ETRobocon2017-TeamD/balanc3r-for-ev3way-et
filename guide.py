@@ -80,9 +80,11 @@ def guide(sh_mem, log_datetime):
             speed_reference, direction, refrection_raw = line_tracer.line_tracing()
 
             # 角度を算出してオドメトリーを使用
-            # angle_l = sh_mem.read_motor_encoder_left_mem()
-            # angle_r = sh_mem.read_motor_encoder_right_mem()
-            # odometry_direction , odometry_speed_reference = odometry.target_trace(angle_l,angle_r)
+            angle_l = sh_mem.read_motor_encoder_left_mem()
+            angle_r = sh_mem.read_motor_encoder_right_mem()
+            odometry_speed_reference, odometry_direction = odometry.target_trace(angle_l,angle_r)
+            direction = odometry_direction
+            speed_reference = speed_reference
 
             # 左右モーターの角度は下記のように取得
             # print(read_motor_encoder_left_mem())
