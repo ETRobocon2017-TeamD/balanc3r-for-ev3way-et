@@ -48,8 +48,22 @@ class Odometry:
         self.cur_target_index =0
 
         self.odmetry_logs = ["" for _ in range(10000)]
-        self.odmetry_log_pointer = 0
+        self.odmetry_log_pointer = 1
 
+        self.odmetry_logs[0] = "{},{},{},{},{},{},{},{},{},{},{},{},{}".format(
+            "モータ回転角度L d",
+            "モータ回転角度R d",
+            "進行距離 mm",
+            "車体角度 d",
+            "現在位置x",
+            "現在位置y",
+            "目標位置x",
+            "目標位置y",
+            "目標までの距離 mm",
+            "目標までの角度 d",
+            "車体角度と目標角度の差 d",
+            "総合走行距離 mm",
+            "総合旋回角度 d")
 
         # # 目標座標までの方位，距離を格納
         # self.Grid_setDistance(0, 0, self.target_pos[0][self.cur_target_index], self.target_pos[1][self.cur_target_index])
@@ -83,26 +97,27 @@ class Odometry:
 
 
         # 現在の位置を計算
-        pos_x = self.pre_pos_x + (cur_dis * cos(radians(cur_dir))) #進行距離 * cos x
-        pos_y = self.pre_pos_y + (cur_dis * sin(radians(cur_dir))) #進行距離 * sin x
+        pos_x = self.pre_pos_x + (cur_dis * cos(radians(self.total_direction))) #進行距離 * cos x
+        pos_y = self.pre_pos_y + (cur_dis * sin(radians(self.total_direction))) #進行距離 * sin x
 
         self.pre_pos_x = pos_x
         self.pre_pos_y = pos_y
 
 
         # 目標座標までの方位，距離を格納
-        target_dis = self.get_target_distance(pos_x, pos_y, self.target_pos[0][self.cur_target_index], self.target_pos[1][self.cur_target_index])
-        target_dir = self.get_target_direction(pos_x, pos_y, self.target_pos[0][self.cur_target_index], self.target_pos[1][self.cur_target_index])
+        target_pos_x = self.target_pos[self.cur_target_index][0]
+        target_pos_y = self.target_pos[self.cur_target_index][1]
+        target_dis = self.get_target_distance(pos_x, pos_y, target_pos_x, target_pos_y)
+        target_dir = self.get_target_direction(pos_x, pos_y, target_pos_x, target_pos_y)
 
 
         #targetとの差分から速度と角度を調整
-        #角度の差に比例すべき？
-        if target_dir < 0 :
-            direction = self.pre_direction_pwm + self.turning_angle
-        elif target_dir == 0:
-            direction = 0
-        else:
-            direction = self.pre_direction_pwm - self.turning_angle
+        deff_dir = target_dir - self.total_direction
+        direction = -deff_dir
+        if direction < -100:
+            direction = -100
+        elif direction > 100:
+            direction = 100
 
         #TODO:距離に比例してスピードを出すべきか検討
         #計測してから
@@ -114,20 +129,23 @@ class Odometry:
 
         #目標に到達していたらindexを進める
         #TODO:目標近傍の閾値について検討
-        if abs(self.target_pos[0][self.cur_target_index] - pos_x) < self.target_area_x and abs(self.target_pos[1][self.cur_target_index] - pos_y) < self.target_area_y:
-            cur_target_index +=1
+        if abs(target_pos_x - pos_x) < self.target_area_x and abs(target_pos_y - pos_y) < self.target_area_y:
+            self.cur_target_index +=1
 
 
         #log
-        self.odmetry_logs[self.odmetry_log_pointer] = "{},{},{},{},{},{},{},{},{},{}".format(
+        self.odmetry_logs[self.odmetry_log_pointer] = "{},{},{},{},{},{},{},{},{},{},{},{},{}".format(
             left_angle,
             right_angle,
             cur_dis,
             cur_dir,
             pos_x,
             pos_y,
+            target_pos_x,
+            target_pos_y,
             target_dis,
             target_dir,
+            deff_dir,
             self.total_distance,
             self.total_direction)
         self.odmetry_log_pointer += 1
