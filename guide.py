@@ -28,11 +28,11 @@ def guide(sh_mem, log_datetime):
 
             if ('line_tracer' in globals()) or ('line_tracer' in locals()):
                 line_tracer.shutdown()
-            
+
             sys.exit()
 
         except Exception as ex:
-            g_log.exception(e)
+            g_log.exception(ex)
             raise ex
 
     def wait_for_input():

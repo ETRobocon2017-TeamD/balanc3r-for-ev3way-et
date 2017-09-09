@@ -39,7 +39,7 @@ def runner(sh_mem, log_datetime):
             sys.exit()
 
         except Exception as ex:
-            g_log.exception(e)
+            g_log.exception(ex)
             raise ex
 
     def wait_for_input():
