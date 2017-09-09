@@ -33,6 +33,12 @@ def guide(sh_mem, log_datetime):
             g_log.exception(e)
             raise ex
 
+    def wait_for_input():
+        print('Guide Waiting ...')
+        sh_mem.write_guide_is_ready_mem(1)
+        while not sh_mem.read_touch_sensor_mem():
+            sleep(0.1)
+
     signal.signal(signal.SIGTERM, shutdown_child)
 
     try:
@@ -46,6 +52,8 @@ def guide(sh_mem, log_datetime):
         logs = ["" for _ in range(10000)]
         log_pointer = 0
 
+        wait_for_input() # 設置が終わるまで待つ
+
         print('Calibrate ColorSensor ...')
         line_tracer = LineTracer()
         line_tracer.calibrate_color_sensor()
@@ -53,10 +61,10 @@ def guide(sh_mem, log_datetime):
         print('Configurating Odometry ...')
         odometry = Odometry()
 
+        print('Guide is Ready')
+
         # タッチセンサー押し待ち
-        print('Guide Waiting ...')
-        while not sh_mem.read_touch_sensor_mem():
-            sleep(0.1)
+        wait_for_input()
 
         speed_reference = 0
         direction = 0

@@ -42,6 +42,11 @@ def runner(sh_mem, log_datetime):
             g_log.exception(e)
             raise ex
 
+    def wait_for_input():
+        print('Runner Waiting ...')
+        sh_mem.write_runner_is_ready_mem(1)
+        while not sh_mem.read_touch_sensor_mem():
+            sleep(0.025)
 
     signal.signal(signal.SIGTERM, shutdown_child)
 
@@ -204,6 +209,9 @@ def runner(sh_mem, log_datetime):
         ########################################################################
         ## Calibrate Gyro
         ########################################################################
+
+        wait_for_input() # 設置が終わるまで待つ
+
         print("-----------------------------------")
         print("Calibrating...")
 
@@ -227,16 +235,13 @@ def runner(sh_mem, log_datetime):
         ########################################################################
         ## タッチセンサー押し待ち
         ########################################################################
-        print('Runner Waiting ...')
-        print('-- PLEASE PUSH BUTTON --')
-        while not sh_mem.read_touch_sensor_mem():
-            sleep(0.025)
+
+        print('Runner is Ready')
+        wait_for_input()
 
         print("-----------------------------------")
         print("GO!")
         print("-----------------------------------")
-
-        tail_motor.run_timed(time_sp=250, speed_sp=-300) # しっぽモーター上に上げる
 
         # 倒立振子スタート時の時間取得
         t_balancer_start = clock()
@@ -311,6 +316,12 @@ def runner(sh_mem, log_datetime):
             steering = sh_mem.read_steering_mem()
             duty_right = set_duty(motor_duty_cycle_right_devfd, motor_duty_cycle_right + steering)
             duty_left = set_duty(motor_duty_cycle_left_devfd, motor_duty_cycle_left - steering) # 右車輪のモーター出力が弱いので、左車輪のPWM値を3つ目の引数で調節(%)してる。まだ偏ってるので調節必要
+
+            ###############################################################
+            ##  ここでしっぽモーターを上げる
+            ###############################################################
+            if motor_angle_raw == 0:
+                tail_motor.run_timed(time_sp=250, speed_sp=-300, stop_action='coast') # しっぽモーター上に上げる
 
             ###############################################################
             ##  Update angle estimate and Gyro Offset Estimate

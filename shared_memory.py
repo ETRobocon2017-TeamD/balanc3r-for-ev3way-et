@@ -24,7 +24,7 @@ def write_anon_mem(memfd, value):
     memfd.write(bytes(bts))
 
 class SharedMemory:
-    __slots__ = ('touch_sensor_memfd', 'speed_memfd', 'steering_memfd', 'motor_encoder_left_memfd', 'motor_encoder_right_memfd')
+    __slots__ = ('touch_sensor_memfd', 'speed_memfd', 'steering_memfd', 'motor_encoder_left_memfd', 'motor_encoder_right_memfd', 'runner_is_ready_memfd', 'guide_is_ready_memfd')
 
     def __init__(self):
         MMAP_SIZE = 18 # マップするバイト数
@@ -39,11 +39,18 @@ class SharedMemory:
         self.motor_encoder_left_memfd = mmap.mmap(-1, MMAP_SIZE)
         self.motor_encoder_right_memfd = mmap.mmap(-1, MMAP_SIZE)
 
+        # Runnerが準備済みかどうかをanonymous memoryで共有
+        self.runner_is_ready_memfd = mmap.mmap(-1, MMAP_SIZE)
+        # Guideが準備済みかどうかをanonymous memoryで共有
+        self.guide_is_ready_memfd = mmap.mmap(-1, MMAP_SIZE)
+
         write_anon_mem(self.touch_sensor_memfd, 0)
         write_anon_mem(self.speed_memfd, 0)
         write_anon_mem(self.steering_memfd, 0)
         write_anon_mem(self.motor_encoder_left_memfd, 0)
         write_anon_mem(self.motor_encoder_right_memfd, 0)
+        write_anon_mem(self.runner_is_ready_memfd, 0)
+        write_anon_mem(self.guide_is_ready_memfd, 0)
 
     def read_touch_sensor_mem(self):
         return read_anon_mem(self.touch_sensor_memfd)
@@ -74,3 +81,15 @@ class SharedMemory:
 
     def write_motor_encoder_right_mem(self, value):
         write_anon_mem(self.motor_encoder_right_memfd, value)
+
+    def read_runner_is_ready_mem(self):
+        return read_anon_mem(self.runner_is_ready_memfd)
+
+    def write_runner_is_ready_mem(self, value):
+        write_anon_mem(self.runner_is_ready_memfd, value)
+
+    def read_guide_is_ready_mem(self):
+        return read_anon_mem(self.guide_is_ready_memfd)
+
+    def write_guide_is_ready_mem(self, value):
+        write_anon_mem(self.guide_is_ready_memfd, value)
