@@ -14,28 +14,30 @@ from ev3dev.auto import Motor
 g_log = logging.getLogger(__name__)
 
 ###############################################################
-## カーネル空間をデバイスのkworkerのpidを特定
+##
+## ナイス値が高いプロセスは倒立振子関連プロセスと競合するため、ナイス値を標準プロセスと一致させる
+##
 ###############################################################
-def renice_driver_kworkers():
-    nice_value = -15
+def renice_high_nice_processes():
+    nice_value = 0
+    cmds = "ps lax | grep -- [-]20 | awk '{{print $3}}' | xargs sudo renice {} -p".format(nice_value)
+    subprocess.check_output(cmds, shell=True)
 
-    kworkers_bytes = subprocess.check_output("ps aux | grep [k]worker/0:", shell=True)
-    kworkers_text = kworkers_bytes.decode()
-    kworker_lines = kworkers_text.split("\n")
-    # 最終行は無効なので消去する
-    kworker_lines.pop()
-    for ps_line in kworker_lines:
-        ps_columns = re.split("\s*", ps_line)
-        subprocess.check_output(("renice {} -p {}".format(nice_value, ps_columns[1])), shell=True)
-    os.nice(nice_value) # 自分のnice値も下げる
+###############################################################
+##
+## カーネル空間にあるデバイス制御に使われそうなkworkerのpidを特定し、nice値を上げる
+##
+###############################################################
+def renice_driver_kworkers(nice_value):
+    cmds = "ps aux | grep '[k]worker/0:' | awk '{{print $2}}' | xargs sudo renice {} -p".format(nice_value)
+    subprocess.check_output(cmds, shell=True)
 
 ########################################################################
 ##
 ## メイン：Guide関数とRunner関数用の子プロセスをフォークする
 ##
 ########################################################################
-if __name__ == '__main__':
-
+def main():
     guide_pid = 0
     runner_pid = 0
 
@@ -64,13 +66,17 @@ if __name__ == '__main__':
         # logフォルダの生成
         if not os.path.exists('./log/'):
             os.mkdir('./log/')
+            
         # 日本時間に変更
         os.environ['TZ'] = "JST-9"
         tzset()
         log_datetime = strftime("%Y%m%d%H%M%S")
         print("Start time is {}".format(log_datetime))
 
-        renice_driver_kworkers()
+        renice_high_nice_processes()
+        nice_value = -15
+        renice_driver_kworkers(nice_value)
+        os.nice(nice_value) # 自分のnice値も下げる
 
         # プロセス間共有メモリ
         sh_mem = SharedMemory()
@@ -115,3 +121,11 @@ if __name__ == '__main__':
         elif (guide_pid == 0):
             print("It's a Guide Exception in shutdown")
             g_log.exception(ex)
+
+###############################################################
+##
+## エントリーポイント
+##
+###############################################################
+if __name__ == '__main__':
+    main()

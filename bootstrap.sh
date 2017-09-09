@@ -26,8 +26,6 @@ if [ "$FLAG_DAEMON" ]; then
     /etc/init.d/avahi-daemon stop
 fi
 
-ps lax | grep -- [-]20 | awk '{print $3}' | xargs sudo renice 0 -p
-
 if [ "$FLAG_R" ]; then
     echo R course selected
     python3 main.py

@@ -26,7 +26,9 @@ def guide(sh_mem, log_datetime):
                     log_file.write("{}\n".format(log))
             log_file.close()
 
-            line_tracer.shutdown()
+            if ('line_tracer' in globals()) or ('line_tracer' in locals()):
+                line_tracer.shutdown()
+            
             sys.exit()
 
         except Exception as ex:
