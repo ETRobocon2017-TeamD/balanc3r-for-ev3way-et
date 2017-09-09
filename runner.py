@@ -65,8 +65,13 @@ def runner(sh_mem, log_datetime):
         right_motor.reset()
         left_motor.run_direct()
         right_motor.run_direct()
+
         #しっぽモーター
         tail_motor = Motor('outA')
+        tail_motor.run_timed(time_sp=1000, speed_sp=-200, stop_action='hold') # しっぽを一番上に上げる
+        sleep(1)
+        tail_motor.reset() # しっぽが一番上の状態を0度とする
+        tail_motor.run_to_abs_pos(position_sp=100, stop_action='hold', speed_sp=300) # ちょうど安定して立つ角度にする
 
         ########################################################################
         ## Definitions and Initialization variables
