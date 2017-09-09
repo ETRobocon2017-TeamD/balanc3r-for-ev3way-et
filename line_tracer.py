@@ -125,8 +125,4 @@ class LineTracer:
         self.i_b = integral
         self.d_b = d_n
 
-        # 目標値と現在地値の差分が少ないときは直進させる
-        if (error < 10) and (error > -10):
-            direction = 0
-
         return direction
