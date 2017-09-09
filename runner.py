@@ -40,6 +40,8 @@ def runner(sh_mem, log_datetime):
 
         except Exception as ex:
             g_log.exception(ex)
+            left_motor.stop()
+            right_motor.stop()
             raise ex
 
     def wait_for_input():
