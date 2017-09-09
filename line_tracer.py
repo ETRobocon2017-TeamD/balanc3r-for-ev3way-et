@@ -1,6 +1,6 @@
 from time import sleep
 from device import read_device
-from ev3dev.auto import ColorSensor
+from ev3dev.auto import ColorSensor, TouchSensor
 
 class LineTracer:
     u"""PID制御によるライントレース
@@ -40,18 +40,46 @@ class LineTracer:
         self.color_reflection_fd = open(self.color._path + "/value0", "rb")
 
     def calibrate_color_sensor(self):
-        target = 0
+        white_target = 559.02 # 黒色のカラーセンサー値
+        black_target =  631.92# 白色のカラーセンサー値
+        target_white_rate = 0.75 # 目標値の白色の割合
         gyro_rate_calibrate_count = 100
         color_val = 0
-        for _ in range(gyro_rate_calibrate_count):
-            color_val = read_device(self.color_reflection_fd)
-            target = target + color_val
-            #pushPrevious(color_val)
-            sleep(0.01)
-        target = target / gyro_rate_calibrate_count
+
+        # -- ここからカラーキャリブレーション --
+
+        # touch = TouchSensor()
+
+        # print('-- SET ON WHITE COLOR LINE --')
+        # while not touch.is_pressed:
+        #     sleep(0.1)
+
+        # for _ in range(gyro_rate_calibrate_count):
+        #     color_val = read_device(self.color_reflection_fd)
+        #     white_target = white_target + color_val
+        #     #pushPrevious(color_val)
+        #     sleep(0.01)
+        # white_target = white_target / gyro_rate_calibrate_count
+
+        # print('-- SET ON BLACK COLOR LINE --')
+        # while not touch.is_pressed:
+        #     sleep(0.1)
+
+        # for _ in range(gyro_rate_calibrate_count):
+        #     color_val = read_device(self.color_reflection_fd)
+        #     black_target = black_target + color_val
+        #     #pushPrevious(color_val)
+        #     sleep(0.01)
+        # black_target = black_target / gyro_rate_calibrate_count
+
+        # -- ここまでカラーキャリブレーション --
+
+        print('White Color: {}'.format(white_target))
+        print('Black Color: {}'.format(black_target))
+
         #目標値を保管
-        self.refrection_target = target
-        self.previous_refrection_raw = target
+        self.refrection_target = (white_target * target_white_rate) + (black_target * (1.0 - target_white_rate))
+        self.previous_refrection_raw = self.refrection_target
 
         u"""
         def pushPrevious(self, val)
