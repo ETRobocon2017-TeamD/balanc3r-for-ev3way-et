@@ -1,5 +1,5 @@
 from time import sleep
-from ev3dev.auto import TouchSensor
+from ev3dev.auto import TouchSensor, Sound
 from device import read_device
 from sys import stdin
 import os
@@ -21,6 +21,9 @@ def pistol(sh_mem):
 
     def wait_for_input(interval):
         try:
+            # 入力待ちの合図
+            Sound.beep('-f 500')
+
             # fdの端末属性を取得
             # newに変更を加えて、適応する
             # oldは、後で元に戻すため
