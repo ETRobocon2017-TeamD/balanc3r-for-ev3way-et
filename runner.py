@@ -244,8 +244,8 @@ def runner(sh_mem, log_datetime):
         print("GO!")
         print("-----------------------------------")
 
-        tail_motor.run_timed(time_sp=100, speed_sp=120) # しっぽモーター下に少し下げる
-        sleep(0.1)
+        tail_motor.run_timed(time_sp=150, speed_sp=120) # しっぽモーター下に少し下げる
+        sleep(0.15)
 
         # 倒立振子スタート時の時間取得
         t_balancer_start = clock()
