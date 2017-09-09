@@ -79,8 +79,14 @@ def pistol(sh_mem):
         wait_for_input(0.1) # ユーザーの入力を待つ
 
         sleep(1)
+        touch_sensor_pressed = 0
 
-        wait_for_input(0.1) # ユーザーの入力を待つ（止めるための）
+        # ユーザーの入力を待つ（止めるための）
+        while not touch_sensor_pressed:
+            sleep(0.2)
+            touch_sensor_pressed = read_device(touch_sensor_devfd)
+            sh_mem.write_touch_sensor_mem(touch_sensor_pressed)
+
 
     finally:
         touch_sensor_devfd.close()
