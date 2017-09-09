@@ -248,6 +248,9 @@ def runner(sh_mem, log_datetime):
         print("GO!")
         print("-----------------------------------")
 
+        tail_motor.run_timed(time_sp=100, speed_sp=400) # しっぽモーター下に少し下げる
+        sleep(0.1)
+
         # 倒立振子スタート時の時間取得
         t_balancer_start = clock()
 
@@ -325,7 +328,7 @@ def runner(sh_mem, log_datetime):
             ###############################################################
             ##  ここでしっぽモーターを上げる
             ###############################################################
-            if motor_angle_raw == 0:
+            if gyro_estimated_angle == 0:
                 tail_motor.run_timed(time_sp=250, speed_sp=-300, stop_action='coast') # しっぽモーター上に上げる
 
             ###############################################################
