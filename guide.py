@@ -13,7 +13,7 @@ g_log = logging.getLogger(__name__)
 ## Guide：ラインの状態を感知して、前進後退速度と旋回速度を算出する関数
 ##
 ########################################################################
-def guide(sh_mem, log_datetime):
+def guide(sh_mem, setting, log_datetime):
     print('Im Guide')
 
     def shutdown_child(signum=None, frame=None):
@@ -56,9 +56,11 @@ def guide(sh_mem, log_datetime):
 
         wait_for_input() # 設置が終わるまで待つ
 
-        print('Calibrate ColorSensor ...')
-        line_tracer = LineTracer()
-        line_tracer.calibrate_color_sensor()
+        line_tracer = LineTracer(setting)
+
+        # プログラム実行時にキャリブレーションを実行する場合は以下のコードを実行する
+        # print('Calibrate ColorSensor ...')
+        # line_tracer.calibrate_color_sensor()
 
         print('Configurating Odometry ...')
         odometry = Odometry()

@@ -13,7 +13,7 @@ g_log = logging.getLogger(__name__)
 ## Runner：倒立振子の制御とDuty比の入力を行う関数
 ##
 ########################################################################
-def runner(sh_mem, log_datetime):
+def runner(sh_mem, setting, log_datetime):
     print('Im Runner')
 
     def shutdown_child(signum=None, frame=None):

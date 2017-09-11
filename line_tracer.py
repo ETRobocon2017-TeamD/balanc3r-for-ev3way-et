@@ -9,7 +9,7 @@ class LineTracer:
     →走行速度によって係数を調整する必要があるため
     """
 
-    def __init__(self):
+    def __init__(self, setting):
         # target_v 目標値
         # delta_t 周回時間
         self.refrection_target = 0.0
@@ -39,40 +39,40 @@ class LineTracer:
         self.color.mode = self.color.MODE_REF_RAW #raw値
         self.color_reflection_fd = open(self.color._path + "/value0", "rb")
 
+        white_target = setting['lineWhiteLuminance']
+        black_target = setting['lineBlackLuminance']
+        target_white_rate = setting['lineLuminanceRate']
+
+        self.refrection_target = (white_target * target_white_rate) + (black_target * (1.0 - target_white_rate))
+        self.previous_refrection_raw = self.refrection_target
+
     def calibrate_color_sensor(self):
-        white_target = 559.02 # 黒色のカラーセンサー値
-        black_target =  631.92# 白色のカラーセンサー値
-        target_white_rate = 0.75 # 目標値の白色の割合
-        gyro_rate_calibrate_count = 100
         color_val = 0
+        gyro_rate_calibrate_count = 100
 
-        # -- ここからカラーキャリブレーション --
+        touch = TouchSensor()
 
-        # touch = TouchSensor()
+        print('-- SET ON WHITE COLOR LINE --')
+        while not touch.is_pressed:
+            sleep(0.1)
 
-        # print('-- SET ON WHITE COLOR LINE --')
-        # while not touch.is_pressed:
-        #     sleep(0.1)
+        for _ in range(gyro_rate_calibrate_count):
+            color_val = read_device(self.color_reflection_fd)
+            white_target = white_target + color_val
+            #pushPrevious(color_val)
+            sleep(0.01)
+        white_target = white_target / gyro_rate_calibrate_count
 
-        # for _ in range(gyro_rate_calibrate_count):
-        #     color_val = read_device(self.color_reflection_fd)
-        #     white_target = white_target + color_val
-        #     #pushPrevious(color_val)
-        #     sleep(0.01)
-        # white_target = white_target / gyro_rate_calibrate_count
+        print('-- SET ON BLACK COLOR LINE --')
+        while not touch.is_pressed:
+            sleep(0.1)
 
-        # print('-- SET ON BLACK COLOR LINE --')
-        # while not touch.is_pressed:
-        #     sleep(0.1)
-
-        # for _ in range(gyro_rate_calibrate_count):
-        #     color_val = read_device(self.color_reflection_fd)
-        #     black_target = black_target + color_val
-        #     #pushPrevious(color_val)
-        #     sleep(0.01)
-        # black_target = black_target / gyro_rate_calibrate_count
-
-        # -- ここまでカラーキャリブレーション --
+        for _ in range(gyro_rate_calibrate_count):
+            color_val = read_device(self.color_reflection_fd)
+            black_target = black_target + color_val
+            #pushPrevious(color_val)
+            sleep(0.01)
+        black_target = black_target / gyro_rate_calibrate_count
 
         print('White Color: {}'.format(white_target))
         print('Black Color: {}'.format(black_target))

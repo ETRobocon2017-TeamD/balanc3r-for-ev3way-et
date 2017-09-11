@@ -10,6 +10,7 @@ from runner import runner
 from guide import guide
 from pistol import pistol
 from ev3dev.auto import Motor
+from settings import load_settings
 
 g_log = logging.getLogger(__name__)
 
@@ -32,6 +33,38 @@ def renice_driver_kworkers(nice_value):
     cmds = "ps aux | grep '[k]worker/0:' | awk '{{print $2}}' | xargs sudo renice {} -p".format(nice_value)
     subprocess.check_output(cmds, shell=True)
 
+###############################################################
+##
+## ライントレースプログラムに関わる全てのプロセスのnice値を調整する
+##
+###############################################################
+def renice_processes():
+    renice_high_nice_processes()
+    nice_value = -15
+    renice_driver_kworkers(nice_value)
+    os.nice(nice_value) # 自分のnice値も下げる
+
+###############################################################
+##
+## しっぽモーターを自立できる角度で固定する
+##
+###############################################################
+def stand_on_tail_motor():
+    tail_motor = Motor('outA')
+    tail_motor.run_timed(time_sp=1000, speed_sp=-200, stop_action='hold') # しっぽを一番上に上げる
+    sleep(1)
+    tail_motor.reset() # しっぽが一番上の状態を0度とする
+    tail_motor.run_to_abs_pos(position_sp=100, stop_action='hold', speed_sp=300) # ちょうど安定して立つ角度にする
+
+###############################################################
+##
+## プログラムのタイムゾーンを日本標準時に設定
+##
+###############################################################
+def set_timezone_jst():
+    os.environ['TZ'] = "JST-9"
+    tzset()
+    
 ########################################################################
 ##
 ## メイン：Guide関数とRunner関数用の子プロセスをフォークする
@@ -56,46 +89,40 @@ def main():
             g_log.exception(ex)
 
     try:
-        #しっぽモーターの調整
-        tail_motor = Motor('outA')
-        tail_motor.run_timed(time_sp=1000, speed_sp=-200, stop_action='hold') # しっぽを一番上に上げる
-        sleep(1)
-        tail_motor.reset() # しっぽが一番上の状態を0度とする
-        tail_motor.run_to_abs_pos(position_sp=100, stop_action='hold', speed_sp=300) # ちょうど安定して立つ角度にする
+        #しっぽモーターを使って自立させる
+        stand_on_tail_motor()
 
         # logフォルダの生成
         if not os.path.exists('./log/'):
             os.mkdir('./log/')
             
         # 日本時間に変更
-        os.environ['TZ'] = "JST-9"
-        tzset()
+        set_timezone_jst()
+
+        # 日付フォーマッタを YYYYmmddHHMMSS に指定した
         log_datetime = strftime("%Y%m%d%H%M%S")
         print("Start time is {}".format(log_datetime))
 
-        renice_high_nice_processes()
-        nice_value = -15
-        renice_driver_kworkers(nice_value)
-        os.nice(nice_value) # 自分のnice値も下げる
+        renice_processes()
 
         # プロセス間共有メモリ
         sh_mem = SharedMemory()
+
+        # 設定ファイル読み込み
+        setting = load_settings()
 
         runner_pid = os.fork()
 
         if runner_pid == 0:
             # NOTE: 倒立振子ライブラリを使う場合はrunner()を、ライントレーサー開発等で倒立振子ライブラリを使いたくない場合はrunner_stub()を使用すること
-            runner(sh_mem, log_datetime)
+            runner(sh_mem, setting, log_datetime)
             print('Runner Done')
             sys.exit()
 
         guide_pid = os.fork()
 
         if guide_pid == 0:  # In a child process
-            guide(sh_mem, log_datetime)
-            # TODO: ガイドが提示する前進後退・旋回スピードはanonymous memoryで共有する
-            # sh_mem.write_speed_mem(50)
-            # sh_mem.write_steering_mem(50)
+            guide(sh_mem, setting, log_datetime)
             print('Guide Done')
             sys.exit()
 
