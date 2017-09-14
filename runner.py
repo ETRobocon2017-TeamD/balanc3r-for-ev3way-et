@@ -109,10 +109,23 @@ def runner(sh_mem, setting, log_datetime):
         gain_gyro_rate                     = 3.3269 * 2 * gain_all    # K_F[3]
         gain_motor_angle_error_accumulated = 0.4472 * gain_all        # K_I
 
-        battery_gain_left = 0.001276 * 1.3632  # PWM出力算出用バッテリ電圧補正係数(左モーター用)
-        battery_offset_left = 1.959 * 2.94  # PWM出力算出用バッテリ電圧補正オフセット(左モーター用)
-        battery_gain_right = 0.000688 * 0.912 * 1.8217 # PWM出力算出用バッテリ電圧補正係数(右モーター用)
-        battery_offset_right = -2.712 * 0.955 * -0.7094 # PWM出力算出用バッテリ電圧補正オフセット(右モーター用)
+        battery_gain_left_calculated = 0.001276
+        battery_gain_left_adjust = 1.3632
+        battery_gain_left = battery_gain_left_calculated * battery_gain_left_adjust  # PWM出力算出用バッテリ電圧補正係数(左モーター用)
+
+        battery_offset_left_calculated = 1.959
+        battery_offset_left_adjust = 2.94
+        battery_offset_left = battery_offset_left_calculated * battery_offset_left_adjust  # PWM出力算出用バッテリ電圧補正オフセット(左モーター用)
+
+        battery_gain_right_calculated = 0.000688
+        battery_gain_right_balance = 0.912
+        battery_gain_right_adjust = 1.8217
+        battery_gain_right = battery_gain_right_calculated * battery_gain_right_balance * battery_gain_right_adjust # PWM出力算出用バッテリ電圧補正係数(右モーター用)
+
+        battery_offset_right_calculated = -2.712
+        battery_offset_right_balance = 0.955
+        battery_offset_right_adjust = -0.7094
+        battery_offset_right = battery_offset_right_calculated * battery_offset_right_balance * battery_offset_right_adjust # PWM出力算出用バッテリ電圧補正オフセット(右モーター用)
 
         a_d = 1.0 - 0.55 #0.51 #0.47  # ローパスフィルタ係数(左右車輪の平均回転角度用)。左右モーターの平均回転角速度(rad/sec)の算出時にのみ使用する。小さいほど角速度の変化に過敏になる。〜0.4951
         a_r = 0.985 #0.98  # ローパスフィルタ係数(左右車輪の目標平均回転角度用)。左右モーターの目標平均回転角度(rad)の算出時に使用する。小さいほど前進・後退する反応が早くなる。
