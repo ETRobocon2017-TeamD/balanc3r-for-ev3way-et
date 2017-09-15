@@ -99,10 +99,7 @@ def runner(sh_mem, setting, log_datetime):
         gyro_drift_compensation_rate = 0.075 * loop_time_sec * rad_per_second_per_raw_gyro_unit
 
         # State feedback control gains (aka the magic numbers)
-        # 8.5V - 0.60
-        # 8.2V - 0.68
-        # 7.5V - 0.77
-        gain_all                           = 0.68 #0.70 #0.81
+        gain_all                           = setting['gainAll']
         gain_motor_angle                   = 0.1606 * 3 * gain_all    # K_F[0]
         gain_gyro_angle                    = 30.2153 * 2.5 * gain_all # K_F[1]
         gain_motor_angular_speed           = 1.0796 * 1.7 * gain_all  # K_F[2]

@@ -108,7 +108,7 @@ class LineTracer:
         if direction < -13 or direction > 13:
             # 低速値
             # NOTE: 倒れなければ速度を下げる必要がない。倒れない程度に速度を上げる方向で調整。30は7.5Vの時にちょうどよさそう
-            speed = 30
+            speed = 40
             # NOTE: directionの条件は調整中。 コースアウトする場合は、ここの値を小さくするとよい。
             # NOTE: 逆に直線で遅くなる傾向にあれば上げるべき。
         elif direction < -9 or direction > 9:
