@@ -65,11 +65,11 @@ class Odometry:
         speed = 0.0
 
         # 前回計測時点との差分を取得
-        cur_dis = self.__get_distance(left_angle, right_angle)
-        self.__total_distance += distance
-        
+        cur_dis = self.__get_distance(left_angle, right_angle)        
+        self.__total_distance += cur_dis
+
         cur_dir = self.__get_direction()
-        self.__total_direction += direction
+        self.__total_direction += cur_dir
 
         # 現在の位置を計算
         pos_x = self.__pre_pos_x + (cur_dis * cos(radians(self.__total_direction))) #進行距離 * cos x
@@ -85,8 +85,8 @@ class Odometry:
         target_dir = self.__get_target_direction(pos_x, pos_y, target_pos_x, target_pos_y)
 
         #targetとの差分から速度と角度を調整
-        deff_dir = target_dir - self.__total_direction
-        direction = -deff_dir
+        diff_dir = target_dir - self.__total_direction
+        direction = -diff_dir
         if direction < -100:
             direction = -100
         elif direction > 100:
@@ -113,7 +113,7 @@ class Odometry:
             target_pos_y,
             target_dis,
             target_dir,
-            deff_dir,
+            diff_dir,
             self.__total_distance,
             self.__total_direction)
         self.__odmetry_log_pointer += 1
@@ -138,9 +138,7 @@ class Odometry:
     # 距離 計測
     # left_motor  左モータ回転角度の現在値
     # right_motor 右モータ回転角度の現在値
-    def __get_distance(self, left_motor, right_motor):
-        cur_angle_L = left_motor
-        cur_angle_R = right_motor
+    def __get_distance(self, cur_angle_L, cur_angle_R):
         distance = 0.0 # 前回との距離
 
         # 計測間の走行距離 = ((円周率 * タイヤの直径) / 360) * (モータ角度過去値　- モータ角度現在値)
@@ -166,7 +164,7 @@ class Odometry:
     # bX, bY 目標値
     @staticmethod
     def __get_target_distance(aX, aY, bX, bY):
-        return sqrt( pow( (bX - aX), 2 ) + pow( (bY - aY), 2 ) )
+        return sqrt(pow((bX - aX), 2) + pow((bY - aY), 2))
 
     #/* 目標座標の方位を取得する関数 */
     # aX, aY 現在地
