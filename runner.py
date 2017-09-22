@@ -262,7 +262,10 @@ def runner(sh_mem, setting, log_datetime):
         # 倒立振子スタート時の時間取得
         t_balancer_start = clock()
 
-        while True:
+        counter = 0
+
+        while (100 > counter):
+            counter = counter + 1
 
             ###############################################################
             ##  Loop info
@@ -286,8 +289,8 @@ def runner(sh_mem, setting, log_datetime):
             ###############################################################
             motor_angle_left_raw = read_device(motor_encoder_left_devfd)
             motor_angle_right_raw = read_device(motor_encoder_right_devfd)
-            # sh_mem.write_motor_encoder_left_mem(motor_angle_left_raw)
-            # sh_mem.write_motor_encoder_right_mem(motor_angle_right_raw)
+            sh_mem.write_motor_encoder_left_mem(motor_angle_left_raw)
+            sh_mem.write_motor_encoder_right_mem(motor_angle_right_raw)
 
             motor_angle_last = motor_angle
             motor_angle_raw = (motor_angle_left_raw + motor_angle_right_raw) * 0.5
@@ -379,6 +382,10 @@ def runner(sh_mem, setting, log_datetime):
                 # sleep(0.0001)
             sleep(max(loop_time_sec - (gyro_rate*0.0005) - (clock() - t_loop_start), 0.002))
 
+
+    except KeyboardInterrupt as ex:
+        print("It's a KeyboardInterrupt")
+        shutdown_child()
     except Exception as e:
         print("It's a Runner Exception")
         g_log.exception(e)

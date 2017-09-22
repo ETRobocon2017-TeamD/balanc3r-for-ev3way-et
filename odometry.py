@@ -9,8 +9,8 @@ class Odometry:
         self.__distance_periodic_R = 0.0  # 右タイヤの4ms間の距離
         self.__pre_angle_L = 0.0
         self.__pre_angle_R = 0.0  # 左右モータ回転角度の過去値
-        self.__pre_pos_x = 0
-        self.__pre_pos_y = 0
+        self.pre_pos_x = 0
+        self.pre_pos_y = 0
 
         self.__total_direction = 0.0 #現在の角度
         self.__total_distance = 0.0 #現在の距離
@@ -19,42 +19,24 @@ class Odometry:
         self.__TIRE_DIAMETER = 81.0  #タイヤ直径（81mm）
 
         #調整用パラメータ
-        self.__TARGET_AREA_X = 200 #目標地点の到達判定領域 x軸(mm)
-        self.__TARGET_AREA_Y = 200 #目標地点の到達判定領域 y軸(mm)
-        self.__RUN_SPEED = 40 #PWM値ロボットの進行速度
+        self.__TARGET_AREA_X = 100 #目標地点の到達判定領域 x軸(mm)
+        self.__TARGET_AREA_Y = 100 #目標地点の到達判定領域 y軸(mm)
+        self.__RUN_SPEED = 30 #PWM値ロボットの進行速度
 
 
         # 目標地点の設定 (mm)
         self.__target_pos = [[0 for i in range(2)] for j in range(10)]
         self.__cur_target_index = 0
-        self.__set_target(1000, 0)
-        self.__set_target(1000, -1000)
-        self.__set_target(0, -1000)
+        self.__set_target(500, 0)
+        self.__set_target(500, -500)
+        self.__set_target(0, -500)
         self.__set_target(0, 0)
-        self.__set_target(1000, 0)
-        self.__set_target(1000, -1000)
-        self.__set_target(0, -1000)
+        self.__set_target(500, 0)
+        self.__set_target(500, -500)
+        self.__set_target(0, -500)
         self.__set_target(0, 0)
 
         self.__cur_target_index = 0
-
-        self.__odmetry_logs = ["" for _ in range(10000)]
-        self.__odmetry_log_pointer = 1
-
-        self.__odmetry_logs[0] = "{},{},{},{},{},{},{},{},{},{},{},{},{}".format(
-            "モータ回転角度L d",
-            "モータ回転角度R d",
-            "進行距離 mm",
-            "車体角度 d",
-            "現在位置x",
-            "現在位置y",
-            "目標位置x",
-            "目標位置y",
-            "目標までの距離 mm",
-            "目標までの角度 d",
-            "車体角度と目標角度の差 d",
-            "総合走行距離 mm",
-            "総合旋回角度 d")
 
     # 目標地点へ進行させる
     # left_motor  左モータ回転角度の現在値
@@ -72,11 +54,11 @@ class Odometry:
         self.__total_direction += cur_dir
 
         # 現在の位置を計算
-        pos_x = self.__pre_pos_x + (cur_dis * cos(radians(self.__total_direction))) #進行距離 * cos x
-        pos_y = self.__pre_pos_y + (cur_dis * sin(radians(self.__total_direction))) #進行距離 * sin x
+        pos_x = self.pre_pos_x + (cur_dis * cos(radians(self.__total_direction))) #進行距離 * cos x
+        pos_y = self.pre_pos_y + (cur_dis * sin(radians(self.__total_direction))) #進行距離 * sin x
 
-        self.__pre_pos_x = pos_x
-        self.__pre_pos_y = pos_y
+        self.pre_pos_x = pos_x
+        self.pre_pos_y = pos_y
 
         # 目標座標までの方位，距離を格納
         target_pos_x = self.__target_pos[self.__cur_target_index][0]
@@ -101,31 +83,7 @@ class Odometry:
         if abs(target_pos_x - pos_x) < self.__TARGET_AREA_X and abs(target_pos_y - pos_y) < self.__TARGET_AREA_Y:
             self.__cur_target_index += 1
 
-        #log
-        self.__odmetry_logs[self.__odmetry_log_pointer] = "{},{},{},{},{},{},{},{},{},{},{},{},{}".format(
-            left_angle,
-            right_angle,
-            cur_dis,
-            cur_dir,
-            pos_x,
-            pos_y,
-            target_pos_x,
-            target_pos_y,
-            target_dis,
-            target_dir,
-            diff_dir,
-            self.__total_distance,
-            self.__total_direction)
-        self.__odmetry_log_pointer += 1
-
         return speed, direction
-
-    def shutdown(self, log_datetime):
-        log_file = open("./log/log_odometry_{}.csv".format(log_datetime), 'w')
-        for log in self.__odmetry_logs:
-            if log != "":
-                log_file.write("{}\n".format(log))
-        log_file.close()
 
     #自己の座標
     #ターゲットの座標

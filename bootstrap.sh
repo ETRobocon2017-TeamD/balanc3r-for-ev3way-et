@@ -34,5 +34,5 @@ elif [ "$FLAG_L" ]; then
     python3 main.py
 else
     echo The course not selected
-    python3 main.py
+    python3 -m cProfile -o runner.prof main.py
 fi
