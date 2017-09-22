@@ -111,26 +111,24 @@ def main():
         # 設定ファイル読み込み
         setting = load_settings()
 
-        # runner_pid = os.fork()
+        runner_pid = os.fork()
 
-        # if runner_pid == 0:
+        if runner_pid == 0:
             # NOTE: 倒立振子ライブラリを使う場合はrunner()を、ライントレーサー開発等で倒立振子ライブラリを使いたくない場合はrunner_stub()を使用すること
-        sh_mem.write_runner_is_ready_mem(1)
-        sh_mem.write_touch_sensor_mem(1)
-        runner(sh_mem, setting, log_datetime)
-        print('Runner Done')
-            # sys.exit()
+            runner(sh_mem, setting, log_datetime)
+            print('Runner Done')
+            sys.exit()
 
-        # guide_pid = os.fork()
+        guide_pid = os.fork()
 
-        # if guide_pid == 0:  # In a child process
-        #     guide(sh_mem, setting, log_datetime)
-        #     print('Guide Done')
-        #     sys.exit()
+        if guide_pid == 0:  # In a child process
+            guide(sh_mem, setting, log_datetime)
+            print('Guide Done')
+            sys.exit()
 
-        # pistol(sh_mem)
+        pistol(sh_mem)
 
-        # shutdown()
+        shutdown()
 
     except KeyboardInterrupt as ex:
         if (runner_pid > 0) and (guide_pid > 0):
