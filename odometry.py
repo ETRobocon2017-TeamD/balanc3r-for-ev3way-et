@@ -86,7 +86,7 @@ class Odometry:
 
         #targetとの差分から速度と角度を調整
         diff_dir = target_dir - self.__total_direction
-        direction = -diff_dir
+        direction = diff_dir
         if direction < -100:
             direction = -100
         elif direction > 100:
