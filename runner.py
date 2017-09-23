@@ -20,6 +20,7 @@ def runner(sh_mem, setting, log_datetime):
         try:
             left_motor.stop()
             right_motor.stop()
+            print('Motor Stoped')
 
             sleep(0.2)
 
@@ -262,6 +263,10 @@ def runner(sh_mem, setting, log_datetime):
         # 倒立振子スタート時の時間取得
         t_balancer_start = clock()
 
+        # counter = 0
+
+        # while (100 > counter):
+        #     counter = counter + 1
         while True:
 
             ###############################################################

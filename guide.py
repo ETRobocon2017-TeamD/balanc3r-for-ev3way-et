@@ -89,12 +89,12 @@ def guide(sh_mem, setting, log_datetime):
             t_loop_start = clock()
 
             # ここでライントレースする
-            speed_reference, direction, refrection_raw = line_tracer.line_tracing()
+            # speed_reference, direction, refrection_raw = line_tracer.line_tracing()
 
             # 角度を算出してオドメトリーを使用
-            angle_l = sh_mem.read_motor_encoder_left_mem()
-            angle_r = sh_mem.read_motor_encoder_right_mem()
-            odometry_speed_reference, odometry_direction = odometry.target_trace(angle_l,angle_r)
+            # angle_l = sh_mem.read_motor_encoder_left_mem()
+            # angle_r = sh_mem.read_motor_encoder_right_mem()
+            odometry_speed_reference, odometry_direction = odometry.target_trace(angle_l, angle_r)
             direction = odometry_direction
             speed_reference = odometry_speed_reference
 
@@ -105,6 +105,8 @@ def guide(sh_mem, setting, log_datetime):
             # 前進後退・旋回スピードは下記のように入力
             sh_mem.write_speed_mem(speed_reference)
             sh_mem.write_steering_mem(int(round(direction)))
+            # sh_mem.write_speed_mem(0)
+            # sh_mem.write_steering_mem(0)
 
             # 実行時間、PID制御に関わる値をログに出力
             t_loop_end = clock()

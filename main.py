@@ -123,6 +123,8 @@ def main():
 
         if guide_pid == 0:  # In a child process
             guide(sh_mem, setting, log_datetime)
+            # sh_mem.write_speed_mem(80)
+            # sh_mem.write_guide_is_ready_mem(1)
             print('Guide Done')
             sys.exit()
 

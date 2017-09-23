@@ -1,0 +1,16 @@
+{
+    "gainAll": 0.68,
+    "lineWhiteLuminance": 559.02 ,
+    "lineBlackLuminance": 631.92 ,
+    "lineLuminanceRate": 0.75,
+    "batteryGainLeft": 0.001276,
+    "batteryGainLeftAdjust": 1.3632,
+    "batteryOffsetLeft": 1.959,
+    "batteryOffsetLeftAdjust": 2.94,
+    "batteryGainRight": 0.000688,
+    "batteryGainRightBalance": 0.912,
+    "batteryGainRightAdjust": 1.8217,
+    "batteryOffsetRight": -2.712,
+    "batteryOffsetRightBalance": 0.955,
+    "batteryOffsetRightAdjust": -0.7094
+}
