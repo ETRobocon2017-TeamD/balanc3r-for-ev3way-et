@@ -139,18 +139,17 @@ class Odometry:
     # left_motor  左モータ回転角度の現在値
     # right_motor 右モータ回転角度の現在値
     def __get_distance(self, cur_angle_L, cur_angle_R):
-        distance = 0.0 # 前回との距離
+        #TIRE_DIAMETER = 81.0  #タイヤ直径（81mm）
 
         # 計測間の走行距離 = ((円周率 * タイヤの直径) / 360) * (モータ角度過去値　- モータ角度現在値)
-        self.__distance_periodic_L = ((pi * self.__TIRE_DIAMETER) / 360.0) * (cur_angle_L - self.__pre_angle_L) # 計測間の左モータ距離
-        self.__distance_periodic_R = ((pi * self.__TIRE_DIAMETER) / 360.0) * (cur_angle_R - self.__pre_angle_R) # 計測間の右モータ距離
-        distance = (self.__distance_periodic_L + self.__distance_periodic_R) / 2.0 # 左右タイヤの走行距離を足して割る
+        self.__distance_periodic_L = ((pi * 81.0) / 360.0) * (cur_angle_L - self.__pre_angle_L) # 計測間の左モータ距離
+        self.__distance_periodic_R = ((pi * 81.0) / 360.0) * (cur_angle_R - self.__pre_angle_R) # 計測間の右モータ距離
 
         # モータの回転角度の過去値を更新
         self.__pre_angle_L = cur_angle_L
         self.__pre_angle_R = cur_angle_R
 
-        return distance
+        return (self.__distance_periodic_L + self.__distance_periodic_R) / 2.0 # 左右タイヤの走行距離を足して割る
 
 
     #/ *方位を取得(右旋回が正転) * /
