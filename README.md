@@ -10,6 +10,30 @@ https://www.youtube.com/watch?v=sKaeCxrSDG8
 
 - Body: [EV3Way-ET](https://github.com/ETrobocon/etroboEV3/wiki)
 - OS: [ev3dev-jessie-2017-06-09](https://github.com/ev3dev/ev3dev/archive/ev3dev-jessie-2017-06-09.zip)
+- Python: 3.4.2
+
+# How to build(Python Extension Module)
+
+ev3dev(jessie) python include dir
+
+```
+$ python3 -c "from distutils import sysconfig; print(sysconfig.get_python_inc())"
+/usr/include/python3.4m
+```
+
+ev3dev(jessie) python libs
+
+```
+$ python3 -c "from distutils import sysconfig; print(sysconfig.get_config_var('LIBS'))"
+-lpthread -ldl  -lutil
+```
+
+ev3dev(jessie) python cflags
+
+```
+$ python3 -c "from distutils import sysconfig; print(sysconfig.get_config_var('CFLAGS'))"
+-Wno-unused-result -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -g -fstack-protector-strong -Wformat -Werror=format-security  -g -flto -fuse-linker-plugin -ffat-lto-objects
+```
 
 
 # How to use
