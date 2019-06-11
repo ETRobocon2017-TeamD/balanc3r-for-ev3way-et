@@ -12,6 +12,45 @@ https://www.youtube.com/watch?v=sKaeCxrSDG8
 - OS: [ev3dev-jessie-2017-06-09](https://github.com/ev3dev/ev3dev/archive/ev3dev-jessie-2017-06-09.zip)
 - Python: 3.4.2
 
+# Development environment
+
+## Docker
+
+If your host OS is not linux, you should install vagrant. and then install debian-stretch into vm.
+
+[Vagrant](https://www.vagrantup.com/)
+
+Host shell
+```
+$ vagrant up
+$ vagrant ssh
+```
+
+You will use EV3dev developer tool, you must install docker.
+
+[DockerCE Debian install](https://docs.docker.com/install/linux/docker-ce/debian/)
+
+vm shell
+```
+$ sudo apt-get remove docker docker-engine docker.io containerd runc
+$ sudo apt-get update
+$ sudo apt-get upgrade
+$ sudo apt-get install \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg2 \
+    software-properties-common
+$ curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
+$ sudo apt-key fingerprint 0EBFCD88
+$ sudo add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/debian \
+   $(lsb_release -cs) \
+   stable"
+$ sudo apt-get update
+$ sudo apt-get install docker-ce docker-ce-cli containerd.io
+```
+
 # How to build(Python Extension Module)
 
 ev3dev(jessie) python include dir
