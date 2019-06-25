@@ -51,6 +51,12 @@ $ sudo apt-get update
 $ sudo apt-get install docker-ce docker-ce-cli containerd.io
 ```
 
+vm shell
+```
+$ cd /host/docker-library/ev3dev-jessie
+$ sudo docker build ./ -f ev3-generic.dockerfile -t ev3jgen
+```
+
 # How to build(Python Extension Module)
 
 ev3dev(jessie) python include dir
