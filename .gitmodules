@@ -4,3 +4,6 @@
 [submodule "docker-cross"]
 	path = docker-cross
 	url = https://github.com/ev3dev/docker-cross.git
+[submodule "docker-base"]
+	path = docker-base
+	url = https://github.com/ev3dev/docker-base.git
