@@ -39,22 +39,40 @@ $ sudo apt-get install \
     apt-transport-https \
     ca-certificates \
     curl \
-    gnupg2 \
+    gnupg-agent \
     software-properties-common
-$ curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
+$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 $ sudo apt-key fingerprint 0EBFCD88
 $ sudo add-apt-repository \
-   "deb [arch=amd64] https://download.docker.com/linux/debian \
+   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
    $(lsb_release -cs) \
    stable"
 $ sudo apt-get update
 $ sudo apt-get install docker-ce docker-ce-cli containerd.io
 ```
 
+Install brickstrap tool, then you will run qemu-armel container.
+
 vm shell
 ```
-$ cd /host/docker-library/ev3dev-jessie
-$ sudo docker build ./ -f ev3-generic.dockerfile -t ev3jgen
+$ sudo add-apt-repository ppa:ev3dev/tools
+$ sudo apt update
+$ sudo apt install brickstrap
+```
+
+Get the container for developing ev3dev.
+
+vm shell
+```
+$ sudo docker pull ev3dev/ev3dev-jessie-ev3-generic
+$ sudo docker tag ev3dev/ev3dev-jessie-ev3-generic ev3jg
+```
+
+Check the container behaviour.
+
+vm shell
+```
+$ sudo docker run --rm -it ev3jg su -l robot
 ```
 
 # How to build(Python Extension Module)
