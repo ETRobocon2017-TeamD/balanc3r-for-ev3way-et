@@ -28,7 +28,7 @@ $ vagrant ssh
 
 You will use EV3dev developer tool, you must install docker.
 
-[DockerCE Debian install](https://docs.docker.com/install/linux/docker-ce/debian/)
+[DockerCE Ubuntu install](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
 
 vm shell
 ```
@@ -73,6 +73,21 @@ Check the container behaviour.
 vm shell
 ```
 $ sudo docker run --rm -it ev3jg su -l robot
+```
+
+[(optionnal) Manage Docker as a non-root user](https://docs.docker.com/install/linux/linux-postinstall/)
+
+vm shell
+```
+$ sudo groupadd docker
+$ sudo usermod -aG docker $USER
+```
+
+Build cython container
+
+vm shell 
+```
+$ docker build -t balan3er-for-ev3way-et/cython .
 ```
 
 # How to build(Python Extension Module)
