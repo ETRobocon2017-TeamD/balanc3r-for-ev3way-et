@@ -83,38 +83,54 @@ $ sudo groupadd docker
 $ sudo usermod -aG docker $USER
 ```
 
-Build cython container
+Install cython package
+
+```
+$ sudo apt install cython3
+```
+
+Build cross build container
+
+vm shell
+```
+$ docker pull yjono/ev3jcrs
+$ docker tag yjono/ev3jcrs ev3jcrs
+```
+
+or 
 
 vm shell 
 ```
-$ docker build -t balan3er-for-ev3way-et/cython .
+$ docker build -t balan3er-for-ev3way-et/ev3jcrs .
+$ docker tag balan3er-for-ev3way-et/ev3jcrs ev3jcrs
 ```
 
 # How to build(Python Extension Module)
 
+Generate C source
+
+vm shell
+```
+$ cython xxxx.pyx
+```
+
+Run the container for cross compile.
+
+vm shell
+```
+$ docker run -it -v /host:/host ev3jcrs /bin/bash
+```
+
 ev3dev(jessie) python include dir
 
+container shell
 ```
-$ python3 -c "from distutils import sysconfig; print(sysconfig.get_python_inc())"
-/usr/include/python3.4m
-```
-
-ev3dev(jessie) python libs
-
-```
-$ python3 -c "from distutils import sysconfig; print(sysconfig.get_config_var('LIBS'))"
--lpthread -ldl  -lutil
+$ CFLAGS=$(arm-linux-gnueabi-python3-config --cflags) \
+LDFLAGS=$(arm-linux-gnueabi-python3-config --ldflags)
+$ TODO write compile command
 ```
 
-ev3dev(jessie) python cflags
-
-```
-$ python3 -c "from distutils import sysconfig; print(sysconfig.get_config_var('CFLAGS'))"
--Wno-unused-result -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -g -fstack-protector-strong -Wformat -Werror=format-security  -g -flto -fuse-linker-plugin -ffat-lto-objects
-```
-
-
-# How to use
+# How to drive the EV3Way-ET
 
 In host shell,  login your EV3Way-ET by ssh.
 
