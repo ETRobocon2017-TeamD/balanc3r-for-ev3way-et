@@ -101,8 +101,8 @@ or
 
 vm shell 
 ```
-$ docker build -t balan3er-for-ev3way-et/ev3jcrs .
-$ docker tag balan3er-for-ev3way-et/ev3jcrs ev3jcrs
+$ docker build -t balan3er-for-ev3way-et/ev3jsrs .
+$ docker tag balan3er-for-ev3way-et/ev3jsrs ev3jsrs
 ```
 
 # How to build(Python Extension Module)
@@ -119,6 +119,15 @@ Run the container for cross compile.
 vm shell
 ```
 $ docker run -it -v /host:/host ev3jcrs /bin/bash
+$ docker run -it -v /host:/host ev3jsrs /bin/bash
+```
+
+or
+
+host shell
+```
+$ docker run -it -v /Users/yoshinori/src/github.com/ETRobocon2017-TeamD/balanc3r-for-ev3way-et:/host ev3jcrs /bin/bash
+$ docker run -it -v /Users/yoshinori/src/github.com/ETRobocon2017-TeamD/balanc3r-for-ev3way-et:/host ev3jsrs /bin/bash
 ```
 
 ev3dev(jessie) python include dir
@@ -127,7 +136,8 @@ container shell
 ```
 $ CFLAGS=$(arm-linux-gnueabi-python3-config --cflags) \
 LDFLAGS=$(arm-linux-gnueabi-python3-config --ldflags)
-$ TODO write compile command
+$ arm-linux-gnueabi-gcc -c runner.c ${CFLAGS}
+$ arm-linux-gnueabi-gcc runner.o -o runner.so -shared ${LDFLAGS}
 ```
 
 # How to drive the EV3Way-ET
