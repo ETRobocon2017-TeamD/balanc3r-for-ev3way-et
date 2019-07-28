@@ -107,6 +107,15 @@ $ docker tag balan3er-for-ev3way-et/ev3jsrs ev3jsrs
 
 # How to build(Python Extension Module)
 
+## short script
+
+vm shell
+```
+make
+```
+
+## description
+
 Generate C source
 
 vm shell
@@ -135,9 +144,10 @@ ev3dev(jessie) python include dir
 container shell
 ```
 $ CFLAGS=$(arm-linux-gnueabi-python3-config --cflags) \
-LDFLAGS=$(arm-linux-gnueabi-python3-config --ldflags)
-$ arm-linux-gnueabi-gcc -c runner.c ${CFLAGS}
-$ arm-linux-gnueabi-gcc runner.o -o runner.so -shared ${LDFLAGS}
+LDFLAGS=$(arm-linux-gnueabi-python3-config --ldflags) \
+INCLUDES=$(arm-linux-gnueabi-python3-config --includes)
+$ arm-linux-gnueabi-gcc ${INCLUDES} -c xxxx.c ${CFLAGS}
+$ arm-linux-gnueabi-gcc xxxx.o -o xxxx.so -shared ${LDFLAGS}
 ```
 
 # How to drive the EV3Way-ET
