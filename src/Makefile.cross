@@ -12,6 +12,7 @@ all: $(PROGRAM)
 
 runner.so: runner.o
 	$(CC) $< -o $(PROGRAM) -shared $(LDFLAGS)
+	make depclean
 
 runner.o: runner.c
 	$(CC) -c $< ${INCLUDES} $(CFLAGS)

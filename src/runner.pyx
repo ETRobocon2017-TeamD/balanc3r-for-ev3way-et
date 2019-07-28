@@ -16,6 +16,10 @@ g_log = logging.getLogger(__name__)
 def runner(sh_mem, setting, log_datetime):
     print('Im Runner')
 
+    # ログ記録用
+    logs = ["" for _ in range(10000)]
+    log_pointer = 0
+
     def shutdown_child(signum=None, frame=None):
         try:
             left_motor.stop()
@@ -100,11 +104,11 @@ def runner(sh_mem, setting, log_datetime):
 
         # State feedback control gains (aka the magic numbers)
         gain_all                           = setting['gainAll']
-        gain_motor_angle                   = 0.1606 * 3 * gain_all    # K_F[0]
-        gain_gyro_angle                    = 30.2153 * 2.5 * gain_all # K_F[1]
-        gain_motor_angular_speed           = 1.0796 * 1.7 * gain_all  # K_F[2]
-        gain_gyro_rate                     = 3.3269 * 2 * gain_all    # K_F[3]
-        gain_motor_angle_error_accumulated = 0.4472 * gain_all        # K_I
+        gain_motor_angle                   = setting["gain_motor_angle"] * gain_all                   # K_F[0]
+        gain_gyro_angle                    = setting['gain_gyro_angle'] * gain_all                    # K_F[1]
+        gain_motor_angular_speed           = setting['gain_motor_angular_speed'] * gain_all           # K_F[2]
+        gain_gyro_rate                     = setting['gain_gyro_rate'] * gain_all                     # K_F[3]
+        gain_motor_angle_error_accumulated = setting['gain_motor_angle_error_accumulated'] * gain_all # K_I
 
         battery_gain_left = setting['batteryGainLeft']
         battery_gain_left_adjust = setting['batteryGainLeftAdjust']
@@ -115,14 +119,12 @@ def runner(sh_mem, setting, log_datetime):
         battery_offset_left = battery_offset_left * battery_offset_left_adjust  # PWM出力算出用バッテリ電圧補正オフセット(左モーター用)
 
         battery_gain_right = setting['batteryGainRight']
-        battery_gain_right_balance = setting['batteryGainRightBalance']
         battery_gain_right_adjust = setting['batteryGainRightAdjust']
-        battery_gain_right = battery_gain_right * battery_gain_right_balance * battery_gain_right_adjust # PWM出力算出用バッテリ電圧補正係数(右モーター用)
+        battery_gain_right = battery_gain_right * battery_gain_right_adjust # PWM出力算出用バッテリ電圧補正係数(右モーター用)
 
         battery_offset_right = setting['batteryOffsetRight']
-        battery_offset_right_balance = setting['batteryOffsetRightBalance']
         battery_offset_right_adjust = setting['batteryOffsetRightAdjust']
-        battery_offset_right = battery_offset_right * battery_offset_right_balance * battery_offset_right_adjust # PWM出力算出用バッテリ電圧補正オフセット(右モーター用)
+        battery_offset_right = battery_offset_right * battery_offset_right_adjust # PWM出力算出用バッテリ電圧補正オフセット(右モーター用)
 
         a_d = 1.0 - 0.55 #0.51 #0.47  # ローパスフィルタ係数(左右車輪の平均回転角度用)。左右モーターの平均回転角速度(rad/sec)の算出時にのみ使用する。小さいほど角速度の変化に過敏になる。〜0.4951
         a_r = 0.985 #0.98  # ローパスフィルタ係数(左右車輪の目標平均回転角度用)。左右モーターの目標平均回転角度(rad)の算出時に使用する。小さいほど前進・後退する反応が早くなる。
@@ -170,9 +172,11 @@ def runner(sh_mem, setting, log_datetime):
         motor_duty_cycle_left = 0
         motor_duty_cycle_right = 0
 
-        # ログ出力用のデューティー比用変数
+        # モータドライバに出力したデューティー比
         duty_left = 0
         duty_right = 0
+        last_duty_right = 0
+        last_duty_left = 0
 
         # The raw value from the gyro sensor in rate mode.
         gyro_rate_raw = 0
@@ -190,10 +194,6 @@ def runner(sh_mem, setting, log_datetime):
         # Over time, the gyro rate value can drift. This causes the sensor to think
         # it is moving even when it is perfectly still. We keep track of this offset.
         gyro_offset = 0
-
-        # ログ記録用
-        logs = ["" for _ in range(10000)]
-        log_pointer = 0
 
         voltage_target = 0
         voltage_estimate_max_left = 0
@@ -333,6 +333,9 @@ def runner(sh_mem, setting, log_datetime):
             duty_right = set_duty(motor_duty_cycle_right_devfd, motor_duty_cycle_right + steering)
             duty_left = set_duty(motor_duty_cycle_left_devfd, motor_duty_cycle_left - steering) # 右車輪のモーター出力が弱いので、左車輪のPWM値を3つ目の引数で調節(%)してる。まだ偏ってるので調節必要
 
+            # last_duty_right = duty_right
+            # last_duty_left = duty_left
+
             ###############################################################
             ##  ここでしっぽモーターを上げる
             ###############################################################
@@ -352,7 +355,8 @@ def runner(sh_mem, setting, log_datetime):
 
             # 実行時間、PWM値(duty cycle value)に関わる値をログに出力
             t_loop_end = clock()
-            logs[log_pointer] = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}".format(
+            logs[log_pointer] = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}".format(
+                log_pointer,
                 t_loop_end - t_balancer_start,
                 t_loop_end - t_loop_start,
                 gyro_rate_raw,
@@ -370,7 +374,10 @@ def runner(sh_mem, setting, log_datetime):
                 motor_duty_cycle_left,
                 motor_duty_cycle_right,
                 )
+
             log_pointer += 1
+            if log_pointer == 1000:
+                log_pointer = 0
 
             ###############################################################
             ##  Busy wait for the loop to complete
