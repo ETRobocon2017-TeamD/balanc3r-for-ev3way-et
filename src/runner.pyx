@@ -28,6 +28,26 @@ def runner(sh_mem, setting, log_datetime):
             sleep(0.2)
 
             log_file = open('./log/log_%s_runner.csv' % log_datetime,'w')
+            log_file.write("id"\
+                ",t_loop_end - t_balancer_start"\
+                ",t_loop_end - t_loop_start"\
+                ",gyro_rate_raw"\
+                ",motor_angle_raw"\
+                ",gyro_estimated_angle"\
+                ",gyro_rate"\
+                ",motor_angle_error"\
+                ",motor_angular_speed_error"\
+                ",motor_angle_error_accumulated"\
+                ",duty_left"\
+                ",duty_right"\
+                ",voltage_raw"\
+                ",voltage_estimate_max_left"\
+                ",voltage_estimate_max_right"\
+                ",motor_duty_cycle_left"\
+                ",motor_duty_cycle_right"\
+                "\n"
+            )
+
             for log in logs:
                 if log != "":
                     log_file.write("{}\n".format(log))
