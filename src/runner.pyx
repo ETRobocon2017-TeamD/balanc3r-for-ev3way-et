@@ -5,6 +5,7 @@ import math
 import logging
 from ev3dev.auto import Motor, LargeMotor, GyroSensor, PowerSupply
 from device import read_device, set_duty
+import codecs
 
 g_log = logging.getLogger(__name__)
 
@@ -27,24 +28,24 @@ def runner(sh_mem, setting, log_datetime):
 
             sleep(0.2)
 
-            log_file = open('./log/log_%s_runner.csv' % log_datetime,'w')
+            log_file = codecs.open('./log/log_%s_runner.csv' % log_datetime,'w', 'utf-8')
             log_file.write("id"\
-                ",t_loop_end - t_balancer_start"\
-                ",t_loop_end - t_loop_start"\
-                ",gyro_rate_raw"\
-                ",motor_angle_raw"\
-                ",gyro_estimated_angle"\
-                ",gyro_rate"\
-                ",motor_angle_error"\
-                ",motor_angular_speed_error"\
-                ",motor_angle_error_accumulated"\
-                ",duty_left"\
-                ",duty_right"\
-                ",voltage_raw"\
-                ",voltage_estimate_max_left"\
-                ",voltage_estimate_max_right"\
-                ",motor_duty_cycle_left"\
-                ",motor_duty_cycle_right"\
+                ",時刻(sec)"\
+                ",処理時間(sec)"\
+                ",ジャイロ角速度生値(deg/sec)"\
+                ",モーター角度生値(deg)"\
+                ",ジャイロ推定角度(rad)"\
+                ",ジャイロ推定角速度(rad/sec)"\
+                ",モーター角度誤差(rad)"\
+                ",モーター角速度誤差(rad/sec)"\
+                ",モーター角度誤差累積値(rad??)"\
+                ",モーターデューティー比左"\
+                ",モーターデューティー比右"\
+                ",モーター電圧生値"\
+                ",推定最大入力可能電圧左"\
+                ",推定最大入力可能電圧右"\
+                ",モーター印加電圧比左"\
+                ",モーター印加電圧比右"\
                 "\n"
             )
 
@@ -146,10 +147,10 @@ def runner(sh_mem, setting, log_datetime):
         battery_offset_right_adjust = setting['batteryOffsetRightAdjust']
         battery_offset_right = battery_offset_right * battery_offset_right_adjust # PWM出力算出用バッテリ電圧補正オフセット(右モーター用)
 
-        a_d = 1.0 - 0.55 #0.51 #0.47  # ローパスフィルタ係数(左右車輪の平均回転角度用)。左右モーターの平均回転角速度(rad/sec)の算出時にのみ使用する。小さいほど角速度の変化に過敏になる。〜0.4951
-        a_r = 0.985 #0.98  # ローパスフィルタ係数(左右車輪の目標平均回転角度用)。左右モーターの目標平均回転角度(rad)の算出時に使用する。小さいほど前進・後退する反応が早くなる。
+        a_d = 0.8 #1.0 - 0.55 #0.51 #0.47  # ローパスフィルタ係数(左右車輪の平均回転角度用)。左右モーターの平均回転角速度(rad/sec)の算出時にのみ使用する。小さいほど角速度の変化に過敏になる。〜0.4951
+        a_r = 0.996 #0.985 #0.98  # ローパスフィルタ係数(左右車輪の目標平均回転角度用)。左右モーターの目標平均回転角度(rad)の算出時に使用する。小さいほど前進・後退する反応が早くなる。
         a_b = 0.85 #ローパスフィルタ係数(最大モーター電圧b用）
-        k_theta_dot = 7.5 # モータ目標回転角速度係数
+        k_theta_dot = 6.0 # モータ目標回転角速度係数
 
         # Variables representing physical signals (more info on these in the docs)
         # The angle of "the motor", measured in raw units (degrees for the
