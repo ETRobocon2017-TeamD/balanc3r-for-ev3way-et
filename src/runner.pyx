@@ -277,7 +277,7 @@ def runner(sh_mem, setting, log_datetime):
         print("GO!")
         print("-----------------------------------")
 
-        tail_motor.run_timed(time_sp=150, speed_sp=125) # しっぽモーター下に少し下げる
+        #tail_motor.run_timed(time_sp=150, speed_sp=125) # しっぽモーター下に少し下げる
         sleep(0.15)
 
         # 倒立振子スタート時の時間取得
