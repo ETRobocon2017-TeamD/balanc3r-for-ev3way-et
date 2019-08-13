@@ -100,8 +100,6 @@ ENV/
 # mypy
 .mypy_cache/
 
-/log/log*
-
 # vagrant
 .vagrant
 
@@ -157,3 +155,5 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+/log/*.csv
