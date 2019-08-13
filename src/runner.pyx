@@ -102,7 +102,7 @@ def runner(sh_mem, setting, log_datetime):
 
         # Timing settings for the program
         ## Time of each loop, measured in miliseconds.
-        loop_time_millisec = 25
+        loop_time_millisec = 15
         ## Time of each loop, measured in seconds.
         loop_time_sec      = loop_time_millisec / 1000.0
 
@@ -405,7 +405,7 @@ def runner(sh_mem, setting, log_datetime):
             ###############################################################
             # while ((clock() - t_loop_start) < (loop_time_sec - 0.011)): # clock()の値にはsleep中の経過時間が含まれないので、このwhileの条件文の算出時間をsleep代わりにしている(算出時間はバラバラ…)
                 # sleep(0.0001)
-            sleep(max(loop_time_sec - (gyro_rate*0.0005) - (clock() - t_loop_start), 0.002))
+            sleep(max(loop_time_sec - (clock() - t_loop_start), 0.002))
 
     except Exception as e:
         print("It's a Runner Exception")
