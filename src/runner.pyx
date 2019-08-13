@@ -159,6 +159,8 @@ def runner(sh_mem, setting, log_datetime):
         motor_angle_left_raw = 0
         motor_angle_right_raw = 0
         motor_angle_raw = 0
+        
+        back_lash_half = 4 # バックラッシュの半分[deg]
 
         # The angle of the motor, converted to radians (2*pi radians equals 360 degrees).
         motor_angle = 0
@@ -196,8 +198,6 @@ def runner(sh_mem, setting, log_datetime):
         # モータドライバに出力したデューティー比
         duty_left = 0
         duty_right = 0
-        last_duty_right = 0
-        last_duty_left = 0
 
         # The raw value from the gyro sensor in rate mode.
         gyro_rate_raw = 0
@@ -310,6 +310,17 @@ def runner(sh_mem, setting, log_datetime):
             # sh_mem.write_motor_encoder_left_mem(motor_angle_left_raw)
             # sh_mem.write_motor_encoder_right_mem(motor_angle_right_raw)
 
+            # バックラッシュキャンセル
+            if duty_left < 0:
+                motor_angle_left_raw = motor_angle_left_raw + back_lash_half
+            elif duty_left > 0:
+                motor_angle_left_raw = motor_angle_left_raw - back_lash_half
+            
+            if duty_right < 0:
+                motor_angle_right_raw = motor_angle_right_raw + back_lash_half
+            elif duty_right > 0:
+                motor_angle_right_raw = motor_angle_right_raw - back_lash_half
+
             motor_angle_last = motor_angle
             motor_angle_raw = (motor_angle_left_raw + motor_angle_right_raw) * 0.5
             motor_angle = (motor_angle_raw * radians_per_raw_motor_unit) + gyro_estimated_angle # 左右モーターの現在の平均回転角度(rad) + 躯体の(推定)回転角度
@@ -353,9 +364,6 @@ def runner(sh_mem, setting, log_datetime):
             steering = sh_mem.read_steering_mem()
             duty_right = set_duty(motor_duty_cycle_right_devfd, motor_duty_cycle_right + steering)
             duty_left = set_duty(motor_duty_cycle_left_devfd, motor_duty_cycle_left - steering) # 右車輪のモーター出力が弱いので、左車輪のPWM値を3つ目の引数で調節(%)してる。まだ偏ってるので調節必要
-
-            # last_duty_right = duty_right
-            # last_duty_left = duty_left
 
             ###############################################################
             ##  ここでしっぽモーターを上げる
