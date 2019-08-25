@@ -102,7 +102,7 @@ def runner(sh_mem, setting, log_datetime):
 
         # Timing settings for the program
         ## Time of each loop, measured in miliseconds.
-        loop_time_millisec = 15
+        loop_time_millisec = 18
         ## Time of each loop, measured in seconds.
         loop_time_sec      = loop_time_millisec / 1000.0
 
@@ -147,10 +147,12 @@ def runner(sh_mem, setting, log_datetime):
         battery_offset_right_adjust = setting['batteryOffsetRightAdjust']
         battery_offset_right = battery_offset_right * battery_offset_right_adjust # PWM出力算出用バッテリ電圧補正オフセット(右モーター用)
 
-        a_d = 0.8 #1.0 - 0.55 #0.51 #0.47  # ローパスフィルタ係数(左右車輪の平均回転角度用)。左右モーターの平均回転角速度(rad/sec)の算出時にのみ使用する。小さいほど角速度の変化に過敏になる。〜0.4951
-        a_r = 0.996 #0.985 #0.98  # ローパスフィルタ係数(左右車輪の目標平均回転角度用)。左右モーターの目標平均回転角度(rad)の算出時に使用する。小さいほど前進・後退する反応が早くなる。
-        a_b = 0.85 #ローパスフィルタ係数(最大モーター電圧b用）
+        a_d = setting['a_d'] #1.0 - 0.55 #0.51 #0.47  # ローパスフィルタ係数(左右車輪の平均回転角度用)。左右モーターの平均回転角速度(rad/sec)の算出時にのみ使用する。小さいほど角速度の変化に過敏になる。〜0.4951
+        a_r = setting['a_r'] #0.985 #0.98  # ローパスフィルタ係数(左右車輪の目標平均回転角度用)。左右モーターの目標平均回転角度(rad)の算出時に使用する。小さいほど前進・後退する反応が早くなる。
+        a_b = setting['a_b'] #ローパスフィルタ係数(最大モーター電圧b用）
         k_theta_dot = 6.0 # モータ目標回転角速度係数
+
+        enable_back_slash_cancel = setting['enable_back_slash_cancel']
 
         # Variables representing physical signals (more info on these in the docs)
         # The angle of "the motor", measured in raw units (degrees for the
@@ -311,15 +313,16 @@ def runner(sh_mem, setting, log_datetime):
             # sh_mem.write_motor_encoder_right_mem(motor_angle_right_raw)
 
             # バックラッシュキャンセル
-            if duty_left < 0:
-                motor_angle_left_raw = motor_angle_left_raw + back_lash_half
-            elif duty_left > 0:
-                motor_angle_left_raw = motor_angle_left_raw - back_lash_half
-            
-            if duty_right < 0:
-                motor_angle_right_raw = motor_angle_right_raw + back_lash_half
-            elif duty_right > 0:
-                motor_angle_right_raw = motor_angle_right_raw - back_lash_half
+            if enable_back_slash_cancel:
+                if duty_left < 0:
+                    motor_angle_left_raw = motor_angle_left_raw + back_lash_half
+                elif duty_left > 0:
+                    motor_angle_left_raw = motor_angle_left_raw - back_lash_half
+                
+                if duty_right < 0:
+                    motor_angle_right_raw = motor_angle_right_raw + back_lash_half
+                elif duty_right > 0:
+                    motor_angle_right_raw = motor_angle_right_raw - back_lash_half
 
             motor_angle_last = motor_angle
             motor_angle_raw = (motor_angle_left_raw + motor_angle_right_raw) * 0.5
@@ -411,9 +414,9 @@ def runner(sh_mem, setting, log_datetime):
             ###############################################################
             ##  Busy wait for the loop to complete
             ###############################################################
-            # while ((clock() - t_loop_start) < (loop_time_sec - 0.011)): # clock()の値にはsleep中の経過時間が含まれないので、このwhileの条件文の算出時間をsleep代わりにしている(算出時間はバラバラ…)
-                # sleep(0.0001)
-            sleep(max(loop_time_sec - (clock() - t_loop_start), 0.002))
+            #while ((clock() - t_loop_start) < (loop_time_sec - 0.014)): # clock()の値にはsleep中の経過時間が含まれないので、このwhileの条件文の算出時間をsleep代わりにしている(算出時間はバラバラ…)
+            #    sleep(0.0001)
+            sleep(max(loop_time_sec - (clock() - t_loop_start), 0.001))
 
     except Exception as e:
         print("It's a Runner Exception")

@@ -46,7 +46,7 @@ def guide(sh_mem, setting, log_datetime):
     try:
         # ここで変数定義などの事前準備を行う
         # Time of each loop, measured in miliseconds.
-        loop_time_millisec = 25
+        loop_time_millisec = 18
         # Time of each loop, measured in seconds.
         loop_time_sec = loop_time_millisec / 1000.0
 
