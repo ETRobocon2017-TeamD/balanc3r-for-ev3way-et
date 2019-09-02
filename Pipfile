@@ -17,4 +17,4 @@ scipy = "*"
 pandas = "*"
 
 [requires]
-python_version = "3.4.2"
+python_version = "3.5.3"
