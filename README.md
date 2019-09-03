@@ -10,9 +10,8 @@ https://www.youtube.com/watch?v=sKaeCxrSDG8
 
 - Body: [EV3Way-ET](https://github.com/ETrobocon/etroboEV3/wiki)
 - OS:ev3dev
- - [ev3dev-jessie-2017-06-09](https://github.com/ev3dev/ev3dev/archive/ev3dev-jessie-2017-06-09.zip)
  - [ev3dev-stretch-2019-03-03](https://github.com/ev3dev/ev3dev/releases/download/ev3dev-stretch-2019-03-03/ev3dev-stretch-ev3-generic-2019-03-03.zip)
-- Python: 3.4.2
+- Python: 3.5.3
 
 # Development environment
 
@@ -285,6 +284,12 @@ After, Execute "pistol.py" by "nice" command to give "-12" nice value.
 ```shell
 $ sudo nice -n -13 python3 pistol.py
 ```
+
+# How to tuning parameter
+
+/Users/yoshinori/.local/share/virtualenvs/balanc3r-for-ev3way-et-SkxC7aZY/lib/python3.4/site-packages/matplotlib/mpl-data/fonts/ttf
+
+TODO: Write usage Jupyter, pandas, matplotlib.
 
 
 # Reference

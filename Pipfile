@@ -15,6 +15,7 @@ ipython = {extras = ["all"],version = "*"}
 numpy = "*"
 scipy = "*"
 pandas = "*"
+control = "*"
 
 [requires]
-python_version = "3.4.2"
+python_version = "3.5.3"
