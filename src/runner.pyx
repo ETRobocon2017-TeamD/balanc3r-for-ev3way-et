@@ -111,9 +111,9 @@ def runner(sh_mem, setting, log_datetime):
         radians_per_degree : cython.double = float(math.pi) / 180
 
         # Platform specific constants and conversions
-        deg_per_sec_per_raw_gyro_unit     :cython.double = float(1)                                        # For the LEGO EV3 Gyro in Rate mode, 1 unit = 1 deg/s
+        deg_per_sec_per_raw_gyro_unit    : cython.double = float(1)                                        # For the LEGO EV3 Gyro in Rate mode, 1 unit = 1 deg/s
         rad_per_second_per_raw_gyro_unit : cython.double = deg_per_sec_per_raw_gyro_unit * radians_per_degree # Express the above as the rate in rad/s per gyro unit
-        deg_per_raw_motor_unit           = 1                                                  # For the LEGO EV3 Large Motor 1 unit = 1 deg
+        deg_per_raw_motor_unit           : cython.double = float(1)                                                  # For the LEGO EV3 Large Motor 1 unit = 1 deg
         radians_per_raw_motor_unit       = deg_per_raw_motor_unit*radians_per_degree          # Express the above as the angle in rad per motor unit
         rpmper_per_percent_speed         = 1.7                                                # On the EV3, "1% speed" corresponds to 1.7 RPM (if speed control were enabled) EV3では、「speed」を1%とした場合、１分間に1.7回転させる速さであると定義する（※電圧によって変わる）
         deg_per_sec_per_percent_speed    = rpmper_per_percent_speed * 360 / 60                # Convert this number to the speed in deg/s per "percent speed" 「speed」を回転角速度(deg)に変換する係数
