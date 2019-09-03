@@ -108,7 +108,7 @@ def runner(sh_mem, setting, log_datetime):
 
         # Math constants
         ## The number of radians in a degree.
-        radians_per_degree = math.pi / 180
+        radians_per_degree : cython.double = float(math.pi) / 180
 
         # Platform specific constants and conversions
         deg_per_sec_per_raw_gyro_unit    = 1                                                  # For the LEGO EV3 Gyro in Rate mode, 1 unit = 1 deg/s

@@ -1702,7 +1702,6 @@ static PyObject *__pyx_int_0;
 static PyObject *__pyx_int_1;
 static PyObject *__pyx_int_4;
 static PyObject *__pyx_int_100;
-static PyObject *__pyx_int_180;
 static PyObject *__pyx_int_250;
 static PyObject *__pyx_int_1000;
 static PyObject *__pyx_int_neg_300;
@@ -2750,14 +2749,14 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
   PyObject *__pyx_v_tail_motor = NULL;
   double __pyx_v_loop_time_millisec;
   double __pyx_v_loop_time_sec;
-  PyObject *__pyx_v_radians_per_degree = NULL;
+  double __pyx_v_radians_per_degree;
   PyObject *__pyx_v_deg_per_sec_per_raw_gyro_unit = NULL;
   PyObject *__pyx_v_rad_per_second_per_raw_gyro_unit = NULL;
   PyObject *__pyx_v_deg_per_raw_motor_unit = NULL;
   PyObject *__pyx_v_radians_per_raw_motor_unit = NULL;
   double __pyx_v_rpmper_per_percent_speed;
   double __pyx_v_deg_per_sec_per_percent_speed;
-  CYTHON_UNUSED PyObject *__pyx_v_rad_per_sec_per_percent_speed = NULL;
+  CYTHON_UNUSED double __pyx_v_rad_per_sec_per_percent_speed;
   PyObject *__pyx_v_gyro_drift_compensation_rate = NULL;
   PyObject *__pyx_v_gain_all = NULL;
   PyObject *__pyx_v_gain_motor_angle = NULL;
@@ -3269,7 +3268,7 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
       /* "runner.pyx":111
  *         # Math constants
  *         ## The number of radians in a degree.
- *         radians_per_degree = math.pi / 180             # <<<<<<<<<<<<<<
+ *         radians_per_degree : cython.double = float(math.pi) / 180             # <<<<<<<<<<<<<<
  * 
  *         # Platform specific constants and conversions
  */
@@ -3278,11 +3277,9 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
       __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_pi); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 111, __pyx_L5_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_1 = __Pyx_PyNumber_Divide(__pyx_t_4, __pyx_int_180); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 111, __pyx_L5_error)
-      __Pyx_GOTREF(__pyx_t_1);
+      __pyx_t_11 = __Pyx_PyObject_AsDouble(__pyx_t_4); if (unlikely(__pyx_t_11 == ((double)((double)-1)) && PyErr_Occurred())) __PYX_ERR(0, 111, __pyx_L5_error)
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __pyx_v_radians_per_degree = __pyx_t_1;
-      __pyx_t_1 = 0;
+      __pyx_v_radians_per_degree = (__pyx_t_11 / 180.0);
 
       /* "runner.pyx":114
  * 
@@ -3301,8 +3298,11 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
  *         deg_per_raw_motor_unit           = 1                                                  # For the LEGO EV3 Large Motor 1 unit = 1 deg
  *         radians_per_raw_motor_unit       = deg_per_raw_motor_unit*radians_per_degree          # Express the above as the angle in rad per motor unit
  */
-      __pyx_t_1 = PyNumber_Multiply(__pyx_v_deg_per_sec_per_raw_gyro_unit, __pyx_v_radians_per_degree); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 115, __pyx_L5_error)
+      __pyx_t_4 = PyFloat_FromDouble(__pyx_v_radians_per_degree); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 115, __pyx_L5_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      __pyx_t_1 = PyNumber_Multiply(__pyx_v_deg_per_sec_per_raw_gyro_unit, __pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 115, __pyx_L5_error)
       __Pyx_GOTREF(__pyx_t_1);
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __pyx_v_rad_per_second_per_raw_gyro_unit = __pyx_t_1;
       __pyx_t_1 = 0;
 
@@ -3323,10 +3323,13 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
  *         rpmper_per_percent_speed         = 1.7                                                # On the EV3, "1% speed" corresponds to 1.7 RPM (if speed control were enabled) EV3speed1%1.7
  *         deg_per_sec_per_percent_speed    = rpmper_per_percent_speed * 360 / 60                # Convert this number to the speed in deg/s per "percent speed" speed(deg)
  */
-      __pyx_t_1 = PyNumber_Multiply(__pyx_v_deg_per_raw_motor_unit, __pyx_v_radians_per_degree); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 117, __pyx_L5_error)
+      __pyx_t_1 = PyFloat_FromDouble(__pyx_v_radians_per_degree); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 117, __pyx_L5_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_v_radians_per_raw_motor_unit = __pyx_t_1;
-      __pyx_t_1 = 0;
+      __pyx_t_4 = PyNumber_Multiply(__pyx_v_deg_per_raw_motor_unit, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 117, __pyx_L5_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      __pyx_v_radians_per_raw_motor_unit = __pyx_t_4;
+      __pyx_t_4 = 0;
 
       /* "runner.pyx":118
  *         deg_per_raw_motor_unit           = 1                                                  # For the LEGO EV3 Large Motor 1 unit = 1 deg
@@ -3353,13 +3356,7 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
  * 
  *         # The rate at which we'll update the gyro offset (precise definition given in docs)
  */
-      __pyx_t_1 = PyFloat_FromDouble(__pyx_v_deg_per_sec_per_percent_speed); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 120, __pyx_L5_error)
-      __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_4 = PyNumber_Multiply(__pyx_t_1, __pyx_v_radians_per_degree); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 120, __pyx_L5_error)
-      __Pyx_GOTREF(__pyx_t_4);
-      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_v_rad_per_sec_per_percent_speed = __pyx_t_4;
-      __pyx_t_4 = 0;
+      __pyx_v_rad_per_sec_per_percent_speed = (__pyx_v_deg_per_sec_per_percent_speed * __pyx_v_radians_per_degree);
 
       /* "runner.pyx":124
  *         # The rate at which we'll update the gyro offset (precise definition given in docs)
@@ -5812,12 +5809,10 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
   __Pyx_XDECREF(__pyx_v_gyro);
   __Pyx_XDECREF(__pyx_v_battery);
   __Pyx_XDECREF(__pyx_v_tail_motor);
-  __Pyx_XDECREF(__pyx_v_radians_per_degree);
   __Pyx_XDECREF(__pyx_v_deg_per_sec_per_raw_gyro_unit);
   __Pyx_XDECREF(__pyx_v_rad_per_second_per_raw_gyro_unit);
   __Pyx_XDECREF(__pyx_v_deg_per_raw_motor_unit);
   __Pyx_XDECREF(__pyx_v_radians_per_raw_motor_unit);
-  __Pyx_XDECREF(__pyx_v_rad_per_sec_per_percent_speed);
   __Pyx_XDECREF(__pyx_v_gyro_drift_compensation_rate);
   __Pyx_XDECREF(__pyx_v_gain_all);
   __Pyx_XDECREF(__pyx_v_gain_motor_angle);
@@ -6355,7 +6350,6 @@ static CYTHON_SMALL_CODE int __Pyx_InitGlobals(void) {
   __pyx_int_1 = PyInt_FromLong(1); if (unlikely(!__pyx_int_1)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_4 = PyInt_FromLong(4); if (unlikely(!__pyx_int_4)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_100 = PyInt_FromLong(100); if (unlikely(!__pyx_int_100)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __pyx_int_180 = PyInt_FromLong(180); if (unlikely(!__pyx_int_180)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_250 = PyInt_FromLong(250); if (unlikely(!__pyx_int_250)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_1000 = PyInt_FromLong(1000); if (unlikely(!__pyx_int_1000)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_neg_300 = PyInt_FromLong(-300); if (unlikely(!__pyx_int_neg_300)) __PYX_ERR(0, 1, __pyx_L1_error)
