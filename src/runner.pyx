@@ -102,7 +102,7 @@ def runner(sh_mem, setting, log_datetime):
 
         # Timing settings for the program
         ## Time of each loop, measured in miliseconds.
-        loop_time_millisec = setting['loop_time_millisec']
+        loop_time_millisec : cython.double = float(setting['loop_time_millisec'])
         ## Time of each loop, measured in seconds.
         loop_time_sec      = loop_time_millisec / 1000.0
 
