@@ -16,10 +16,21 @@ g_log = logging.getLogger(__name__)
 
 ###############################################################
 ##
+## 確実に使用しないプロセスのナイス値を下げる
+##
+###############################################################
+def renice_low_priority_processes():
+    nice_value = 19
+    process_names = "-e [b]rickman -e [m]m_percpu_wq -e [w]pa_supplicant -e [c]onnmand -e [s]shd -e [c]rypto"
+    cmds = "ps lax | grep {} | awk '{{print $3}}' | xargs sudo renice {} -p".format(process_names, nice_value)
+    subprocess.check_output(cmds, shell=True)
+
+###############################################################
+##
 ## ナイス値が高いプロセスは倒立振子関連プロセスと競合するため、ナイス値を標準プロセスと一致させる
 ##
 ###############################################################
-def renice_high_nice_processes():
+def renice_high_priority_processes():
     nice_value = 0
     cmds = "ps lax | grep -- [-]20 | awk '{{print $3}}' | xargs sudo renice {} -p".format(nice_value)
     subprocess.check_output(cmds, shell=True)
@@ -30,7 +41,8 @@ def renice_high_nice_processes():
 ##
 ###############################################################
 def renice_driver_kworkers(nice_value):
-    cmds = "ps aux | grep '[k]worker/0:' | awk '{{print $2}}' | xargs sudo renice {} -p".format(nice_value)
+    process_names = "-e '[k]worker/u2' -e [w]riteback -e [k]blockd -e [r]cu_preempt -e [r]cu_sched -e [r]cu_bh -e [e]v3-tac -e [t]i-ads7"
+    cmds = "ps aux | grep {} | awk '{{print $2}}' | xargs sudo renice {} -p".format(process_names, nice_value)
     subprocess.check_output(cmds, shell=True)
 
 ###############################################################
@@ -39,8 +51,9 @@ def renice_driver_kworkers(nice_value):
 ##
 ###############################################################
 def renice_processes():
-    renice_high_nice_processes()
-    nice_value = -15
+    renice_low_priority_processes()
+    renice_high_priority_processes()
+    nice_value = -20
     renice_driver_kworkers(nice_value)
     os.nice(nice_value) # 自分のnice値も下げる
 
