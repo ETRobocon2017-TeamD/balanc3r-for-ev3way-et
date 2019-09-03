@@ -16,6 +16,7 @@ numpy = "*"
 scipy = "*"
 pandas = "*"
 control = "*"
+cython = ">=0.27"
 
 [requires]
 python_version = "3.5.3"
