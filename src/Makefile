@@ -8,7 +8,7 @@ C_SRC = runner.c
 all: $(PROGRAM)
 
 .PHONY: cython
-cython: runner.c
+cython: $(C_SRC)
 
 runner.so: runner.c
 	docker run -v /Users/yoshinori/src/github.com/ETRobocon2017-TeamD/balanc3r-for-ev3way-et:/host ev3jsrs /bin/bash /host/src/cross_compile.sh
