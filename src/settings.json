@@ -1,5 +1,5 @@
 {
-    "gainAll": 1,
+    "gain_all": 1,
     "gain_motor_angle"                  : 1.06526,
     "gain_gyro_angle"                   : 70.73965,
     "gain_motor_angular_speed"          : 0.401898,
@@ -13,12 +13,12 @@
     "lineWhiteLuminance": 440.0,
     "lineBlackLuminance": 647.0,
     "lineLuminanceRate": 0.75,
-    "batteryGainLeft": 0.001089,
-    "batteryGainLeftAdjust": 1.1,
-    "batteryOffsetLeft": 0.625,
-    "batteryOffsetLeftAdjust": 1.0,
-    "batteryGainRight": 0.001089,
-    "batteryGainRightAdjust": 1.0,
-    "batteryOffsetRight": 0.625,
-    "batteryOffsetRightAdjust": 1.0
+    "battery_gain_left": 0.001089,
+    "battery_gain_left_adjust": 1.1,
+    "battery_offset_left": 0.625,
+    "battery_offset_left_adjust": 1.0,
+    "battery_gain_right": 0.001089,
+    "battery_gain_right_adjust": 1.0,
+    "battery_offset_right": 0.625,
+    "battery_offset_right_adjust": 1.0
 }

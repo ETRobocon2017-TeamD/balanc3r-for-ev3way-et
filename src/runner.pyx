@@ -115,41 +115,41 @@ def runner(sh_mem, setting, log_datetime):
         rad_per_second_per_raw_gyro_unit : cython.double = deg_per_sec_per_raw_gyro_unit * radians_per_degree # Express the above as the rate in rad/s per gyro unit
         deg_per_raw_motor_unit           : cython.double = float(1)                                                  # For the LEGO EV3 Large Motor 1 unit = 1 deg
         radians_per_raw_motor_unit       = deg_per_raw_motor_unit*radians_per_degree          # Express the above as the angle in rad per motor unit
-        rpmper_per_percent_speed         = 1.7                                                # On the EV3, "1% speed" corresponds to 1.7 RPM (if speed control were enabled) EV3では、「speed」を1%とした場合、１分間に1.7回転させる速さであると定義する（※電圧によって変わる）
-        deg_per_sec_per_percent_speed    = rpmper_per_percent_speed * 360 / 60                # Convert this number to the speed in deg/s per "percent speed" 「speed」を回転角速度(deg)に変換する係数
-        rad_per_sec_per_percent_speed    = deg_per_sec_per_percent_speed * radians_per_degree # Convert this number to the speed in rad/s per "percent speed" 「speed」を回転角速度(rad)に変換する係数
+        # rpmper_per_percent_speed         = 1.7                                                # On the EV3, "1% speed" corresponds to 1.7 RPM (if speed control were enabled) EV3では、「speed」を1%とした場合、１分間に1.7回転させる速さであると定義する（※電圧によって変わる）
+        # deg_per_sec_per_percent_speed    = rpmper_per_percent_speed * 360 / 60                # Convert this number to the speed in deg/s per "percent speed" 「speed」を回転角速度(deg)に変換する係数
+        # rad_per_sec_per_percent_speed    = deg_per_sec_per_percent_speed * radians_per_degree # Convert this number to the speed in rad/s per "percent speed" 「speed」を回転角速度(rad)に変換する係数
 
         # The rate at which we'll update the gyro offset (precise definition given in docs)
         # ジャイロ値を補正するオフセット値の更新に使用する。調節する必要がある。
         gyro_drift_compensation_rate = 0.075 * loop_time_sec * rad_per_second_per_raw_gyro_unit
 
         # State feedback control gains (aka the magic numbers)
-        gain_all                           = setting['gainAll']
-        gain_motor_angle                   = setting["gain_motor_angle"] * gain_all                   # K_F[0]
-        gain_gyro_angle                    = setting['gain_gyro_angle'] * gain_all                    # K_F[1]
-        gain_motor_angular_speed           = setting['gain_motor_angular_speed'] * gain_all           # K_F[2]
-        gain_gyro_rate                     = setting['gain_gyro_rate'] * gain_all                     # K_F[3]
-        gain_motor_angle_error_accumulated = setting['gain_motor_angle_error_accumulated'] * gain_all # K_I
+        gain_all                           : cython.double = float(setting['gain_all'])
+        gain_motor_angle                   : cython.double = float(setting["gain_motor_angle"]) * gain_all                   # K_F[0]
+        gain_gyro_angle                    : cython.double = float(setting['gain_gyro_angle']) * gain_all                    # K_F[1]
+        gain_motor_angular_speed           : cython.double = float(setting['gain_motor_angular_speed']) * gain_all           # K_F[2]
+        gain_gyro_rate                     : cython.double = float(setting['gain_gyro_rate']) * gain_all                     # K_F[3]
+        gain_motor_angle_error_accumulated : cython.double = float(setting['gain_motor_angle_error_accumulated']) * gain_all # K_I
 
-        battery_gain_left = setting['batteryGainLeft']
-        battery_gain_left_adjust = setting['batteryGainLeftAdjust']
-        battery_gain_left = battery_gain_left * battery_gain_left_adjust  # PWM出力算出用バッテリ電圧補正係数(左モーター用)
+        battery_gain_left        : cython.double = float(setting['battery_gain_left'])
+        battery_gain_left_adjust : cython.double = float(setting['battery_gain_left_adjust'])
+        battery_gain_left *= battery_gain_left_adjust  # PWM出力算出用バッテリ電圧補正係数(左モーター用)
 
-        battery_offset_left = setting['batteryOffsetLeft']
-        battery_offset_left_adjust = setting['batteryOffsetLeftAdjust']
-        battery_offset_left = battery_offset_left * battery_offset_left_adjust  # PWM出力算出用バッテリ電圧補正オフセット(左モーター用)
+        battery_offset_left        : cython.double = float(setting['battery_offset_left'])
+        battery_offset_left_adjust : cython.double = float(setting['battery_offset_left_adjust'])
+        battery_offset_left *= battery_offset_left_adjust  # PWM出力算出用バッテリ電圧補正オフセット(左モーター用)
 
-        battery_gain_right = setting['batteryGainRight']
-        battery_gain_right_adjust = setting['batteryGainRightAdjust']
+        battery_gain_right        : cython.double = float(setting['battery_gain_right'])
+        battery_gain_right_adjust : cython.double = float(setting['battery_gain_right_adjust'])
         battery_gain_right = battery_gain_right * battery_gain_right_adjust # PWM出力算出用バッテリ電圧補正係数(右モーター用)
 
-        battery_offset_right = setting['batteryOffsetRight']
-        battery_offset_right_adjust = setting['batteryOffsetRightAdjust']
+        battery_offset_right        : cython.double = float(setting['battery_offset_right'])
+        battery_offset_right_adjust : cython.double = float(setting['battery_offset_right_adjust'])
         battery_offset_right = battery_offset_right * battery_offset_right_adjust # PWM出力算出用バッテリ電圧補正オフセット(右モーター用)
 
-        a_d = setting['a_d'] #1.0 - 0.55 #0.51 #0.47  # ローパスフィルタ係数(左右車輪の平均回転角度用)。左右モーターの平均回転角速度(rad/sec)の算出時にのみ使用する。小さいほど角速度の変化に過敏になる。〜0.4951
-        a_r = setting['a_r'] #0.985 #0.98  # ローパスフィルタ係数(左右車輪の目標平均回転角度用)。左右モーターの目標平均回転角度(rad)の算出時に使用する。小さいほど前進・後退する反応が早くなる。
-        a_b = setting['a_b'] #ローパスフィルタ係数(最大モーター電圧b用）
+        a_d : cython.double = float(setting['a_d']) #1.0 - 0.55 #0.51 #0.47  # ローパスフィルタ係数(左右車輪の平均回転角度用)。左右モーターの平均回転角速度(rad/sec)の算出時にのみ使用する。小さいほど角速度の変化に過敏になる。〜0.4951
+        a_r : cython.double = float(setting['a_r']) #0.985 #0.98  # ローパスフィルタ係数(左右車輪の目標平均回転角度用)。左右モーターの目標平均回転角度(rad)の算出時に使用する。小さいほど前進・後退する反応が早くなる。
+        # a_b : cython.double = float(setting['a_b']) #ローパスフィルタ係数(最大モーター電圧b用）
         k_theta_dot = 6.0 # モータ目標回転角速度係数
 
         enable_back_slash_cancel = setting['enable_back_slash_cancel']
