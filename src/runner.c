@@ -3544,39 +3544,35 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
       /* "runner.pyx":161
  *         # EV3). We will take the average of both motor positions as "the motor"
  *         # angle, wich is essentially how far the middle of the robot has traveled.
- *         motor_angle_left_raw : cython.int = 0             # <<<<<<<<<<<<<<
- *         motor_angle_right_raw : cython.int = int(0)
- *         motor_angle_raw : cython.int = int(0)
+ *         motor_angle_left_raw = 0             # <<<<<<<<<<<<<<
+ *         motor_angle_right_raw = 0
+ *         motor_angle_raw = 0
  */
       __Pyx_INCREF(__pyx_int_0);
       __pyx_v_motor_angle_left_raw = __pyx_int_0;
 
       /* "runner.pyx":162
  *         # angle, wich is essentially how far the middle of the robot has traveled.
- *         motor_angle_left_raw : cython.int = 0
- *         motor_angle_right_raw : cython.int = int(0)             # <<<<<<<<<<<<<<
- *         motor_angle_raw : cython.int = int(0)
+ *         motor_angle_left_raw = 0
+ *         motor_angle_right_raw = 0             # <<<<<<<<<<<<<<
+ *         motor_angle_raw = 0
  * 
  */
-      __pyx_t_4 = __Pyx_PyNumber_Int(__pyx_int_0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 162, __pyx_L5_error)
-      __Pyx_GOTREF(__pyx_t_4);
-      __pyx_v_motor_angle_right_raw = __pyx_t_4;
-      __pyx_t_4 = 0;
+      __Pyx_INCREF(__pyx_int_0);
+      __pyx_v_motor_angle_right_raw = __pyx_int_0;
 
       /* "runner.pyx":163
- *         motor_angle_left_raw : cython.int = 0
- *         motor_angle_right_raw : cython.int = int(0)
- *         motor_angle_raw : cython.int = int(0)             # <<<<<<<<<<<<<<
+ *         motor_angle_left_raw = 0
+ *         motor_angle_right_raw = 0
+ *         motor_angle_raw = 0             # <<<<<<<<<<<<<<
  * 
  *         back_lash_half = 4 # [deg]
  */
-      __pyx_t_4 = __Pyx_PyNumber_Int(__pyx_int_0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 163, __pyx_L5_error)
-      __Pyx_GOTREF(__pyx_t_4);
-      __pyx_v_motor_angle_raw = __pyx_t_4;
-      __pyx_t_4 = 0;
+      __Pyx_INCREF(__pyx_int_0);
+      __pyx_v_motor_angle_raw = __pyx_int_0;
 
       /* "runner.pyx":165
- *         motor_angle_raw : cython.int = int(0)
+ *         motor_angle_raw = 0
  * 
  *         back_lash_half = 4 # [deg]             # <<<<<<<<<<<<<<
  * 
@@ -4550,7 +4546,7 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
  *             #
  *             if enable_back_slash_cancel:             # <<<<<<<<<<<<<<
  *                 if duty_left < 0:
- *                     motor_angle_left_raw = motor_angle_left_raw + back_lash_half
+ *                     motor_angle_left_raw += back_lash_half
  */
         __pyx_t_14 = __Pyx_PyObject_IsTrue(__pyx_v_enable_back_slash_cancel); if (unlikely(__pyx_t_14 < 0)) __PYX_ERR(0, 316, __pyx_L5_error)
         if (__pyx_t_14) {
@@ -4559,7 +4555,7 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
  *             #
  *             if enable_back_slash_cancel:
  *                 if duty_left < 0:             # <<<<<<<<<<<<<<
- *                     motor_angle_left_raw = motor_angle_left_raw + back_lash_half
+ *                     motor_angle_left_raw += back_lash_half
  *                 elif duty_left > 0:
  */
           __pyx_t_7 = PyObject_RichCompare(__pyx_v_duty_left, __pyx_int_0, Py_LT); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 317, __pyx_L5_error)
@@ -4570,11 +4566,11 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
             /* "runner.pyx":318
  *             if enable_back_slash_cancel:
  *                 if duty_left < 0:
- *                     motor_angle_left_raw = motor_angle_left_raw + back_lash_half             # <<<<<<<<<<<<<<
+ *                     motor_angle_left_raw += back_lash_half             # <<<<<<<<<<<<<<
  *                 elif duty_left > 0:
- *                     motor_angle_left_raw = motor_angle_left_raw - back_lash_half
+ *                     motor_angle_left_raw -= back_lash_half
  */
-            __pyx_t_7 = PyNumber_Add(__pyx_v_motor_angle_left_raw, __pyx_v_back_lash_half); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 318, __pyx_L5_error)
+            __pyx_t_7 = PyNumber_InPlaceAdd(__pyx_v_motor_angle_left_raw, __pyx_v_back_lash_half); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 318, __pyx_L5_error)
             __Pyx_GOTREF(__pyx_t_7);
             __Pyx_DECREF_SET(__pyx_v_motor_angle_left_raw, __pyx_t_7);
             __pyx_t_7 = 0;
@@ -4583,7 +4579,7 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
  *             #
  *             if enable_back_slash_cancel:
  *                 if duty_left < 0:             # <<<<<<<<<<<<<<
- *                     motor_angle_left_raw = motor_angle_left_raw + back_lash_half
+ *                     motor_angle_left_raw += back_lash_half
  *                 elif duty_left > 0:
  */
             goto __pyx_L19;
@@ -4591,9 +4587,9 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
 
           /* "runner.pyx":319
  *                 if duty_left < 0:
- *                     motor_angle_left_raw = motor_angle_left_raw + back_lash_half
+ *                     motor_angle_left_raw += back_lash_half
  *                 elif duty_left > 0:             # <<<<<<<<<<<<<<
- *                     motor_angle_left_raw = motor_angle_left_raw - back_lash_half
+ *                     motor_angle_left_raw -= back_lash_half
  * 
  */
           __pyx_t_7 = PyObject_RichCompare(__pyx_v_duty_left, __pyx_int_0, Py_GT); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 319, __pyx_L5_error)
@@ -4602,32 +4598,32 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
           if (__pyx_t_14) {
 
             /* "runner.pyx":320
- *                     motor_angle_left_raw = motor_angle_left_raw + back_lash_half
+ *                     motor_angle_left_raw += back_lash_half
  *                 elif duty_left > 0:
- *                     motor_angle_left_raw = motor_angle_left_raw - back_lash_half             # <<<<<<<<<<<<<<
+ *                     motor_angle_left_raw -= back_lash_half             # <<<<<<<<<<<<<<
  * 
  *                 if duty_right < 0:
  */
-            __pyx_t_7 = PyNumber_Subtract(__pyx_v_motor_angle_left_raw, __pyx_v_back_lash_half); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 320, __pyx_L5_error)
+            __pyx_t_7 = PyNumber_InPlaceSubtract(__pyx_v_motor_angle_left_raw, __pyx_v_back_lash_half); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 320, __pyx_L5_error)
             __Pyx_GOTREF(__pyx_t_7);
             __Pyx_DECREF_SET(__pyx_v_motor_angle_left_raw, __pyx_t_7);
             __pyx_t_7 = 0;
 
             /* "runner.pyx":319
  *                 if duty_left < 0:
- *                     motor_angle_left_raw = motor_angle_left_raw + back_lash_half
+ *                     motor_angle_left_raw += back_lash_half
  *                 elif duty_left > 0:             # <<<<<<<<<<<<<<
- *                     motor_angle_left_raw = motor_angle_left_raw - back_lash_half
+ *                     motor_angle_left_raw -= back_lash_half
  * 
  */
           }
           __pyx_L19:;
 
           /* "runner.pyx":322
- *                     motor_angle_left_raw = motor_angle_left_raw - back_lash_half
+ *                     motor_angle_left_raw -= back_lash_half
  * 
  *                 if duty_right < 0:             # <<<<<<<<<<<<<<
- *                     motor_angle_right_raw = motor_angle_right_raw + back_lash_half
+ *                     motor_angle_right_raw += back_lash_half
  *                 elif duty_right > 0:
  */
           __pyx_t_7 = PyObject_RichCompare(__pyx_v_duty_right, __pyx_int_0, Py_LT); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 322, __pyx_L5_error)
@@ -4638,20 +4634,20 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
             /* "runner.pyx":323
  * 
  *                 if duty_right < 0:
- *                     motor_angle_right_raw = motor_angle_right_raw + back_lash_half             # <<<<<<<<<<<<<<
+ *                     motor_angle_right_raw += back_lash_half             # <<<<<<<<<<<<<<
  *                 elif duty_right > 0:
- *                     motor_angle_right_raw = motor_angle_right_raw - back_lash_half
+ *                     motor_angle_right_raw -= back_lash_half
  */
-            __pyx_t_7 = PyNumber_Add(__pyx_v_motor_angle_right_raw, __pyx_v_back_lash_half); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 323, __pyx_L5_error)
+            __pyx_t_7 = PyNumber_InPlaceAdd(__pyx_v_motor_angle_right_raw, __pyx_v_back_lash_half); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 323, __pyx_L5_error)
             __Pyx_GOTREF(__pyx_t_7);
             __Pyx_DECREF_SET(__pyx_v_motor_angle_right_raw, __pyx_t_7);
             __pyx_t_7 = 0;
 
             /* "runner.pyx":322
- *                     motor_angle_left_raw = motor_angle_left_raw - back_lash_half
+ *                     motor_angle_left_raw -= back_lash_half
  * 
  *                 if duty_right < 0:             # <<<<<<<<<<<<<<
- *                     motor_angle_right_raw = motor_angle_right_raw + back_lash_half
+ *                     motor_angle_right_raw += back_lash_half
  *                 elif duty_right > 0:
  */
             goto __pyx_L20;
@@ -4659,9 +4655,9 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
 
           /* "runner.pyx":324
  *                 if duty_right < 0:
- *                     motor_angle_right_raw = motor_angle_right_raw + back_lash_half
+ *                     motor_angle_right_raw += back_lash_half
  *                 elif duty_right > 0:             # <<<<<<<<<<<<<<
- *                     motor_angle_right_raw = motor_angle_right_raw - back_lash_half
+ *                     motor_angle_right_raw -= back_lash_half
  * 
  */
           __pyx_t_7 = PyObject_RichCompare(__pyx_v_duty_right, __pyx_int_0, Py_GT); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 324, __pyx_L5_error)
@@ -4670,22 +4666,22 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
           if (__pyx_t_14) {
 
             /* "runner.pyx":325
- *                     motor_angle_right_raw = motor_angle_right_raw + back_lash_half
+ *                     motor_angle_right_raw += back_lash_half
  *                 elif duty_right > 0:
- *                     motor_angle_right_raw = motor_angle_right_raw - back_lash_half             # <<<<<<<<<<<<<<
+ *                     motor_angle_right_raw -= back_lash_half             # <<<<<<<<<<<<<<
  * 
  *             motor_angle_last = motor_angle
  */
-            __pyx_t_7 = PyNumber_Subtract(__pyx_v_motor_angle_right_raw, __pyx_v_back_lash_half); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 325, __pyx_L5_error)
+            __pyx_t_7 = PyNumber_InPlaceSubtract(__pyx_v_motor_angle_right_raw, __pyx_v_back_lash_half); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 325, __pyx_L5_error)
             __Pyx_GOTREF(__pyx_t_7);
             __Pyx_DECREF_SET(__pyx_v_motor_angle_right_raw, __pyx_t_7);
             __pyx_t_7 = 0;
 
             /* "runner.pyx":324
  *                 if duty_right < 0:
- *                     motor_angle_right_raw = motor_angle_right_raw + back_lash_half
+ *                     motor_angle_right_raw += back_lash_half
  *                 elif duty_right > 0:             # <<<<<<<<<<<<<<
- *                     motor_angle_right_raw = motor_angle_right_raw - back_lash_half
+ *                     motor_angle_right_raw -= back_lash_half
  * 
  */
           }
@@ -4696,12 +4692,12 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
  *             #
  *             if enable_back_slash_cancel:             # <<<<<<<<<<<<<<
  *                 if duty_left < 0:
- *                     motor_angle_left_raw = motor_angle_left_raw + back_lash_half
+ *                     motor_angle_left_raw += back_lash_half
  */
         }
 
         /* "runner.pyx":327
- *                     motor_angle_right_raw = motor_angle_right_raw - back_lash_half
+ *                     motor_angle_right_raw -= back_lash_half
  * 
  *             motor_angle_last = motor_angle             # <<<<<<<<<<<<<<
  *             motor_angle_raw = (motor_angle_left_raw + motor_angle_right_raw) * 0.5

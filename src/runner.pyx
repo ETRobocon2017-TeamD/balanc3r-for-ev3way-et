@@ -315,14 +315,14 @@ def runner(sh_mem, setting, log_datetime):
             # バックラッシュキャンセル
             if enable_back_slash_cancel:
                 if duty_left < 0:
-                    motor_angle_left_raw = motor_angle_left_raw + back_lash_half
+                    motor_angle_left_raw += back_lash_half
                 elif duty_left > 0:
-                    motor_angle_left_raw = motor_angle_left_raw - back_lash_half
+                    motor_angle_left_raw -= back_lash_half
                 
                 if duty_right < 0:
-                    motor_angle_right_raw = motor_angle_right_raw + back_lash_half
+                    motor_angle_right_raw += back_lash_half
                 elif duty_right > 0:
-                    motor_angle_right_raw = motor_angle_right_raw - back_lash_half
+                    motor_angle_right_raw -= back_lash_half
 
             motor_angle_last = motor_angle
             motor_angle_raw = (motor_angle_left_raw + motor_angle_right_raw) * 0.5
