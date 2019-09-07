@@ -116,6 +116,12 @@ def main():
         log_datetime = strftime("%Y%m%d%H%M%S")
         print("Start time is {}".format(log_datetime))
 
+        # スケジューラー設定
+        priority = os.sched_get_priority_max(os.SCHED_FIFO)
+        sched_params = os.sched_param(priority)
+        os.sched_setscheduler(0, os.SCHED_FIFO, sched_params)
+
+        # ナイス値設定
         renice_processes()
 
         # プロセス間共有メモリ
