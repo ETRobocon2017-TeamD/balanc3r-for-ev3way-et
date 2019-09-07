@@ -95,7 +95,7 @@ Build cross build container
 vm shell
 ```
 $ docker pull yjono/ev3jcrs
-$ docker tag yjono/ev3jcrs ev3jcrs
+$ docker tag yjono/ev3jcrs ev3jsrs
 ```
 
 or 
@@ -136,8 +136,8 @@ or
 
 host shell
 ```
-$ docker run -it -v /Users/yoshinori/src/github.com/ETRobocon2017-TeamD/balanc3r-for-ev3way-et:/host ev3jcrs /bin/bash
-$ docker run -it -v /Users/yoshinori/src/github.com/ETRobocon2017-TeamD/balanc3r-for-ev3way-et:/host ev3jsrs /bin/bash
+$ docker run -it -v $HOME/src/github.com/ETRobocon2017-TeamD/balanc3r-for-ev3way-et:/host ev3jcrs /bin/bash
+$ docker run -it -v $HOME/src/github.com/ETRobocon2017-TeamD/balanc3r-for-ev3way-et:/host ev3jsrs /bin/bash
 ```
 
 ev3dev(jessie) python include dir
@@ -287,7 +287,7 @@ $ sudo nice -n -13 python3 pistol.py
 
 # How to tuning parameter
 
-/Users/yoshinori/.local/share/virtualenvs/balanc3r-for-ev3way-et-SkxC7aZY/lib/python3.4/site-packages/matplotlib/mpl-data/fonts/ttf
+$HOME/.local/share/virtualenvs/balanc3r-for-ev3way-et-SkxC7aZY/lib/python3.4/site-packages/matplotlib/mpl-data/fonts/ttf
 
 TODO: Write usage Jupyter, pandas, matplotlib.
 
