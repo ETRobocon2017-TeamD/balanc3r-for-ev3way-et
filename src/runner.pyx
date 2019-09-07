@@ -279,7 +279,7 @@ def runner(sh_mem, setting, log_datetime):
         print("GO!")
         print("-----------------------------------")
 
-        #tail_motor.run_timed(time_sp=150, speed_sp=125) # しっぽモーター下に少し下げる
+        tail_motor.run_timed(time_sp=150, speed_sp=125) # しっぽモーター下に少し下げる
         sleep(0.15)
 
         # 倒立振子スタート時の時間取得
@@ -372,7 +372,7 @@ def runner(sh_mem, setting, log_datetime):
             ##  ここでしっぽモーターを上げる
             ###############################################################
             if gyro_estimated_angle == 0:
-                tail_motor.run_timed(time_sp=250, speed_sp=-300, stop_action='coast') # しっぽモーター上に上げる
+                tail_motor.run_timed(time_sp=250, speed_sp=-600, stop_action='coast') # しっぽモーター上に上げる
 
             ###############################################################
             ##  Update angle estimate and Gyro Offset Estimate
@@ -417,7 +417,7 @@ def runner(sh_mem, setting, log_datetime):
             ###############################################################
             #while ((clock() - t_loop_start) < (loop_time_sec - 0.014)): # clock()の値にはsleep中の経過時間が含まれないので、このwhileの条件文の算出時間をsleep代わりにしている(算出時間はバラバラ…)
             #    sleep(0.0001)
-            sleep(max(loop_time_sec - (float(clock()) - t_loop_start), 0.002))
+            sleep(max(loop_time_sec - (float(clock()) - t_loop_start), 0.0))
 
     except Exception as exception:
         print("It's a Runner Exception")
