@@ -287,7 +287,51 @@ $ sudo nice -n -13 python3 pistol.py
 
 # How to tuning parameter
 
+
+## Setup jupyter for japanese 
+
+**Find matplotlib, then write japanese fonts setting.**
+
+```shell
+sudo apt install fonts-takao-pgothic fonts-takao-mincho
+```
+
+```shell
+$ pipenv shell
+
+or
+
+$ conda activate
+
+$ python3
+```
+
+```python
+>>> import matplotlib
+>>> matplotlib.matplotlib_fname()
+```
+
+$HOME/.local/share/virtualenvs/balanc3r-for-ev3way-et-9y2obqay/lib/python3.5/site-packages/matplotlib/mpl-data/matplotlibrc
+
 $HOME/.local/share/virtualenvs/balanc3r-for-ev3way-et-SkxC7aZY/lib/python3.4/site-packages/matplotlib/mpl-data/fonts/ttf
+
+if matplot>=3.1.0 
+```matplotlibrc
+font.serif          : Noto Serif CJK JP, DejaVu Serif, Bitstream Vera Serif, Computer Modern Roman, New Century Schoolbook, Century Schoolbook L, Utopia, ITC Bookman, Bookman, Nimbus Roman No9 L, Times New Roman, Times, Palatino, Charter, serif
+
+font.sans-serif     : Noto Sans CJK JP, DejaVu Sans, Bitstream Vera Sans, Computer Modern Sans Serif, Lucida Grande, Verdana, Geneva, Lucid, Arial, Helvetica, Avant Garde, sans-serif
+```
+
+else matplot<3.1.0
+```matplotlibrc
+font.serif          : TakaoPMincho, DejaVu Serif, Bitstream Vera Serif, Computer Modern Roman, New Century Schoolbook, Century Schoolbook L, Utopia, ITC Bookman, Bookman, Nimbus Roman No9 L, Times New Roman, Times, Palatino, Charter, serif
+
+font.sans-serif     : TakaoPGothic, DejaVu Sans, Bitstream Vera Sans, Computer Modern Sans Serif, Lucida Grande, Verdana, Geneva, Lucid, Arial, Helvetica, Avant Garde, sans-serif
+```
+
+```shell
+rm -rf ~/.cache/matplotlib/
+```
 
 TODO: Write usage Jupyter, pandas, matplotlib.
 
