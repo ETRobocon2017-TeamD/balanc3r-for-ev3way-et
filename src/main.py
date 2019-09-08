@@ -36,17 +36,6 @@ def renice_driver_kworkers(nice_value):
     cmds = "ps aux | grep {} | awk '{{print $2}}' | xargs sudo renice {} -p".format(process_names, nice_value)
     subprocess.check_output(cmds, shell=True)
 
-    # スケジューラのポリシーをFIFOにする
-    priority = os.sched_get_priority_max(os.SCHED_FIFO)
-    sched_params = os.sched_param(priority)
-    cmds = "ps aux | grep {} | awk '{{print $2}}'".format(process_names)
-    pids = subprocess.check_output(cmds, shell=True, universal_newlines=True)
-    pids_array = [x for x in pids.split('\n') if x] # pid＋\nの文字列を配列に変換して空文字を抜いた。
-    for pid in pids_array:
-        os.sched_setscheduler(int(pid), os.SCHED_FIFO, sched_params)
-        scheduler_policy = os.sched_getscheduler(int(pid))
-        print("pid {} scheduler_policy is FIFO : {}".format(pid, scheduler_policy == os.SCHED_FIFO))
-
 ###############################################################
 ##
 ## ライントレースプログラムに関わる全てのプロセスのnice値を調整する
@@ -117,11 +106,6 @@ def main():
         log_datetime = strftime("%Y%m%d%H%M%S")
         print("Start time is {}".format(log_datetime))
 
-        # スケジューラー設定
-        priority = os.sched_get_priority_max(os.SCHED_FIFO)
-        sched_params = os.sched_param(priority)
-        os.sched_setscheduler(0, os.SCHED_FIFO, sched_params)
-
         # ナイス値設定
         renice_processes()
 
@@ -134,6 +118,10 @@ def main():
         runner_pid = os.fork()
 
         if runner_pid == 0:
+            # スケジューラー設定
+            priority = os.sched_get_priority_min(os.SCHED_FIFO)
+            sched_params = os.sched_param(priority)
+            os.sched_setscheduler(runner_pid, os.SCHED_FIFO, sched_params)
             # NOTE: 倒立振子ライブラリを使う場合はrunner()を、ライントレーサー開発等で倒立振子ライブラリを使いたくない場合はrunner_stub()を使用すること
             runner(sh_mem, setting, log_datetime)
             print('Runner Done')
