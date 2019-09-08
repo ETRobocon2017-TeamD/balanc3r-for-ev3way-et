@@ -46,7 +46,7 @@ def guide(sh_mem, setting, log_datetime):
     try:
         # ここで変数定義などの事前準備を行う
         # Time of each loop, measured in miliseconds.
-        loop_time_millisec = 25
+        loop_time_millisec = 18
         # Time of each loop, measured in seconds.
         loop_time_sec = loop_time_millisec / 1000.0
 
@@ -94,9 +94,9 @@ def guide(sh_mem, setting, log_datetime):
             # 角度を算出してオドメトリーを使用
             angle_l = sh_mem.read_motor_encoder_left_mem()
             angle_r = sh_mem.read_motor_encoder_right_mem()
-            odometry_speed_reference, odometry_direction = odometry.target_trace(angle_l,angle_r)
-            direction = odometry_direction
-            speed_reference = odometry_speed_reference
+            # odometry_speed_reference, odometry_direction = odometry.target_trace(angle_l,angle_r)
+            # direction = odometry_direction
+            # speed_reference = odometry_speed_reference
 
             # 左右モーターの角度は下記のように取得
             # print(read_motor_encoder_left_mem())
@@ -108,7 +108,8 @@ def guide(sh_mem, setting, log_datetime):
 
             # 実行時間、PID制御に関わる値をログに出力
             t_loop_end = clock()
-            logs[log_pointer] = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}".format(
+            # logs[log_pointer] = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}".format(
+            logs[log_pointer] = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}".format(
                 t_loop_end - t_line_trace_start,
                 t_loop_end - t_loop_start,
                 speed_reference,
@@ -120,11 +121,13 @@ def guide(sh_mem, setting, log_datetime):
                 line_tracer.i_b,
                 line_tracer.d_b,
                 angle_l,
-                angle_r,
-                odometry.pre_pos_x,
-                odometry.pre_pos_y,
-                odometry_direction,
-                odometry_speed_reference)
+                angle_r
+                # ,
+                # odometry.pre_pos_x,
+                # odometry.pre_pos_y,
+                # odometry_direction,
+                # odometry_speed_reference
+                )
             log_pointer += 1
 
             ###############################################################

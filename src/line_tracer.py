@@ -18,7 +18,7 @@ class LineTracer:
         # 8.5V - 0.31
         # 8.2V - 0.30
         # 7.5V - 0.26
-        self.k_p = 0.30 #0.26
+        self.k_p = 0.26 #0.26
         # TODO: I係数(要調整)
         self.k_i = 0.1
         # TODO: D係数(要調整)

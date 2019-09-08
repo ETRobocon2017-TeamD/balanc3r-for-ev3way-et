@@ -1,0 +1,22 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+paramiko = "*"
+scp = "*"
+jupyter = "*"
+matplotlib = "*"
+pillow = "*"
+ipython = {extras = ["all"],version = "*"}
+numpy = "*"
+scipy = "*"
+pandas = "*"
+control = "*"
+cython = ">=0.27"
+
+[requires]
+python_version = "3.5.3"

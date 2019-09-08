@@ -9,10 +9,149 @@ https://www.youtube.com/watch?v=sKaeCxrSDG8
 # Prerequisite
 
 - Body: [EV3Way-ET](https://github.com/ETrobocon/etroboEV3/wiki)
-- OS: [ev3dev-jessie-2017-06-09](https://github.com/ev3dev/ev3dev/archive/ev3dev-jessie-2017-06-09.zip)
+- OS:ev3dev
+ - [ev3dev-stretch-2019-03-03](https://github.com/ev3dev/ev3dev/releases/download/ev3dev-stretch-2019-03-03/ev3dev-stretch-ev3-generic-2019-03-03.zip)
+- Python: 3.5.3
 
+# Development environment
 
-# How to use
+## Docker
+
+If your host OS is not linux, you should install vagrant. and then install debian-stretch into vm.
+
+[Vagrant](https://www.vagrantup.com/)
+
+Host shell
+```
+$ vagrant up
+$ vagrant ssh
+```
+
+You will use EV3dev developer tool, you must install docker.
+
+[DockerCE Ubuntu install](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
+
+vm shell
+```
+$ sudo apt-get remove docker docker-engine docker.io containerd runc
+$ sudo apt-get update
+$ sudo apt-get upgrade
+$ sudo apt-get install \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg-agent \
+    software-properties-common
+$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+$ sudo apt-key fingerprint 0EBFCD88
+$ sudo add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+   $(lsb_release -cs) \
+   stable"
+$ sudo apt-get update
+$ sudo apt-get install docker-ce docker-ce-cli containerd.io
+```
+
+Install brickstrap tool, then you will run qemu-armel container.
+
+vm shell
+```
+$ sudo add-apt-repository ppa:ev3dev/tools
+$ sudo apt update
+$ sudo apt install brickstrap
+```
+
+Get the container for developing ev3dev.
+
+vm shell
+```
+$ sudo docker pull ev3dev/ev3dev-jessie-ev3-generic
+$ sudo docker tag ev3dev/ev3dev-jessie-ev3-generic ev3jg
+```
+
+Check the container behaviour.
+
+vm shell
+```
+$ sudo docker run --rm -it ev3jg su -l robot
+```
+
+[(optionnal) Manage Docker as a non-root user](https://docs.docker.com/install/linux/linux-postinstall/)
+
+vm shell
+```
+$ sudo groupadd docker
+$ sudo usermod -aG docker $USER
+```
+
+Install cython package
+
+```
+$ sudo apt install cython3
+```
+
+Build cross build container
+
+vm shell
+```
+$ docker pull yjono/ev3jcrs
+$ docker tag yjono/ev3jcrs ev3jsrs
+```
+
+or 
+
+vm shell 
+```
+$ docker build -t balan3er-for-ev3way-et/ev3jsrs .
+$ docker tag balan3er-for-ev3way-et/ev3jsrs ev3jsrs
+```
+
+# How to build(Python Extension Module)
+
+## short script
+
+vm shell
+```
+make
+```
+
+## description
+
+Generate C source
+
+vm shell
+```
+$ cython xxxx.pyx
+```
+
+Run the container for cross compile.
+
+vm shell
+```
+$ docker run -it -v /host:/host ev3jcrs /bin/bash
+$ docker run -it -v /host:/host ev3jsrs /bin/bash
+```
+
+or
+
+host shell
+```
+$ docker run -it -v $HOME/src/github.com/ETRobocon2017-TeamD/balanc3r-for-ev3way-et:/host ev3jcrs /bin/bash
+$ docker run -it -v $HOME/src/github.com/ETRobocon2017-TeamD/balanc3r-for-ev3way-et:/host ev3jsrs /bin/bash
+```
+
+ev3dev(jessie) python include dir
+
+container shell
+```
+$ CFLAGS=$(arm-linux-gnueabi-python3-config --cflags) \
+LDFLAGS=$(arm-linux-gnueabi-python3-config --ldflags) \
+INCLUDES=$(arm-linux-gnueabi-python3-config --includes)
+$ arm-linux-gnueabi-gcc ${INCLUDES} -c xxxx.c ${CFLAGS}
+$ arm-linux-gnueabi-gcc xxxx.o -o xxxx.so -shared ${LDFLAGS}
+```
+
+# How to drive the EV3Way-ET
 
 In host shell,  login your EV3Way-ET by ssh.
 
@@ -145,6 +284,56 @@ After, Execute "pistol.py" by "nice" command to give "-12" nice value.
 ```shell
 $ sudo nice -n -13 python3 pistol.py
 ```
+
+# How to tuning parameter
+
+
+## Setup jupyter for japanese 
+
+**Find matplotlib, then write japanese fonts setting.**
+
+```shell
+sudo apt install fonts-takao-pgothic fonts-takao-mincho
+```
+
+```shell
+$ pipenv shell
+
+or
+
+$ conda activate
+
+$ python3
+```
+
+```python
+>>> import matplotlib
+>>> matplotlib.matplotlib_fname()
+```
+
+$HOME/.local/share/virtualenvs/balanc3r-for-ev3way-et-9y2obqay/lib/python3.5/site-packages/matplotlib/mpl-data/matplotlibrc
+
+$HOME/.local/share/virtualenvs/balanc3r-for-ev3way-et-SkxC7aZY/lib/python3.4/site-packages/matplotlib/mpl-data/fonts/ttf
+
+if matplot>=3.1.0 
+```matplotlibrc
+font.serif          : Noto Serif CJK JP, DejaVu Serif, Bitstream Vera Serif, Computer Modern Roman, New Century Schoolbook, Century Schoolbook L, Utopia, ITC Bookman, Bookman, Nimbus Roman No9 L, Times New Roman, Times, Palatino, Charter, serif
+
+font.sans-serif     : Noto Sans CJK JP, DejaVu Sans, Bitstream Vera Sans, Computer Modern Sans Serif, Lucida Grande, Verdana, Geneva, Lucid, Arial, Helvetica, Avant Garde, sans-serif
+```
+
+else matplot<3.1.0
+```matplotlibrc
+font.serif          : TakaoPMincho, DejaVu Serif, Bitstream Vera Serif, Computer Modern Roman, New Century Schoolbook, Century Schoolbook L, Utopia, ITC Bookman, Bookman, Nimbus Roman No9 L, Times New Roman, Times, Palatino, Charter, serif
+
+font.sans-serif     : TakaoPGothic, DejaVu Sans, Bitstream Vera Sans, Computer Modern Sans Serif, Lucida Grande, Verdana, Geneva, Lucid, Arial, Helvetica, Avant Garde, sans-serif
+```
+
+```shell
+rm -rf ~/.cache/matplotlib/
+```
+
+TODO: Write usage Jupyter, pandas, matplotlib.
 
 
 # Reference

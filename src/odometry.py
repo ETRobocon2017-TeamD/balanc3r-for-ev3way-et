@@ -9,8 +9,8 @@ class Odometry:
         self.__distance_periodic_R = 0.0  # 右タイヤの4ms間の距離
         self.__pre_angle_L = 0.0
         self.__pre_angle_R = 0.0  # 左右モータ回転角度の過去値
-        self.__pre_pos_x = 0
-        self.__pre_pos_y = 0
+        self.pre_pos_x = 0
+        self.pre_pos_y = 0
 
         self.__total_direction = 0.0 #現在の角度
         self.__total_distance = 0.0 #現在の距離
@@ -72,11 +72,11 @@ class Odometry:
         self.__total_direction += cur_dir
 
         # 現在の位置を計算
-        pos_x = self.__pre_pos_x + (cur_dis * cos(radians(self.__total_direction))) #進行距離 * cos x
-        pos_y = self.__pre_pos_y + (cur_dis * sin(radians(self.__total_direction))) #進行距離 * sin x
+        pos_x = self.pre_pos_x + (cur_dis * cos(radians(self.__total_direction))) #進行距離 * cos x
+        pos_y = self.pre_pos_y + (cur_dis * sin(radians(self.__total_direction))) #進行距離 * sin x
 
-        self.__pre_pos_x = pos_x
-        self.__pre_pos_y = pos_y
+        self.pre_pos_x = pos_x
+        self.pre_pos_y = pos_y
 
         # 目標座標までの方位，距離を格納
         target_pos_x = self.__target_pos[self.__cur_target_index][0]

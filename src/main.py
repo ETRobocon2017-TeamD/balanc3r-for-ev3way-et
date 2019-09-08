@@ -16,13 +16,15 @@ g_log = logging.getLogger(__name__)
 
 ###############################################################
 ##
-## ナイス値が高いプロセスは倒立振子関連プロセスと競合するため、ナイス値を標準プロセスと一致させる
+## 確実に倒立真摯に関係ないプロセスのナイス値を下げる
 ##
 ###############################################################
-def renice_high_nice_processes():
-    nice_value = 0
-    cmds = "ps lax | grep -- [-]20 | awk '{{print $3}}' | xargs sudo renice {} -p".format(nice_value)
+def renice_low_priority_processes():
+    nice_value = 19
+    process_names = "-e [b]rickman"
+    cmds = "ps lax | grep {} | awk '{{print $3}}' | xargs sudo renice {} -p".format(process_names, nice_value)
     subprocess.check_output(cmds, shell=True)
+
 
 ###############################################################
 ##
@@ -30,7 +32,8 @@ def renice_high_nice_processes():
 ##
 ###############################################################
 def renice_driver_kworkers(nice_value):
-    cmds = "ps aux | grep '[k]worker/0:' | awk '{{print $2}}' | xargs sudo renice {} -p".format(nice_value)
+    process_names = "-e '[k]worker/u2' -e '[k]worker/0'" # -e [w]riteback -e [k]blockd -e [r]cu_preempt -e [r]cu_sched -e [r]cu_bh -e [e]v3-tac -e [t]i-ads7"
+    cmds = "ps aux | grep {} | awk '{{print $2}}' | xargs sudo renice {} -p".format(process_names, nice_value)
     subprocess.check_output(cmds, shell=True)
 
 ###############################################################
@@ -39,8 +42,8 @@ def renice_driver_kworkers(nice_value):
 ##
 ###############################################################
 def renice_processes():
-    renice_high_nice_processes()
-    nice_value = -15
+    renice_low_priority_processes()
+    nice_value = -20
     renice_driver_kworkers(nice_value)
     os.nice(nice_value) # 自分のnice値も下げる
 
@@ -54,7 +57,7 @@ def stand_on_tail_motor():
     tail_motor.run_timed(time_sp=1000, speed_sp=-200, stop_action='hold') # しっぽを一番上に上げる
     sleep(1)
     tail_motor.reset() # しっぽが一番上の状態を0度とする
-    tail_motor.run_to_abs_pos(position_sp=100, stop_action='hold', speed_sp=300) # ちょうど安定して立つ角度にする
+    tail_motor.run_to_abs_pos(position_sp=98, stop_action='hold', speed_sp=300) # ちょうど安定して立つ角度にする
 
 ###############################################################
 ##
