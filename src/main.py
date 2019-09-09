@@ -57,7 +57,8 @@ def stand_on_tail_motor():
     tail_motor.run_timed(time_sp=1000, speed_sp=-200, stop_action='hold') # しっぽを一番上に上げる
     sleep(1)
     tail_motor.reset() # しっぽが一番上の状態を0度とする
-    tail_motor.run_to_abs_pos(position_sp=98, stop_action='hold', speed_sp=300) # ちょうど安定して立つ角度にする
+    # ちょうど安定して立つ角度にする。 充電バッテリーの時:97、乾電池の時:93
+    tail_motor.run_to_abs_pos(position_sp=93, stop_action='hold', speed_sp=300)
 
 ###############################################################
 ##
