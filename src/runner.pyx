@@ -375,7 +375,7 @@ def runner(sh_mem, setting, log_datetime):
             ##  ここでしっぽモーターを上げる
             ###############################################################
             if gyro_estimated_angle == 0:
-                tail_motor.run_to_abs_pos(position_sp=0, stop_action='hold', speed_sp=-600) # しっぽモーター上に上げる
+                tail_motor.run_to_abs_pos(position_sp=10, stop_action='hold', speed_sp=-300) # しっぽモーター上に上げる
 
             ###############################################################
             ##  Update angle estimate and Gyro Offset Estimate
