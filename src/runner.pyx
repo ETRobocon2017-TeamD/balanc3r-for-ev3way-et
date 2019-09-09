@@ -6,6 +6,7 @@ import logging
 from ev3dev.auto import Motor, LargeMotor, GyroSensor, PowerSupply
 from device import read_device, set_duty
 import codecs
+import cython
 
 g_log = logging.getLogger(__name__)
 
@@ -14,6 +15,7 @@ g_log = logging.getLogger(__name__)
 ## Runner：倒立振子の制御とDuty比の入力を行う関数
 ##
 ########################################################################
+@cython.infer_types(True)
 def runner(sh_mem, setting, log_datetime):
     print('Im Runner')
 
@@ -153,14 +155,14 @@ def runner(sh_mem, setting, log_datetime):
         # a_b : cython.double = float(setting['a_b']) #ローパスフィルタ係数(最大モーター電圧b用）
         k_theta_dot = 6.0 # モータ目標回転角速度係数
 
-        enable_back_slash_cancel = setting['enable_back_slash_cancel']
+        enable_back_slash_cancel : cython.int = bool(setting['enable_back_slash_cancel'])
 
         # Variables representing physical signals (more info on these in the docs)
         # The angle of "the motor", measured in raw units (degrees for the
         # EV3). We will take the average of both motor positions as "the motor"
         # angle, wich is essentially how far the middle of the robot has traveled.
-        motor_angle_left_raw = 0
-        motor_angle_right_raw = 0
+        motor_angle_left_raw : cython.int = 0
+        motor_angle_right_raw : cython.int = 0
         motor_angle_raw = 0.0
         
         back_lash_half = 4 # バックラッシュの半分[deg]
@@ -203,13 +205,13 @@ def runner(sh_mem, setting, log_datetime):
         duty_right = 0
 
         # The raw value from the gyro sensor in rate mode.
-        gyro_rate_raw = 0
+        gyro_rate_raw : cython.int = 0
 
         # The angular rate of the robot (how fast it is falling forward or backward), measured in radians per second.
         gyro_rate = 0.0
 
         # 現在のバッテリー電圧
-        voltage_raw = 0
+        voltage_raw : cython.int = 0
 
         # The gyro doesn't measure the angle of the robot, but we can estimate
         # this angle by keeping track of the gyro_rate value in time
@@ -263,8 +265,8 @@ def runner(sh_mem, setting, log_datetime):
         # Print the result
         print("GyroOffset: %s" % gyro_offset)
 
-        speed_reference = int(sh_mem.read_speed_mem())
-        steering = int(sh_mem.read_steering_mem())
+        speed_reference : cython.int = sh_mem.read_speed_mem()
+        steering : cython.int = sh_mem.read_steering_mem()
 
         #speed_reference = 62.5 # 前進・後退速度。62.5〜-62.5の間で入力
         #steering = -1 * self.STEER_SPEED * 0.5 # 旋回速度。他の係数をいじったせいか、今の値でも少々不安定になっている。もう少し下げたほうがいいかも
@@ -296,7 +298,7 @@ def runner(sh_mem, setting, log_datetime):
             ###############################################################
             ##  Reading the Gyro.
             ###############################################################
-            gyro_rate_raw = int(read_device(gyro_sensor_devfd))
+            gyro_rate_raw = read_device(gyro_sensor_devfd)
             gyro_rate = (float(gyro_rate_raw) - gyro_offset) * rad_per_second_per_raw_gyro_unit # 躯体の角速度(rad/sec)。ジャイロから得た角速度をオフセット値で調整している
 
             # 倒れた時のログを確認したところ、倒れた時点の角速度が4以上だった。
@@ -329,7 +331,7 @@ def runner(sh_mem, setting, log_datetime):
             motor_angle_raw = float(motor_angle_left_raw + motor_angle_right_raw) * 0.5
             motor_angle = (motor_angle_raw * radians_per_raw_motor_unit) + gyro_estimated_angle # 左右モーターの現在の平均回転角度(rad) + 躯体の(推定)回転角度
 
-            speed_reference = int(sh_mem.read_speed_mem())
+            speed_reference = sh_mem.read_speed_mem()
 
             # K_THETA_DOT(7.5): 最大モーター角速度だと思われる値。 speed_reference(モータ最大角速度を100%とする、目標割合)にかけ合わせて
             motor_angular_speed_reference_next = (float(speed_reference) / 100.0) * k_theta_dot
@@ -365,7 +367,7 @@ def runner(sh_mem, setting, log_datetime):
             ###############################################################
             ##  Apply the signal to the motor, and add steering
             ###############################################################
-            steering = int(sh_mem.read_steering_mem())
+            steering = sh_mem.read_steering_mem()
             duty_right = float(set_duty(motor_duty_cycle_right_devfd, motor_duty_cycle_right + steering))
             duty_left  = float(set_duty(motor_duty_cycle_left_devfd, motor_duty_cycle_left - steering)) # 右車輪のモーター出力が弱いので、左車輪のPWM値を3つ目の引数で調節(%)してる。まだ偏ってるので調節必要
 
