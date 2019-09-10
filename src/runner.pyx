@@ -150,10 +150,10 @@ def runner(sh_mem, setting, log_datetime):
         battery_offset_right_adjust = float(setting['battery_offset_right_adjust'])
         battery_offset_right = battery_offset_right * battery_offset_right_adjust # PWM出力算出用バッテリ電圧補正オフセット(右モーター用)
 
-        a_d = float(setting['a_d']) #1.0 - 0.55 #0.51 #0.47  # ローパスフィルタ係数(左右車輪の平均回転角度用)。左右モーターの平均回転角速度(rad/sec)の算出時にのみ使用する。小さいほど角速度の変化に過敏になる。〜0.4951
-        a_r = float(setting['a_r']) #0.985 #0.98  # ローパスフィルタ係数(左右車輪の目標平均回転角度用)。左右モーターの目標平均回転角度(rad)の算出時に使用する。小さいほど前進・後退する反応が早くなる。
+        a_d = float(setting['a_d']) # ローパスフィルタ係数(左右車輪の平均回転角度用)。左右モーターの平均回転角速度(rad/sec)の算出時にのみ使用する。小さいほど角速度の変化に過敏になる。
+        a_r = float(setting['a_r']) # ローパスフィルタ係数(左右車輪の目標平均回転角度用)。左右モーターの目標平均回転角度(rad)の算出時に使用する。小さいほど前進・後退する反応が早くなる。
         # a_b : cython.double = float(setting['a_b']) #ローパスフィルタ係数(最大モーター電圧b用）
-        k_theta_dot = 6.0 # モータ目標回転角速度係数
+        k_theta_dot = float(setting['k_theta_dot']) # モータ目標回転角速度係数
 
         enable_back_slash_cancel : cython.int = bool(setting['enable_back_slash_cancel'])
 
@@ -333,7 +333,7 @@ def runner(sh_mem, setting, log_datetime):
 
             speed_reference = sh_mem.read_speed_mem()
 
-            # K_THETA_DOT(7.5): 最大モーター角速度だと思われる値。 speed_reference(モータ最大角速度を100%とする、目標割合)にかけ合わせて
+            # K_THETA_DOT: 最大モーター角速度だと思われる値。 speed_reference(モータ最大角速度を100%とする、目標割合)にかけ合わせて
             motor_angular_speed_reference_next = (float(speed_reference) / 100.0) * k_theta_dot
             motor_angular_speed_reference = ((1.0 - a_r) * motor_angular_speed_reference_next) + (a_r * motor_angular_speed_reference)
             motor_angle_reference += (motor_angular_speed_reference * loop_time_sec) # 左右モーターの目標平均回転角度(rad)。初期値は0になる。入力値speed_referenceがずっと0でも0になる
