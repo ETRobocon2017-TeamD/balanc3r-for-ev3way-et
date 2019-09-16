@@ -134,6 +134,10 @@ def runner(sh_mem, setting, log_datetime):
         gain_gyro_rate                     = float(setting['gain_gyro_rate']) * gain_all                     # K_F[3]
         gain_motor_angle_error_accumulated = float(setting['gain_motor_angle_error_accumulated']) * gain_all # K_I
 
+        battery_gain    = float(setting['battery_gain'])
+        battery_offset  = float(setting['battery_offset'])
+        gain_motor_sync = float(setting['gain_motor_sync'])
+
         battery_gain_left        = float(setting['battery_gain_left'])
         battery_gain_left_adjust = float(setting['battery_gain_left_adjust'])
         battery_gain_left *= battery_gain_left_adjust  # PWM出力算出用バッテリ電圧補正係数(左モーター用)
@@ -152,7 +156,7 @@ def runner(sh_mem, setting, log_datetime):
 
         a_d = float(setting['a_d']) # ローパスフィルタ係数(左右車輪の平均回転角度用)。左右モーターの平均回転角速度(rad/sec)の算出時にのみ使用する。小さいほど角速度の変化に過敏になる。
         a_r = float(setting['a_r']) # ローパスフィルタ係数(左右車輪の目標平均回転角度用)。左右モーターの目標平均回転角度(rad)の算出時に使用する。小さいほど前進・後退する反応が早くなる。
-        # a_b : cython.double = float(setting['a_b']) #ローパスフィルタ係数(最大モーター電圧b用）
+        a_b = float(setting['a_b']) # ローパスフィルタ係数(最大モーター電圧b用）
         k_theta_dot = float(setting['k_theta_dot']) # モータ目標回転角速度係数
 
         enable_back_slash_cancel : cython.int = bool(setting['enable_back_slash_cancel'])
@@ -240,10 +244,13 @@ def runner(sh_mem, setting, log_datetime):
 
         # バッテリー電圧
         voltage_raw = read_device(battery_voltage_devfd) # 単位(μV)
+        voltage_current = voltage_raw
         # 現在のバッテリー電圧をもとに、PWMデューティ値を100%にしたとき、モータが受け取る推定電圧を求める。
         # 6.2 アクチュエータ　(6.1)式 バッテリ電圧とモータ回転速度(rpm)の関係式
-        voltage_estimate_max_left = (battery_gain_left * float(voltage_raw) / 1000) - battery_offset_left
-        voltage_estimate_max_right = (battery_gain_right * float(voltage_raw) / 1000) - battery_offset_right
+        voltage_estimate_max = (battery_gain * float(voltage_current) / 1000) - battery_offset
+
+        # voltage_estimate_max_left = (battery_gain_left * float(voltage_current) / 1000) - battery_offset_left
+        # voltage_estimate_max_right = (battery_gain_right * float(voltage_current) / 1000) - battery_offset_right
 
         ########################################################################
         ## Calibrate Gyro
@@ -307,6 +314,7 @@ def runner(sh_mem, setting, log_datetime):
 
             ##  Reading the Voltage.
             voltage_raw = read_device(battery_voltage_devfd) #バッテリー電圧(μV)
+            voltage_current = (a_b * voltage_current) + ((1 - a_b) * voltage_raw)
 
             speed_reference = sh_mem.read_speed_mem()
             steering = sh_mem.read_steering_mem()
@@ -358,10 +366,29 @@ def runner(sh_mem, setting, log_datetime):
                 + (gain_motor_angle * float(motor_angle_error))
                 + (gain_motor_angular_speed * motor_angular_speed_error)
                 + (gain_motor_angle_error_accumulated * motor_angle_error_accumulated))
-            voltage_estimate_max_left = (battery_gain_left * float(voltage_raw) / 1000) - battery_offset_left
-            voltage_estimate_max_right = (battery_gain_right * float(voltage_raw) / 1000) - battery_offset_right
-            motor_duty_cycle_left = (voltage_target / voltage_estimate_max_left) * 100
-            motor_duty_cycle_right = (voltage_target / voltage_estimate_max_right) * 100
+
+            ###############################################################
+            ##  Cal PWM
+            ###############################################################
+            # voltage_estimate_max_left = (battery_gain_left * float(voltage_current) / 1000) - battery_offset_left
+            # voltage_estimate_max_right = (battery_gain_right * float(voltage_current) / 1000) - battery_offset_right
+            # motor_duty_cycle_left = (voltage_target / voltage_estimate_max_left) * 100
+            # motor_duty_cycle_right = (voltage_target / voltage_estimate_max_right) * 100
+            
+            voltage_estimate_max = (battery_gain * float(voltage_current) / 1000) - battery_offset
+            motor_duty_cycle_left = voltage_target / voltage_estimate_max * 100
+            motor_angle_diff = gain_motor_sync * (motor_angle_left_raw - motor_angle_right_raw)
+            motor_duty_cycle_right = motor_duty_cycle_left - motor_angle_diff
+
+            # if motor_duty_cycle_left > 100.:
+            #     motor_duty_cycle_left = 100.
+            # elif motor_duty_cycle_left < -100.:
+            #     motor_duty_cycle_left = -100.
+            
+            # if motor_duty_cycle_right > 100.:
+            #     motor_duty_cycle_right = 100.
+            # elif motor_duty_cycle_right < -100.:
+            #     motor_duty_cycle_right = -100.
 
             ###############################################################
             ##  Update angle estimate and Gyro Offset Estimate

@@ -1,12 +1,14 @@
 {
     "gain_all": 1,
-    "gain_motor_angle"                  : 0.8653,
-    "gain_gyro_angle"                   : 30.7396,
-    "gain_motor_angular_speed"          : 1.1483,
-    "gain_gyro_rate"                    : 2.2976,
-    "gain_motor_angle_error_accumulated": 0.84721,
+
+    "gain_motor_angle"                  :  0.7263814678586831 ,
+    "gain_gyro_angle"                   :  22.619636099434423 ,
+    "gain_motor_angular_speed"          :  1.187379154665731 ,
+    "gain_gyro_rate"                    :  1.9915549806969939 ,
+    "gain_motor_angle_error_accumulated":  0.39174253878232124 ,
+    
     "enable_back_slash_cancel": true,
-    "loop_time_millisec": 18,
+    "loop_time_millisec": 16,
     "a_d": 0.2,
     "a_r": 0.996,
     "a_b": 0.8,
@@ -14,10 +16,16 @@
     "lineWhiteLuminance": 440.0,
     "lineBlackLuminance": 647.0,
     "lineLuminanceRate": 0.75,
+
+    "battery_gain": 0.001089,
+    "battery_offset": 0.625,
+    "gain_motor_sync": 0.0,
+
     "battery_gain_left": 0.001089,
     "battery_gain_left_adjust": 1.0,
     "battery_offset_left": 0.625,
     "battery_offset_left_adjust": 1.0,
+
     "battery_gain_right": 0.001089,
     "battery_gain_right_adjust": 1.0,
     "battery_offset_right": 0.625,
