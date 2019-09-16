@@ -1652,11 +1652,11 @@ static PyObject *__pyx_float_0_2;
 static PyObject *__pyx_float_0_01;
 static PyObject *__pyx_float_0_15;
 static PyObject *__pyx_float_0_025;
-static PyObject *__pyx_int_0;
 static PyObject *__pyx_int_1;
+static PyObject *__pyx_int_10;
 static PyObject *__pyx_int_125;
 static PyObject *__pyx_int_150;
-static PyObject *__pyx_int_neg_600;
+static PyObject *__pyx_int_neg_300;
 static PyObject *__pyx_tuple__3;
 static PyObject *__pyx_tuple__5;
 static PyObject *__pyx_tuple__8;
@@ -3520,15 +3520,15 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
  *         battery_offset_right_adjust = float(setting['battery_offset_right_adjust'])
  *         battery_offset_right = battery_offset_right * battery_offset_right_adjust # PWM()             # <<<<<<<<<<<<<<
  * 
- *         a_d = float(setting['a_d']) #1.0 - 0.55 #0.51 #0.47  # ()(rad/sec)0.4951
+ *         a_d = float(setting['a_d']) # ()(rad/sec)
  */
       __pyx_v_battery_offset_right = (__pyx_v_battery_offset_right * __pyx_v_battery_offset_right_adjust);
 
       /* "runner.pyx":153
  *         battery_offset_right = battery_offset_right * battery_offset_right_adjust # PWM()
  * 
- *         a_d = float(setting['a_d']) #1.0 - 0.55 #0.51 #0.47  # ()(rad/sec)0.4951             # <<<<<<<<<<<<<<
- *         a_r = float(setting['a_r']) #0.985 #0.98  # ()(rad)
+ *         a_d = float(setting['a_d']) # ()(rad/sec)             # <<<<<<<<<<<<<<
+ *         a_r = float(setting['a_r']) # ()(rad)
  *         # a_b : cython.double = float(setting['a_b']) #(b
  */
       __pyx_t_4 = __Pyx_PyObject_Dict_GetItem(__pyx_v_setting, __pyx_n_s_a_d); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 153, __pyx_L5_error)
@@ -3539,10 +3539,10 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
 
       /* "runner.pyx":154
  * 
- *         a_d = float(setting['a_d']) #1.0 - 0.55 #0.51 #0.47  # ()(rad/sec)0.4951
- *         a_r = float(setting['a_r']) #0.985 #0.98  # ()(rad)             # <<<<<<<<<<<<<<
+ *         a_d = float(setting['a_d']) # ()(rad/sec)
+ *         a_r = float(setting['a_r']) # ()(rad)             # <<<<<<<<<<<<<<
  *         # a_b : cython.double = float(setting['a_b']) #(b
- *         k_theta_dot = 6.0 #
+ *         k_theta_dot = float(setting['k_theta_dot']) #
  */
       __pyx_t_4 = __Pyx_PyObject_Dict_GetItem(__pyx_v_setting, __pyx_n_s_a_r); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 154, __pyx_L5_error)
       __Pyx_GOTREF(__pyx_t_4);
@@ -3551,16 +3551,20 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
       __pyx_v_a_r = __pyx_t_11;
 
       /* "runner.pyx":156
- *         a_r = float(setting['a_r']) #0.985 #0.98  # ()(rad)
+ *         a_r = float(setting['a_r']) # ()(rad)
  *         # a_b : cython.double = float(setting['a_b']) #(b
- *         k_theta_dot = 6.0 #             # <<<<<<<<<<<<<<
+ *         k_theta_dot = float(setting['k_theta_dot']) #             # <<<<<<<<<<<<<<
  * 
  *         enable_back_slash_cancel : cython.int = bool(setting['enable_back_slash_cancel'])
  */
-      __pyx_v_k_theta_dot = 6.0;
+      __pyx_t_4 = __Pyx_PyObject_Dict_GetItem(__pyx_v_setting, __pyx_n_s_k_theta_dot); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 156, __pyx_L5_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      __pyx_t_11 = __Pyx_PyObject_AsDouble(__pyx_t_4); if (unlikely(__pyx_t_11 == ((double)((double)-1)) && PyErr_Occurred())) __PYX_ERR(0, 156, __pyx_L5_error)
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __pyx_v_k_theta_dot = __pyx_t_11;
 
       /* "runner.pyx":158
- *         k_theta_dot = 6.0 #
+ *         k_theta_dot = float(setting['k_theta_dot']) #
  * 
  *         enable_back_slash_cancel : cython.int = bool(setting['enable_back_slash_cancel'])             # <<<<<<<<<<<<<<
  * 
@@ -4319,18 +4323,18 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
  * 
  *         while True:             # <<<<<<<<<<<<<<
  * 
- *             ###############################################################
+ *             ###################################################################################
  */
       while (1) {
 
-        /* "runner.pyx":296
+        /* "runner.pyx":297
+ * 
  *             ##  Loop info
- *             ###############################################################
  *             t_loop_start = float(clock())             # <<<<<<<<<<<<<<
  * 
- *             ###############################################################
+ *             ##  Reading the Gyro.
  */
-        __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_clock); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 296, __pyx_L5_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_clock); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 297, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_4);
         __pyx_t_1 = NULL;
         if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_4))) {
@@ -4344,21 +4348,21 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
         }
         __pyx_t_7 = (__pyx_t_1) ? __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_1) : __Pyx_PyObject_CallNoArg(__pyx_t_4);
         __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 296, __pyx_L5_error)
+        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 297, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_7);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __pyx_t_11 = __Pyx_PyObject_AsDouble(__pyx_t_7); if (unlikely(__pyx_t_11 == ((double)((double)-1)) && PyErr_Occurred())) __PYX_ERR(0, 296, __pyx_L5_error)
+        __pyx_t_11 = __Pyx_PyObject_AsDouble(__pyx_t_7); if (unlikely(__pyx_t_11 == ((double)((double)-1)) && PyErr_Occurred())) __PYX_ERR(0, 297, __pyx_L5_error)
         __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
         __pyx_v_t_loop_start = __pyx_t_11;
 
-        /* "runner.pyx":301
- *             ##  Reading the Gyro.
- *             ###############################################################
- *             gyro_rate_raw = read_device(gyro_sensor_devfd)             # <<<<<<<<<<<<<<
- *             gyro_rate = (float(gyro_rate_raw) - gyro_offset) * rad_per_second_per_raw_gyro_unit # (rad/sec)
+        /* "runner.pyx":300
  * 
+ *             ##  Reading the Gyro.
+ *             gyro_rate_raw = read_device(gyro_sensor_devfd)             # <<<<<<<<<<<<<<
+ * 
+ *             ##  Reading the Motor Position
  */
-        __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_read_device); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 301, __pyx_L5_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_read_device); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 300, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_4);
         __pyx_t_1 = NULL;
         if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_4))) {
@@ -4372,23 +4376,154 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
         }
         __pyx_t_7 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_1, __pyx_cur_scope->__pyx_v_gyro_sensor_devfd) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_cur_scope->__pyx_v_gyro_sensor_devfd);
         __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 301, __pyx_L5_error)
+        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 300, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_7);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_7); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 301, __pyx_L5_error)
+        __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_7); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 300, __pyx_L5_error)
         __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
         __pyx_v_gyro_rate_raw = __pyx_t_6;
 
-        /* "runner.pyx":302
- *             ###############################################################
- *             gyro_rate_raw = read_device(gyro_sensor_devfd)
- *             gyro_rate = (float(gyro_rate_raw) - gyro_offset) * rad_per_second_per_raw_gyro_unit # (rad/sec)             # <<<<<<<<<<<<<<
+        /* "runner.pyx":303
  * 
- *             # 4
+ *             ##  Reading the Motor Position
+ *             motor_angle_left_raw = read_device(motor_encoder_left_devfd)             # <<<<<<<<<<<<<<
+ *             motor_angle_right_raw = read_device(motor_encoder_right_devfd)
+ *             # sh_mem.write_motor_encoder_left_mem(motor_angle_left_raw)
  */
-        __pyx_v_gyro_rate = ((((double)__pyx_v_gyro_rate_raw) - __pyx_v_gyro_offset) * __pyx_v_rad_per_second_per_raw_gyro_unit);
+        __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_read_device); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 303, __pyx_L5_error)
+        __Pyx_GOTREF(__pyx_t_4);
+        __pyx_t_1 = NULL;
+        if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_4))) {
+          __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_4);
+          if (likely(__pyx_t_1)) {
+            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+            __Pyx_INCREF(__pyx_t_1);
+            __Pyx_INCREF(function);
+            __Pyx_DECREF_SET(__pyx_t_4, function);
+          }
+        }
+        __pyx_t_7 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_1, __pyx_cur_scope->__pyx_v_motor_encoder_left_devfd) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_cur_scope->__pyx_v_motor_encoder_left_devfd);
+        __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 303, __pyx_L5_error)
+        __Pyx_GOTREF(__pyx_t_7);
+        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+        __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_7); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 303, __pyx_L5_error)
+        __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+        __pyx_v_motor_angle_left_raw = __pyx_t_6;
 
-        /* "runner.pyx":306
+        /* "runner.pyx":304
+ *             ##  Reading the Motor Position
+ *             motor_angle_left_raw = read_device(motor_encoder_left_devfd)
+ *             motor_angle_right_raw = read_device(motor_encoder_right_devfd)             # <<<<<<<<<<<<<<
+ *             # sh_mem.write_motor_encoder_left_mem(motor_angle_left_raw)
+ *             # sh_mem.write_motor_encoder_right_mem(motor_angle_right_raw)
+ */
+        __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_read_device); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 304, __pyx_L5_error)
+        __Pyx_GOTREF(__pyx_t_4);
+        __pyx_t_1 = NULL;
+        if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_4))) {
+          __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_4);
+          if (likely(__pyx_t_1)) {
+            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+            __Pyx_INCREF(__pyx_t_1);
+            __Pyx_INCREF(function);
+            __Pyx_DECREF_SET(__pyx_t_4, function);
+          }
+        }
+        __pyx_t_7 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_1, __pyx_cur_scope->__pyx_v_motor_encoder_right_devfd) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_cur_scope->__pyx_v_motor_encoder_right_devfd);
+        __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 304, __pyx_L5_error)
+        __Pyx_GOTREF(__pyx_t_7);
+        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+        __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_7); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 304, __pyx_L5_error)
+        __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+        __pyx_v_motor_angle_right_raw = __pyx_t_6;
+
+        /* "runner.pyx":309
+ * 
+ *             ##  Reading the Voltage.
+ *             voltage_raw = read_device(battery_voltage_devfd) #(V)             # <<<<<<<<<<<<<<
+ * 
+ *             speed_reference = sh_mem.read_speed_mem()
+ */
+        __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_read_device); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 309, __pyx_L5_error)
+        __Pyx_GOTREF(__pyx_t_4);
+        __pyx_t_1 = NULL;
+        if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_4))) {
+          __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_4);
+          if (likely(__pyx_t_1)) {
+            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+            __Pyx_INCREF(__pyx_t_1);
+            __Pyx_INCREF(function);
+            __Pyx_DECREF_SET(__pyx_t_4, function);
+          }
+        }
+        __pyx_t_7 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_1, __pyx_cur_scope->__pyx_v_battery_voltage_devfd) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_cur_scope->__pyx_v_battery_voltage_devfd);
+        __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 309, __pyx_L5_error)
+        __Pyx_GOTREF(__pyx_t_7);
+        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+        __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_7); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 309, __pyx_L5_error)
+        __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+        __pyx_v_voltage_raw = __pyx_t_6;
+
+        /* "runner.pyx":311
+ *             voltage_raw = read_device(battery_voltage_devfd) #(V)
+ * 
+ *             speed_reference = sh_mem.read_speed_mem()             # <<<<<<<<<<<<<<
+ *             steering = sh_mem.read_steering_mem()
+ *             ###################################################################################
+ */
+        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_sh_mem, __pyx_n_s_read_speed_mem); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 311, __pyx_L5_error)
+        __Pyx_GOTREF(__pyx_t_4);
+        __pyx_t_1 = NULL;
+        if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
+          __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_4);
+          if (likely(__pyx_t_1)) {
+            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+            __Pyx_INCREF(__pyx_t_1);
+            __Pyx_INCREF(function);
+            __Pyx_DECREF_SET(__pyx_t_4, function);
+          }
+        }
+        __pyx_t_7 = (__pyx_t_1) ? __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_1) : __Pyx_PyObject_CallNoArg(__pyx_t_4);
+        __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 311, __pyx_L5_error)
+        __Pyx_GOTREF(__pyx_t_7);
+        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+        __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_7); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 311, __pyx_L5_error)
+        __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+        __pyx_v_speed_reference = __pyx_t_6;
+
+        /* "runner.pyx":312
+ * 
+ *             speed_reference = sh_mem.read_speed_mem()
+ *             steering = sh_mem.read_steering_mem()             # <<<<<<<<<<<<<<
+ *             ###################################################################################
+ * 
+ */
+        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_sh_mem, __pyx_n_s_read_steering_mem); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 312, __pyx_L5_error)
+        __Pyx_GOTREF(__pyx_t_4);
+        __pyx_t_1 = NULL;
+        if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
+          __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_4);
+          if (likely(__pyx_t_1)) {
+            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+            __Pyx_INCREF(__pyx_t_1);
+            __Pyx_INCREF(function);
+            __Pyx_DECREF_SET(__pyx_t_4, function);
+          }
+        }
+        __pyx_t_7 = (__pyx_t_1) ? __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_1) : __Pyx_PyObject_CallNoArg(__pyx_t_4);
+        __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 312, __pyx_L5_error)
+        __Pyx_GOTREF(__pyx_t_7);
+        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+        __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_7); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 312, __pyx_L5_error)
+        __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+        __pyx_v_steering = __pyx_t_6;
+
+        /* "runner.pyx":317
  *             # 4
  *             # TODO: 4.0
  *             if gyro_rate > 5.0 or gyro_rate < -5.0:             # <<<<<<<<<<<<<<
@@ -4406,20 +4541,20 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
         __pyx_L16_bool_binop_done:;
         if (unlikely(__pyx_t_12)) {
 
-          /* "runner.pyx":308
+          /* "runner.pyx":319
  *             if gyro_rate > 5.0 or gyro_rate < -5.0:
  *                 # TODO:
  *                 raise Exception('I fell down!')             # <<<<<<<<<<<<<<
  * 
- *             ###############################################################
+ *             # (rad/sec)
  */
-          __pyx_t_7 = __Pyx_PyObject_Call(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])), __pyx_tuple__8, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 308, __pyx_L5_error)
+          __pyx_t_7 = __Pyx_PyObject_Call(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])), __pyx_tuple__8, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 319, __pyx_L5_error)
           __Pyx_GOTREF(__pyx_t_7);
           __Pyx_Raise(__pyx_t_7, 0, 0, 0);
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-          __PYX_ERR(0, 308, __pyx_L5_error)
+          __PYX_ERR(0, 319, __pyx_L5_error)
 
-          /* "runner.pyx":306
+          /* "runner.pyx":317
  *             # 4
  *             # TODO: 4.0
  *             if gyro_rate > 5.0 or gyro_rate < -5.0:             # <<<<<<<<<<<<<<
@@ -4428,63 +4563,16 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
  */
         }
 
-        /* "runner.pyx":313
- *             ##  Reading the Motor Position
- *             ###############################################################
- *             motor_angle_left_raw = read_device(motor_encoder_left_devfd)             # <<<<<<<<<<<<<<
- *             motor_angle_right_raw = read_device(motor_encoder_right_devfd)
- *             # sh_mem.write_motor_encoder_left_mem(motor_angle_left_raw)
+        /* "runner.pyx":322
+ * 
+ *             # (rad/sec)
+ *             gyro_rate = (float(gyro_rate_raw) - gyro_offset) * rad_per_second_per_raw_gyro_unit             # <<<<<<<<<<<<<<
+ * 
+ *             #
  */
-        __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_read_device); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 313, __pyx_L5_error)
-        __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_1 = NULL;
-        if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_4))) {
-          __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_4);
-          if (likely(__pyx_t_1)) {
-            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
-            __Pyx_INCREF(__pyx_t_1);
-            __Pyx_INCREF(function);
-            __Pyx_DECREF_SET(__pyx_t_4, function);
-          }
-        }
-        __pyx_t_7 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_1, __pyx_cur_scope->__pyx_v_motor_encoder_left_devfd) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_cur_scope->__pyx_v_motor_encoder_left_devfd);
-        __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 313, __pyx_L5_error)
-        __Pyx_GOTREF(__pyx_t_7);
-        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_7); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 313, __pyx_L5_error)
-        __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-        __pyx_v_motor_angle_left_raw = __pyx_t_6;
+        __pyx_v_gyro_rate = ((((double)__pyx_v_gyro_rate_raw) - __pyx_v_gyro_offset) * __pyx_v_rad_per_second_per_raw_gyro_unit);
 
-        /* "runner.pyx":314
- *             ###############################################################
- *             motor_angle_left_raw = read_device(motor_encoder_left_devfd)
- *             motor_angle_right_raw = read_device(motor_encoder_right_devfd)             # <<<<<<<<<<<<<<
- *             # sh_mem.write_motor_encoder_left_mem(motor_angle_left_raw)
- *             # sh_mem.write_motor_encoder_right_mem(motor_angle_right_raw)
- */
-        __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_read_device); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 314, __pyx_L5_error)
-        __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_1 = NULL;
-        if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_4))) {
-          __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_4);
-          if (likely(__pyx_t_1)) {
-            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
-            __Pyx_INCREF(__pyx_t_1);
-            __Pyx_INCREF(function);
-            __Pyx_DECREF_SET(__pyx_t_4, function);
-          }
-        }
-        __pyx_t_7 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_1, __pyx_cur_scope->__pyx_v_motor_encoder_right_devfd) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_cur_scope->__pyx_v_motor_encoder_right_devfd);
-        __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 314, __pyx_L5_error)
-        __Pyx_GOTREF(__pyx_t_7);
-        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_7); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 314, __pyx_L5_error)
-        __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-        __pyx_v_motor_angle_right_raw = __pyx_t_6;
-
-        /* "runner.pyx":319
+        /* "runner.pyx":325
  * 
  *             #
  *             if enable_back_slash_cancel:             # <<<<<<<<<<<<<<
@@ -4494,7 +4582,7 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
         __pyx_t_12 = (__pyx_v_enable_back_slash_cancel != 0);
         if (__pyx_t_12) {
 
-          /* "runner.pyx":320
+          /* "runner.pyx":326
  *             #
  *             if enable_back_slash_cancel:
  *                 if duty_left < 0:             # <<<<<<<<<<<<<<
@@ -4504,7 +4592,7 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
           __pyx_t_12 = ((__pyx_v_duty_left < 0.0) != 0);
           if (__pyx_t_12) {
 
-            /* "runner.pyx":321
+            /* "runner.pyx":327
  *             if enable_back_slash_cancel:
  *                 if duty_left < 0:
  *                     motor_angle_left_raw += back_lash_half             # <<<<<<<<<<<<<<
@@ -4513,7 +4601,7 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
  */
             __pyx_v_motor_angle_left_raw = (__pyx_v_motor_angle_left_raw + __pyx_v_back_lash_half);
 
-            /* "runner.pyx":320
+            /* "runner.pyx":326
  *             #
  *             if enable_back_slash_cancel:
  *                 if duty_left < 0:             # <<<<<<<<<<<<<<
@@ -4523,7 +4611,7 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
             goto __pyx_L19;
           }
 
-          /* "runner.pyx":322
+          /* "runner.pyx":328
  *                 if duty_left < 0:
  *                     motor_angle_left_raw += back_lash_half
  *                 elif duty_left > 0:             # <<<<<<<<<<<<<<
@@ -4533,7 +4621,7 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
           __pyx_t_12 = ((__pyx_v_duty_left > 0.0) != 0);
           if (__pyx_t_12) {
 
-            /* "runner.pyx":323
+            /* "runner.pyx":329
  *                     motor_angle_left_raw += back_lash_half
  *                 elif duty_left > 0:
  *                     motor_angle_left_raw -= back_lash_half             # <<<<<<<<<<<<<<
@@ -4542,7 +4630,7 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
  */
             __pyx_v_motor_angle_left_raw = (__pyx_v_motor_angle_left_raw - __pyx_v_back_lash_half);
 
-            /* "runner.pyx":322
+            /* "runner.pyx":328
  *                 if duty_left < 0:
  *                     motor_angle_left_raw += back_lash_half
  *                 elif duty_left > 0:             # <<<<<<<<<<<<<<
@@ -4552,7 +4640,7 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
           }
           __pyx_L19:;
 
-          /* "runner.pyx":325
+          /* "runner.pyx":331
  *                     motor_angle_left_raw -= back_lash_half
  * 
  *                 if duty_right < 0:             # <<<<<<<<<<<<<<
@@ -4562,7 +4650,7 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
           __pyx_t_12 = ((__pyx_v_duty_right < 0.0) != 0);
           if (__pyx_t_12) {
 
-            /* "runner.pyx":326
+            /* "runner.pyx":332
  * 
  *                 if duty_right < 0:
  *                     motor_angle_right_raw += back_lash_half             # <<<<<<<<<<<<<<
@@ -4571,7 +4659,7 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
  */
             __pyx_v_motor_angle_right_raw = (__pyx_v_motor_angle_right_raw + __pyx_v_back_lash_half);
 
-            /* "runner.pyx":325
+            /* "runner.pyx":331
  *                     motor_angle_left_raw -= back_lash_half
  * 
  *                 if duty_right < 0:             # <<<<<<<<<<<<<<
@@ -4581,7 +4669,7 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
             goto __pyx_L20;
           }
 
-          /* "runner.pyx":327
+          /* "runner.pyx":333
  *                 if duty_right < 0:
  *                     motor_angle_right_raw += back_lash_half
  *                 elif duty_right > 0:             # <<<<<<<<<<<<<<
@@ -4591,7 +4679,7 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
           __pyx_t_12 = ((__pyx_v_duty_right > 0.0) != 0);
           if (__pyx_t_12) {
 
-            /* "runner.pyx":328
+            /* "runner.pyx":334
  *                     motor_angle_right_raw += back_lash_half
  *                 elif duty_right > 0:
  *                     motor_angle_right_raw -= back_lash_half             # <<<<<<<<<<<<<<
@@ -4600,7 +4688,7 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
  */
             __pyx_v_motor_angle_right_raw = (__pyx_v_motor_angle_right_raw - __pyx_v_back_lash_half);
 
-            /* "runner.pyx":327
+            /* "runner.pyx":333
  *                 if duty_right < 0:
  *                     motor_angle_right_raw += back_lash_half
  *                 elif duty_right > 0:             # <<<<<<<<<<<<<<
@@ -4610,7 +4698,7 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
           }
           __pyx_L20:;
 
-          /* "runner.pyx":319
+          /* "runner.pyx":325
  * 
  *             #
  *             if enable_back_slash_cancel:             # <<<<<<<<<<<<<<
@@ -4619,7 +4707,7 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
  */
         }
 
-        /* "runner.pyx":330
+        /* "runner.pyx":336
  *                     motor_angle_right_raw -= back_lash_half
  * 
  *             motor_angle_last = motor_angle             # <<<<<<<<<<<<<<
@@ -4628,7 +4716,7 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
  */
         __pyx_v_motor_angle_last = __pyx_v_motor_angle;
 
-        /* "runner.pyx":331
+        /* "runner.pyx":337
  * 
  *             motor_angle_last = motor_angle
  *             motor_angle_raw = float(motor_angle_left_raw + motor_angle_right_raw) * 0.5             # <<<<<<<<<<<<<<
@@ -4637,54 +4725,26 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
  */
         __pyx_v_motor_angle_raw = (((double)(__pyx_v_motor_angle_left_raw + __pyx_v_motor_angle_right_raw)) * 0.5);
 
-        /* "runner.pyx":332
+        /* "runner.pyx":338
  *             motor_angle_last = motor_angle
  *             motor_angle_raw = float(motor_angle_left_raw + motor_angle_right_raw) * 0.5
  *             motor_angle = (motor_angle_raw * radians_per_raw_motor_unit) + gyro_estimated_angle # (rad) + ()             # <<<<<<<<<<<<<<
  * 
- *             speed_reference = sh_mem.read_speed_mem()
+ *             # K_THETA_DOT:  speed_reference(100%)
  */
         __pyx_v_motor_angle = ((__pyx_v_motor_angle_raw * __pyx_v_radians_per_raw_motor_unit) + __pyx_v_gyro_estimated_angle);
 
-        /* "runner.pyx":334
- *             motor_angle = (motor_angle_raw * radians_per_raw_motor_unit) + gyro_estimated_angle # (rad) + ()
+        /* "runner.pyx":341
  * 
- *             speed_reference = sh_mem.read_speed_mem()             # <<<<<<<<<<<<<<
- * 
- *             # K_THETA_DOT(7.5):  speed_reference(100%)
- */
-        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_sh_mem, __pyx_n_s_read_speed_mem); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 334, __pyx_L5_error)
-        __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_1 = NULL;
-        if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
-          __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_4);
-          if (likely(__pyx_t_1)) {
-            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
-            __Pyx_INCREF(__pyx_t_1);
-            __Pyx_INCREF(function);
-            __Pyx_DECREF_SET(__pyx_t_4, function);
-          }
-        }
-        __pyx_t_7 = (__pyx_t_1) ? __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_1) : __Pyx_PyObject_CallNoArg(__pyx_t_4);
-        __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 334, __pyx_L5_error)
-        __Pyx_GOTREF(__pyx_t_7);
-        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_7); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 334, __pyx_L5_error)
-        __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-        __pyx_v_speed_reference = __pyx_t_6;
-
-        /* "runner.pyx":337
- * 
- *             # K_THETA_DOT(7.5):  speed_reference(100%)
+ *             # K_THETA_DOT:  speed_reference(100%)
  *             motor_angular_speed_reference_next = (float(speed_reference) / 100.0) * k_theta_dot             # <<<<<<<<<<<<<<
  *             motor_angular_speed_reference = ((1.0 - a_r) * motor_angular_speed_reference_next) + (a_r * motor_angular_speed_reference)
  *             motor_angle_reference += (motor_angular_speed_reference * loop_time_sec) # (rad)0speed_reference00
  */
         __pyx_v_motor_angular_speed_reference_next = ((((double)__pyx_v_speed_reference) / 100.0) * __pyx_v_k_theta_dot);
 
-        /* "runner.pyx":338
- *             # K_THETA_DOT(7.5):  speed_reference(100%)
+        /* "runner.pyx":342
+ *             # K_THETA_DOT:  speed_reference(100%)
  *             motor_angular_speed_reference_next = (float(speed_reference) / 100.0) * k_theta_dot
  *             motor_angular_speed_reference = ((1.0 - a_r) * motor_angular_speed_reference_next) + (a_r * motor_angular_speed_reference)             # <<<<<<<<<<<<<<
  *             motor_angle_reference += (motor_angular_speed_reference * loop_time_sec) # (rad)0speed_reference00
@@ -4692,7 +4752,7 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
  */
         __pyx_v_motor_angular_speed_reference = (((1.0 - __pyx_v_a_r) * __pyx_v_motor_angular_speed_reference_next) + (__pyx_v_a_r * __pyx_v_motor_angular_speed_reference));
 
-        /* "runner.pyx":339
+        /* "runner.pyx":343
  *             motor_angular_speed_reference_next = (float(speed_reference) / 100.0) * k_theta_dot
  *             motor_angular_speed_reference = ((1.0 - a_r) * motor_angular_speed_reference_next) + (a_r * motor_angular_speed_reference)
  *             motor_angle_reference += (motor_angular_speed_reference * loop_time_sec) # (rad)0speed_reference00             # <<<<<<<<<<<<<<
@@ -4701,7 +4761,7 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
  */
         __pyx_v_motor_angle_reference = (__pyx_v_motor_angle_reference + (__pyx_v_motor_angular_speed_reference * __pyx_v_loop_time_sec));
 
-        /* "runner.pyx":341
+        /* "runner.pyx":345
  *             motor_angle_reference += (motor_angular_speed_reference * loop_time_sec) # (rad)0speed_reference00
  * 
  *             motor_angle_error = motor_angle - motor_angle_reference # (rad)             # <<<<<<<<<<<<<<
@@ -4710,7 +4770,7 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
  */
         __pyx_v_motor_angle_error = (__pyx_v_motor_angle - __pyx_v_motor_angle_reference);
 
-        /* "runner.pyx":346
+        /* "runner.pyx":350
  *             ##  Computing Motor Speed
  *             ###############################################################
  *             motor_angular_speed = (((1.0 - a_d) * motor_angle) + (a_d * motor_angle_last) - motor_angle_last) / loop_time_sec # (rad/sec)             # <<<<<<<<<<<<<<
@@ -4720,11 +4780,11 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
         __pyx_t_11 = ((((1.0 - __pyx_v_a_d) * __pyx_v_motor_angle) + (__pyx_v_a_d * __pyx_v_motor_angle_last)) - __pyx_v_motor_angle_last);
         if (unlikely(__pyx_v_loop_time_sec == 0)) {
           PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-          __PYX_ERR(0, 346, __pyx_L5_error)
+          __PYX_ERR(0, 350, __pyx_L5_error)
         }
         __pyx_v_motor_angular_speed = (__pyx_t_11 / __pyx_v_loop_time_sec);
 
-        /* "runner.pyx":347
+        /* "runner.pyx":351
  *             ###############################################################
  *             motor_angular_speed = (((1.0 - a_d) * motor_angle) + (a_d * motor_angle_last) - motor_angle_last) / loop_time_sec # (rad/sec)
  *             motor_angular_speed_error = motor_angular_speed - motor_angular_speed_reference # (rad/sec)             # <<<<<<<<<<<<<<
@@ -4733,54 +4793,26 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
  */
         __pyx_v_motor_angular_speed_error = (__pyx_v_motor_angular_speed - __pyx_v_motor_angular_speed_reference);
 
-        /* "runner.pyx":352
- *             ##  Reading the Voltage.
- *             ###############################################################
- *             voltage_raw = read_device(battery_voltage_devfd) #(V)             # <<<<<<<<<<<<<<
- * 
- *             ###############################################################
- */
-        __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_read_device); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 352, __pyx_L5_error)
-        __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_1 = NULL;
-        if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_4))) {
-          __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_4);
-          if (likely(__pyx_t_1)) {
-            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
-            __Pyx_INCREF(__pyx_t_1);
-            __Pyx_INCREF(function);
-            __Pyx_DECREF_SET(__pyx_t_4, function);
-          }
-        }
-        __pyx_t_7 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_1, __pyx_cur_scope->__pyx_v_battery_voltage_devfd) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_cur_scope->__pyx_v_battery_voltage_devfd);
-        __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 352, __pyx_L5_error)
-        __Pyx_GOTREF(__pyx_t_7);
-        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_7); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 352, __pyx_L5_error)
-        __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-        __pyx_v_voltage_raw = __pyx_t_6;
-
-        /* "runner.pyx":361
- *                + (gain_motor_angle * float(motor_angle_error))
- *                + (gain_motor_angular_speed * motor_angular_speed_error)
- *                + (gain_motor_angle_error_accumulated * motor_angle_error_accumulated))             # <<<<<<<<<<<<<<
+        /* "runner.pyx":360
+ *                 + (gain_motor_angle * float(motor_angle_error))
+ *                 + (gain_motor_angular_speed * motor_angular_speed_error)
+ *                 + (gain_motor_angle_error_accumulated * motor_angle_error_accumulated))             # <<<<<<<<<<<<<<
  *             voltage_estimate_max_left = (battery_gain_left * float(voltage_raw) / 1000) - battery_offset_left
  *             voltage_estimate_max_right = (battery_gain_right * float(voltage_raw) / 1000) - battery_offset_right
  */
         __pyx_v_voltage_target = (((((__pyx_v_gain_gyro_angle * __pyx_v_gyro_estimated_angle) + (__pyx_v_gain_gyro_rate * __pyx_v_gyro_rate)) + (__pyx_v_gain_motor_angle * __pyx_v_motor_angle_error)) + (__pyx_v_gain_motor_angular_speed * __pyx_v_motor_angular_speed_error)) + (__pyx_v_gain_motor_angle_error_accumulated * __pyx_v_motor_angle_error_accumulated));
 
-        /* "runner.pyx":362
- *                + (gain_motor_angular_speed * motor_angular_speed_error)
- *                + (gain_motor_angle_error_accumulated * motor_angle_error_accumulated))
+        /* "runner.pyx":361
+ *                 + (gain_motor_angular_speed * motor_angular_speed_error)
+ *                 + (gain_motor_angle_error_accumulated * motor_angle_error_accumulated))
  *             voltage_estimate_max_left = (battery_gain_left * float(voltage_raw) / 1000) - battery_offset_left             # <<<<<<<<<<<<<<
  *             voltage_estimate_max_right = (battery_gain_right * float(voltage_raw) / 1000) - battery_offset_right
  *             motor_duty_cycle_left = (voltage_target / voltage_estimate_max_left) * 100
  */
         __pyx_v_voltage_estimate_max_left = (((__pyx_v_battery_gain_left * ((double)__pyx_v_voltage_raw)) / 1000.0) - __pyx_v_battery_offset_left);
 
-        /* "runner.pyx":363
- *                + (gain_motor_angle_error_accumulated * motor_angle_error_accumulated))
+        /* "runner.pyx":362
+ *                 + (gain_motor_angle_error_accumulated * motor_angle_error_accumulated))
  *             voltage_estimate_max_left = (battery_gain_left * float(voltage_raw) / 1000) - battery_offset_left
  *             voltage_estimate_max_right = (battery_gain_right * float(voltage_raw) / 1000) - battery_offset_right             # <<<<<<<<<<<<<<
  *             motor_duty_cycle_left = (voltage_target / voltage_estimate_max_left) * 100
@@ -4788,7 +4820,7 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
  */
         __pyx_v_voltage_estimate_max_right = (((__pyx_v_battery_gain_right * ((double)__pyx_v_voltage_raw)) / 1000.0) - __pyx_v_battery_offset_right);
 
-        /* "runner.pyx":364
+        /* "runner.pyx":363
  *             voltage_estimate_max_left = (battery_gain_left * float(voltage_raw) / 1000) - battery_offset_left
  *             voltage_estimate_max_right = (battery_gain_right * float(voltage_raw) / 1000) - battery_offset_right
  *             motor_duty_cycle_left = (voltage_target / voltage_estimate_max_left) * 100             # <<<<<<<<<<<<<<
@@ -4797,11 +4829,11 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
  */
         if (unlikely(__pyx_v_voltage_estimate_max_left == 0)) {
           PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-          __PYX_ERR(0, 364, __pyx_L5_error)
+          __PYX_ERR(0, 363, __pyx_L5_error)
         }
         __pyx_v_motor_duty_cycle_left = ((__pyx_v_voltage_target / __pyx_v_voltage_estimate_max_left) * 100.0);
 
-        /* "runner.pyx":365
+        /* "runner.pyx":364
  *             voltage_estimate_max_right = (battery_gain_right * float(voltage_raw) / 1000) - battery_offset_right
  *             motor_duty_cycle_left = (voltage_target / voltage_estimate_max_left) * 100
  *             motor_duty_cycle_right = (voltage_target / voltage_estimate_max_right) * 100             # <<<<<<<<<<<<<<
@@ -4810,48 +4842,47 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
  */
         if (unlikely(__pyx_v_voltage_estimate_max_right == 0)) {
           PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-          __PYX_ERR(0, 365, __pyx_L5_error)
+          __PYX_ERR(0, 364, __pyx_L5_error)
         }
         __pyx_v_motor_duty_cycle_right = ((__pyx_v_voltage_target / __pyx_v_voltage_estimate_max_right) * 100.0);
 
+        /* "runner.pyx":369
+ *             ##  Update angle estimate and Gyro Offset Estimate
+ *             ###############################################################
+ *             gyro_estimated_angle += float(gyro_rate * loop_time_sec) # (rad)             # <<<<<<<<<<<<<<
+ *             gyro_offset = float(((1 - gyro_drift_compensation_rate) * gyro_offset) +
+ *                 (gyro_drift_compensation_rate * float(gyro_rate_raw))) # (rad/sec) gyro_drift_compensation_rate
+ */
+        __pyx_v_gyro_estimated_angle = (__pyx_v_gyro_estimated_angle + (__pyx_v_gyro_rate * __pyx_v_loop_time_sec));
+
         /* "runner.pyx":370
+ *             ###############################################################
+ *             gyro_estimated_angle += float(gyro_rate * loop_time_sec) # (rad)
+ *             gyro_offset = float(((1 - gyro_drift_compensation_rate) * gyro_offset) +             # <<<<<<<<<<<<<<
+ *                 (gyro_drift_compensation_rate * float(gyro_rate_raw))) # (rad/sec) gyro_drift_compensation_rate
+ * 
+ */
+        __pyx_v_gyro_offset = (((1.0 - __pyx_v_gyro_drift_compensation_rate) * __pyx_v_gyro_offset) + (__pyx_v_gyro_drift_compensation_rate * ((double)__pyx_v_gyro_rate_raw)));
+
+        /* "runner.pyx":376
+ *             ##  Update Accumulated Motor Error
+ *             ###############################################################
+ *             motor_angle_error_accumulated += (float(motor_angle_error) * loop_time_sec) # (rad*t)             # <<<<<<<<<<<<<<
+ * 
+ *             ###############################################################
+ */
+        __pyx_v_motor_angle_error_accumulated = (__pyx_v_motor_angle_error_accumulated + (__pyx_v_motor_angle_error * __pyx_v_loop_time_sec));
+
+        /* "runner.pyx":381
  *             ##  Apply the signal to the motor, and add steering
  *             ###############################################################
- *             steering = sh_mem.read_steering_mem()             # <<<<<<<<<<<<<<
- *             duty_right = float(set_duty(motor_duty_cycle_right_devfd, motor_duty_cycle_right + steering))
- *             duty_left  = float(set_duty(motor_duty_cycle_left_devfd, motor_duty_cycle_left - steering)) # PWM3(%)
- */
-        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_sh_mem, __pyx_n_s_read_steering_mem); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 370, __pyx_L5_error)
-        __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_1 = NULL;
-        if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
-          __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_4);
-          if (likely(__pyx_t_1)) {
-            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
-            __Pyx_INCREF(__pyx_t_1);
-            __Pyx_INCREF(function);
-            __Pyx_DECREF_SET(__pyx_t_4, function);
-          }
-        }
-        __pyx_t_7 = (__pyx_t_1) ? __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_1) : __Pyx_PyObject_CallNoArg(__pyx_t_4);
-        __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 370, __pyx_L5_error)
-        __Pyx_GOTREF(__pyx_t_7);
-        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_7); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 370, __pyx_L5_error)
-        __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-        __pyx_v_steering = __pyx_t_6;
-
-        /* "runner.pyx":371
- *             ###############################################################
- *             steering = sh_mem.read_steering_mem()
  *             duty_right = float(set_duty(motor_duty_cycle_right_devfd, motor_duty_cycle_right + steering))             # <<<<<<<<<<<<<<
  *             duty_left  = float(set_duty(motor_duty_cycle_left_devfd, motor_duty_cycle_left - steering)) # PWM3(%)
  * 
  */
-        __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_set_duty); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 371, __pyx_L5_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_set_duty); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 381, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_1 = PyFloat_FromDouble((__pyx_v_motor_duty_cycle_right + __pyx_v_steering)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 371, __pyx_L5_error)
+        __pyx_t_1 = PyFloat_FromDouble((__pyx_v_motor_duty_cycle_right + __pyx_v_steering)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 381, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_1);
         __pyx_t_5 = NULL;
         __pyx_t_6 = 0;
@@ -4868,7 +4899,7 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
         #if CYTHON_FAST_PYCALL
         if (PyFunction_Check(__pyx_t_4)) {
           PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_cur_scope->__pyx_v_motor_duty_cycle_right_devfd, __pyx_t_1};
-          __pyx_t_7 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 371, __pyx_L5_error)
+          __pyx_t_7 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 381, __pyx_L5_error)
           __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
           __Pyx_GOTREF(__pyx_t_7);
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -4877,14 +4908,14 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
         #if CYTHON_FAST_PYCCALL
         if (__Pyx_PyFastCFunction_Check(__pyx_t_4)) {
           PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_cur_scope->__pyx_v_motor_duty_cycle_right_devfd, __pyx_t_1};
-          __pyx_t_7 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 371, __pyx_L5_error)
+          __pyx_t_7 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 381, __pyx_L5_error)
           __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
           __Pyx_GOTREF(__pyx_t_7);
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         } else
         #endif
         {
-          __pyx_t_3 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 371, __pyx_L5_error)
+          __pyx_t_3 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 381, __pyx_L5_error)
           __Pyx_GOTREF(__pyx_t_3);
           if (__pyx_t_5) {
             __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -4895,25 +4926,25 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
           __Pyx_GIVEREF(__pyx_t_1);
           PyTuple_SET_ITEM(__pyx_t_3, 1+__pyx_t_6, __pyx_t_1);
           __pyx_t_1 = 0;
-          __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_3, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 371, __pyx_L5_error)
+          __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_3, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 381, __pyx_L5_error)
           __Pyx_GOTREF(__pyx_t_7);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         }
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __pyx_t_11 = __Pyx_PyObject_AsDouble(__pyx_t_7); if (unlikely(__pyx_t_11 == ((double)((double)-1)) && PyErr_Occurred())) __PYX_ERR(0, 371, __pyx_L5_error)
+        __pyx_t_11 = __Pyx_PyObject_AsDouble(__pyx_t_7); if (unlikely(__pyx_t_11 == ((double)((double)-1)) && PyErr_Occurred())) __PYX_ERR(0, 381, __pyx_L5_error)
         __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
         __pyx_v_duty_right = __pyx_t_11;
 
-        /* "runner.pyx":372
- *             steering = sh_mem.read_steering_mem()
+        /* "runner.pyx":382
+ *             ###############################################################
  *             duty_right = float(set_duty(motor_duty_cycle_right_devfd, motor_duty_cycle_right + steering))
  *             duty_left  = float(set_duty(motor_duty_cycle_left_devfd, motor_duty_cycle_left - steering)) # PWM3(%)             # <<<<<<<<<<<<<<
  * 
  *             ###############################################################
  */
-        __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_set_duty); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 372, __pyx_L5_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_set_duty); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 382, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_3 = PyFloat_FromDouble((__pyx_v_motor_duty_cycle_left - __pyx_v_steering)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 372, __pyx_L5_error)
+        __pyx_t_3 = PyFloat_FromDouble((__pyx_v_motor_duty_cycle_left - __pyx_v_steering)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 382, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_3);
         __pyx_t_1 = NULL;
         __pyx_t_6 = 0;
@@ -4930,7 +4961,7 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
         #if CYTHON_FAST_PYCALL
         if (PyFunction_Check(__pyx_t_4)) {
           PyObject *__pyx_temp[3] = {__pyx_t_1, __pyx_cur_scope->__pyx_v_motor_duty_cycle_left_devfd, __pyx_t_3};
-          __pyx_t_7 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 372, __pyx_L5_error)
+          __pyx_t_7 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 382, __pyx_L5_error)
           __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
           __Pyx_GOTREF(__pyx_t_7);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -4939,14 +4970,14 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
         #if CYTHON_FAST_PYCCALL
         if (__Pyx_PyFastCFunction_Check(__pyx_t_4)) {
           PyObject *__pyx_temp[3] = {__pyx_t_1, __pyx_cur_scope->__pyx_v_motor_duty_cycle_left_devfd, __pyx_t_3};
-          __pyx_t_7 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 372, __pyx_L5_error)
+          __pyx_t_7 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 382, __pyx_L5_error)
           __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
           __Pyx_GOTREF(__pyx_t_7);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         } else
         #endif
         {
-          __pyx_t_5 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 372, __pyx_L5_error)
+          __pyx_t_5 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 382, __pyx_L5_error)
           __Pyx_GOTREF(__pyx_t_5);
           if (__pyx_t_1) {
             __Pyx_GIVEREF(__pyx_t_1); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_1); __pyx_t_1 = NULL;
@@ -4957,89 +4988,62 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
           __Pyx_GIVEREF(__pyx_t_3);
           PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_6, __pyx_t_3);
           __pyx_t_3 = 0;
-          __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_5, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 372, __pyx_L5_error)
+          __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_5, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 382, __pyx_L5_error)
           __Pyx_GOTREF(__pyx_t_7);
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
         }
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __pyx_t_11 = __Pyx_PyObject_AsDouble(__pyx_t_7); if (unlikely(__pyx_t_11 == ((double)((double)-1)) && PyErr_Occurred())) __PYX_ERR(0, 372, __pyx_L5_error)
+        __pyx_t_11 = __Pyx_PyObject_AsDouble(__pyx_t_7); if (unlikely(__pyx_t_11 == ((double)((double)-1)) && PyErr_Occurred())) __PYX_ERR(0, 382, __pyx_L5_error)
         __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
         __pyx_v_duty_left = __pyx_t_11;
 
-        /* "runner.pyx":377
- *             ##
+        /* "runner.pyx":387
+ *             ##  HACK:
  *             ###############################################################
- *             if gyro_estimated_angle == 0:             # <<<<<<<<<<<<<<
- *                 tail_motor.run_to_abs_pos(position_sp=0, stop_action='hold', speed_sp=-600) #
+ *             if log_pointer == 0:             # <<<<<<<<<<<<<<
+ *                 tail_motor.run_to_abs_pos(position_sp=10, stop_action='hold', speed_sp=-300) #
  * 
  */
-        __pyx_t_12 = ((__pyx_v_gyro_estimated_angle == 0.0) != 0);
+        __pyx_t_12 = ((__pyx_v_log_pointer == 0) != 0);
         if (__pyx_t_12) {
 
-          /* "runner.pyx":378
+          /* "runner.pyx":388
  *             ###############################################################
- *             if gyro_estimated_angle == 0:
- *                 tail_motor.run_to_abs_pos(position_sp=0, stop_action='hold', speed_sp=-600) #             # <<<<<<<<<<<<<<
+ *             if log_pointer == 0:
+ *                 tail_motor.run_to_abs_pos(position_sp=10, stop_action='hold', speed_sp=-300) #             # <<<<<<<<<<<<<<
  * 
- *             ###############################################################
+ *             # PWM(duty cycle value)
  */
-          __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_tail_motor, __pyx_n_s_run_to_abs_pos); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 378, __pyx_L5_error)
+          __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_tail_motor, __pyx_n_s_run_to_abs_pos); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 388, __pyx_L5_error)
           __Pyx_GOTREF(__pyx_t_7);
-          __pyx_t_4 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 378, __pyx_L5_error)
+          __pyx_t_4 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 388, __pyx_L5_error)
           __Pyx_GOTREF(__pyx_t_4);
-          if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_position_sp, __pyx_int_0) < 0) __PYX_ERR(0, 378, __pyx_L5_error)
-          if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_stop_action, __pyx_n_s_hold) < 0) __PYX_ERR(0, 378, __pyx_L5_error)
-          if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_speed_sp, __pyx_int_neg_600) < 0) __PYX_ERR(0, 378, __pyx_L5_error)
-          __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_empty_tuple, __pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 378, __pyx_L5_error)
+          if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_position_sp, __pyx_int_10) < 0) __PYX_ERR(0, 388, __pyx_L5_error)
+          if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_stop_action, __pyx_n_s_hold) < 0) __PYX_ERR(0, 388, __pyx_L5_error)
+          if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_speed_sp, __pyx_int_neg_300) < 0) __PYX_ERR(0, 388, __pyx_L5_error)
+          __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_empty_tuple, __pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 388, __pyx_L5_error)
           __Pyx_GOTREF(__pyx_t_5);
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-          /* "runner.pyx":377
- *             ##
+          /* "runner.pyx":387
+ *             ##  HACK:
  *             ###############################################################
- *             if gyro_estimated_angle == 0:             # <<<<<<<<<<<<<<
- *                 tail_motor.run_to_abs_pos(position_sp=0, stop_action='hold', speed_sp=-600) #
+ *             if log_pointer == 0:             # <<<<<<<<<<<<<<
+ *                 tail_motor.run_to_abs_pos(position_sp=10, stop_action='hold', speed_sp=-300) #
  * 
  */
         }
 
-        /* "runner.pyx":383
- *             ##  Update angle estimate and Gyro Offset Estimate
- *             ###############################################################
- *             gyro_estimated_angle += float(gyro_rate * loop_time_sec) # (rad)             # <<<<<<<<<<<<<<
- *             gyro_offset = float(((1 - gyro_drift_compensation_rate) * gyro_offset) +
- *                 (gyro_drift_compensation_rate * float(gyro_rate_raw))) # (rad/sec) gyro_drift_compensation_rate
- */
-        __pyx_v_gyro_estimated_angle = (__pyx_v_gyro_estimated_angle + (__pyx_v_gyro_rate * __pyx_v_loop_time_sec));
-
-        /* "runner.pyx":384
- *             ###############################################################
- *             gyro_estimated_angle += float(gyro_rate * loop_time_sec) # (rad)
- *             gyro_offset = float(((1 - gyro_drift_compensation_rate) * gyro_offset) +             # <<<<<<<<<<<<<<
- *                 (gyro_drift_compensation_rate * float(gyro_rate_raw))) # (rad/sec) gyro_drift_compensation_rate
- * 
- */
-        __pyx_v_gyro_offset = (((1.0 - __pyx_v_gyro_drift_compensation_rate) * __pyx_v_gyro_offset) + (__pyx_v_gyro_drift_compensation_rate * ((double)__pyx_v_gyro_rate_raw)));
-
-        /* "runner.pyx":390
- *             ##  Update Accumulated Motor Error
- *             ###############################################################
- *             motor_angle_error_accumulated += (float(motor_angle_error) * loop_time_sec) # (rad*t)             # <<<<<<<<<<<<<<
- * 
- *             # PWM(duty cycle value)
- */
-        __pyx_v_motor_angle_error_accumulated = (__pyx_v_motor_angle_error_accumulated + (__pyx_v_motor_angle_error * __pyx_v_loop_time_sec));
-
-        /* "runner.pyx":393
+        /* "runner.pyx":391
  * 
  *             # PWM(duty cycle value)
  *             t_loop_end = float(clock())             # <<<<<<<<<<<<<<
  *             logs[log_pointer] = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}".format(
  *                 log_pointer,
  */
-        __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_clock); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 393, __pyx_L5_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_clock); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 391, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_4);
         __pyx_t_7 = NULL;
         if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_4))) {
@@ -5053,191 +5057,191 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
         }
         __pyx_t_5 = (__pyx_t_7) ? __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_7) : __Pyx_PyObject_CallNoArg(__pyx_t_4);
         __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-        if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 393, __pyx_L5_error)
+        if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 391, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __pyx_t_11 = __Pyx_PyObject_AsDouble(__pyx_t_5); if (unlikely(__pyx_t_11 == ((double)((double)-1)) && PyErr_Occurred())) __PYX_ERR(0, 393, __pyx_L5_error)
+        __pyx_t_11 = __Pyx_PyObject_AsDouble(__pyx_t_5); if (unlikely(__pyx_t_11 == ((double)((double)-1)) && PyErr_Occurred())) __PYX_ERR(0, 391, __pyx_L5_error)
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
         __pyx_v_t_loop_end = __pyx_t_11;
 
-        /* "runner.pyx":394
+        /* "runner.pyx":392
  *             # PWM(duty cycle value)
  *             t_loop_end = float(clock())
  *             logs[log_pointer] = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}".format(             # <<<<<<<<<<<<<<
  *                 log_pointer,
  *                 t_loop_end - t_balancer_start,
  */
-        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s__9, __pyx_n_s_format); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 394, __pyx_L5_error)
+        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s__9, __pyx_n_s_format); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 392, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_4);
 
-        /* "runner.pyx":395
+        /* "runner.pyx":393
  *             t_loop_end = float(clock())
  *             logs[log_pointer] = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}".format(
  *                 log_pointer,             # <<<<<<<<<<<<<<
  *                 t_loop_end - t_balancer_start,
  *                 t_loop_end - t_loop_start,
  */
-        __pyx_t_7 = __Pyx_PyInt_From_long(__pyx_v_log_pointer); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 395, __pyx_L5_error)
+        __pyx_t_7 = __Pyx_PyInt_From_long(__pyx_v_log_pointer); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 393, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_7);
 
-        /* "runner.pyx":396
+        /* "runner.pyx":394
  *             logs[log_pointer] = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}".format(
  *                 log_pointer,
  *                 t_loop_end - t_balancer_start,             # <<<<<<<<<<<<<<
  *                 t_loop_end - t_loop_start,
  *                 gyro_rate_raw,
  */
-        __pyx_t_3 = PyFloat_FromDouble((__pyx_v_t_loop_end - __pyx_v_t_balancer_start)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 396, __pyx_L5_error)
+        __pyx_t_3 = PyFloat_FromDouble((__pyx_v_t_loop_end - __pyx_v_t_balancer_start)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 394, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_3);
 
-        /* "runner.pyx":397
+        /* "runner.pyx":395
  *                 log_pointer,
  *                 t_loop_end - t_balancer_start,
  *                 t_loop_end - t_loop_start,             # <<<<<<<<<<<<<<
  *                 gyro_rate_raw,
  *                 motor_angle_raw,
  */
-        __pyx_t_1 = PyFloat_FromDouble((__pyx_v_t_loop_end - __pyx_v_t_loop_start)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 397, __pyx_L5_error)
+        __pyx_t_1 = PyFloat_FromDouble((__pyx_v_t_loop_end - __pyx_v_t_loop_start)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 395, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_1);
 
-        /* "runner.pyx":398
+        /* "runner.pyx":396
  *                 t_loop_end - t_balancer_start,
  *                 t_loop_end - t_loop_start,
  *                 gyro_rate_raw,             # <<<<<<<<<<<<<<
  *                 motor_angle_raw,
  *                 gyro_estimated_angle,
  */
-        __pyx_t_16 = __Pyx_PyInt_From_int(__pyx_v_gyro_rate_raw); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 398, __pyx_L5_error)
+        __pyx_t_16 = __Pyx_PyInt_From_int(__pyx_v_gyro_rate_raw); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 396, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_16);
 
-        /* "runner.pyx":399
+        /* "runner.pyx":397
  *                 t_loop_end - t_loop_start,
  *                 gyro_rate_raw,
  *                 motor_angle_raw,             # <<<<<<<<<<<<<<
  *                 gyro_estimated_angle,
  *                 gyro_rate,
  */
-        __pyx_t_17 = PyFloat_FromDouble(__pyx_v_motor_angle_raw); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 399, __pyx_L5_error)
+        __pyx_t_17 = PyFloat_FromDouble(__pyx_v_motor_angle_raw); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 397, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_17);
 
-        /* "runner.pyx":400
+        /* "runner.pyx":398
  *                 gyro_rate_raw,
  *                 motor_angle_raw,
  *                 gyro_estimated_angle,             # <<<<<<<<<<<<<<
  *                 gyro_rate,
  *                 motor_angle_error,
  */
-        __pyx_t_18 = PyFloat_FromDouble(__pyx_v_gyro_estimated_angle); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 400, __pyx_L5_error)
+        __pyx_t_18 = PyFloat_FromDouble(__pyx_v_gyro_estimated_angle); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 398, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_18);
 
-        /* "runner.pyx":401
+        /* "runner.pyx":399
  *                 motor_angle_raw,
  *                 gyro_estimated_angle,
  *                 gyro_rate,             # <<<<<<<<<<<<<<
  *                 motor_angle_error,
  *                 motor_angular_speed_error,
  */
-        __pyx_t_19 = PyFloat_FromDouble(__pyx_v_gyro_rate); if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 401, __pyx_L5_error)
+        __pyx_t_19 = PyFloat_FromDouble(__pyx_v_gyro_rate); if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 399, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_19);
 
-        /* "runner.pyx":402
+        /* "runner.pyx":400
  *                 gyro_estimated_angle,
  *                 gyro_rate,
  *                 motor_angle_error,             # <<<<<<<<<<<<<<
  *                 motor_angular_speed_error,
  *                 motor_angle_error_accumulated,
  */
-        __pyx_t_20 = PyFloat_FromDouble(__pyx_v_motor_angle_error); if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 402, __pyx_L5_error)
+        __pyx_t_20 = PyFloat_FromDouble(__pyx_v_motor_angle_error); if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 400, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_20);
 
-        /* "runner.pyx":403
+        /* "runner.pyx":401
  *                 gyro_rate,
  *                 motor_angle_error,
  *                 motor_angular_speed_error,             # <<<<<<<<<<<<<<
  *                 motor_angle_error_accumulated,
  *                 duty_left,
  */
-        __pyx_t_21 = PyFloat_FromDouble(__pyx_v_motor_angular_speed_error); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 403, __pyx_L5_error)
+        __pyx_t_21 = PyFloat_FromDouble(__pyx_v_motor_angular_speed_error); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 401, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_21);
 
-        /* "runner.pyx":404
+        /* "runner.pyx":402
  *                 motor_angle_error,
  *                 motor_angular_speed_error,
  *                 motor_angle_error_accumulated,             # <<<<<<<<<<<<<<
  *                 duty_left,
  *                 duty_right,
  */
-        __pyx_t_22 = PyFloat_FromDouble(__pyx_v_motor_angle_error_accumulated); if (unlikely(!__pyx_t_22)) __PYX_ERR(0, 404, __pyx_L5_error)
+        __pyx_t_22 = PyFloat_FromDouble(__pyx_v_motor_angle_error_accumulated); if (unlikely(!__pyx_t_22)) __PYX_ERR(0, 402, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_22);
 
-        /* "runner.pyx":405
+        /* "runner.pyx":403
  *                 motor_angular_speed_error,
  *                 motor_angle_error_accumulated,
  *                 duty_left,             # <<<<<<<<<<<<<<
  *                 duty_right,
  *                 voltage_raw,
  */
-        __pyx_t_23 = PyFloat_FromDouble(__pyx_v_duty_left); if (unlikely(!__pyx_t_23)) __PYX_ERR(0, 405, __pyx_L5_error)
+        __pyx_t_23 = PyFloat_FromDouble(__pyx_v_duty_left); if (unlikely(!__pyx_t_23)) __PYX_ERR(0, 403, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_23);
 
-        /* "runner.pyx":406
+        /* "runner.pyx":404
  *                 motor_angle_error_accumulated,
  *                 duty_left,
  *                 duty_right,             # <<<<<<<<<<<<<<
  *                 voltage_raw,
  *                 voltage_estimate_max_left,
  */
-        __pyx_t_24 = PyFloat_FromDouble(__pyx_v_duty_right); if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 406, __pyx_L5_error)
+        __pyx_t_24 = PyFloat_FromDouble(__pyx_v_duty_right); if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 404, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_24);
 
-        /* "runner.pyx":407
+        /* "runner.pyx":405
  *                 duty_left,
  *                 duty_right,
  *                 voltage_raw,             # <<<<<<<<<<<<<<
  *                 voltage_estimate_max_left,
  *                 voltage_estimate_max_right,
  */
-        __pyx_t_25 = __Pyx_PyInt_From_int(__pyx_v_voltage_raw); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 407, __pyx_L5_error)
+        __pyx_t_25 = __Pyx_PyInt_From_int(__pyx_v_voltage_raw); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 405, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_25);
 
-        /* "runner.pyx":408
+        /* "runner.pyx":406
  *                 duty_right,
  *                 voltage_raw,
  *                 voltage_estimate_max_left,             # <<<<<<<<<<<<<<
  *                 voltage_estimate_max_right,
  *                 motor_duty_cycle_left,
  */
-        __pyx_t_26 = PyFloat_FromDouble(__pyx_v_voltage_estimate_max_left); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 408, __pyx_L5_error)
+        __pyx_t_26 = PyFloat_FromDouble(__pyx_v_voltage_estimate_max_left); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 406, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_26);
 
-        /* "runner.pyx":409
+        /* "runner.pyx":407
  *                 voltage_raw,
  *                 voltage_estimate_max_left,
  *                 voltage_estimate_max_right,             # <<<<<<<<<<<<<<
  *                 motor_duty_cycle_left,
  *                 motor_duty_cycle_right,
  */
-        __pyx_t_27 = PyFloat_FromDouble(__pyx_v_voltage_estimate_max_right); if (unlikely(!__pyx_t_27)) __PYX_ERR(0, 409, __pyx_L5_error)
+        __pyx_t_27 = PyFloat_FromDouble(__pyx_v_voltage_estimate_max_right); if (unlikely(!__pyx_t_27)) __PYX_ERR(0, 407, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_27);
 
-        /* "runner.pyx":410
+        /* "runner.pyx":408
  *                 voltage_estimate_max_left,
  *                 voltage_estimate_max_right,
  *                 motor_duty_cycle_left,             # <<<<<<<<<<<<<<
  *                 motor_duty_cycle_right,
  *                 )
  */
-        __pyx_t_28 = PyFloat_FromDouble(__pyx_v_motor_duty_cycle_left); if (unlikely(!__pyx_t_28)) __PYX_ERR(0, 410, __pyx_L5_error)
+        __pyx_t_28 = PyFloat_FromDouble(__pyx_v_motor_duty_cycle_left); if (unlikely(!__pyx_t_28)) __PYX_ERR(0, 408, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_28);
 
-        /* "runner.pyx":411
+        /* "runner.pyx":409
  *                 voltage_estimate_max_right,
  *                 motor_duty_cycle_left,
  *                 motor_duty_cycle_right,             # <<<<<<<<<<<<<<
  *                 )
  * 
  */
-        __pyx_t_29 = PyFloat_FromDouble(__pyx_v_motor_duty_cycle_right); if (unlikely(!__pyx_t_29)) __PYX_ERR(0, 411, __pyx_L5_error)
+        __pyx_t_29 = PyFloat_FromDouble(__pyx_v_motor_duty_cycle_right); if (unlikely(!__pyx_t_29)) __PYX_ERR(0, 409, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_29);
         __pyx_t_30 = NULL;
         __pyx_t_6 = 0;
@@ -5254,7 +5258,7 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
         #if CYTHON_FAST_PYCALL
         if (PyFunction_Check(__pyx_t_4)) {
           PyObject *__pyx_temp[18] = {__pyx_t_30, __pyx_t_7, __pyx_t_3, __pyx_t_1, __pyx_t_16, __pyx_t_17, __pyx_t_18, __pyx_t_19, __pyx_t_20, __pyx_t_21, __pyx_t_22, __pyx_t_23, __pyx_t_24, __pyx_t_25, __pyx_t_26, __pyx_t_27, __pyx_t_28, __pyx_t_29};
-          __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_6, 17+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 394, __pyx_L5_error)
+          __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_6, 17+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 392, __pyx_L5_error)
           __Pyx_XDECREF(__pyx_t_30); __pyx_t_30 = 0;
           __Pyx_GOTREF(__pyx_t_5);
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
@@ -5279,7 +5283,7 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
         #if CYTHON_FAST_PYCCALL
         if (__Pyx_PyFastCFunction_Check(__pyx_t_4)) {
           PyObject *__pyx_temp[18] = {__pyx_t_30, __pyx_t_7, __pyx_t_3, __pyx_t_1, __pyx_t_16, __pyx_t_17, __pyx_t_18, __pyx_t_19, __pyx_t_20, __pyx_t_21, __pyx_t_22, __pyx_t_23, __pyx_t_24, __pyx_t_25, __pyx_t_26, __pyx_t_27, __pyx_t_28, __pyx_t_29};
-          __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_6, 17+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 394, __pyx_L5_error)
+          __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_6, 17+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 392, __pyx_L5_error)
           __Pyx_XDECREF(__pyx_t_30); __pyx_t_30 = 0;
           __Pyx_GOTREF(__pyx_t_5);
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
@@ -5302,7 +5306,7 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
         } else
         #endif
         {
-          __pyx_t_31 = PyTuple_New(17+__pyx_t_6); if (unlikely(!__pyx_t_31)) __PYX_ERR(0, 394, __pyx_L5_error)
+          __pyx_t_31 = PyTuple_New(17+__pyx_t_6); if (unlikely(!__pyx_t_31)) __PYX_ERR(0, 392, __pyx_L5_error)
           __Pyx_GOTREF(__pyx_t_31);
           if (__pyx_t_30) {
             __Pyx_GIVEREF(__pyx_t_30); PyTuple_SET_ITEM(__pyx_t_31, 0, __pyx_t_30); __pyx_t_30 = NULL;
@@ -5358,70 +5362,70 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
           __pyx_t_27 = 0;
           __pyx_t_28 = 0;
           __pyx_t_29 = 0;
-          __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_31, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 394, __pyx_L5_error)
+          __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_31, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 392, __pyx_L5_error)
           __Pyx_GOTREF(__pyx_t_5);
           __Pyx_DECREF(__pyx_t_31); __pyx_t_31 = 0;
         }
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-        /* "runner.pyx":394
+        /* "runner.pyx":392
  *             # PWM(duty cycle value)
  *             t_loop_end = float(clock())
  *             logs[log_pointer] = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}".format(             # <<<<<<<<<<<<<<
  *                 log_pointer,
  *                 t_loop_end - t_balancer_start,
  */
-        if (unlikely(__Pyx_SetItemInt(__pyx_cur_scope->__pyx_v_logs, __pyx_v_log_pointer, __pyx_t_5, long, 1, __Pyx_PyInt_From_long, 1, 1, 1) < 0)) __PYX_ERR(0, 394, __pyx_L5_error)
+        if (unlikely(__Pyx_SetItemInt(__pyx_cur_scope->__pyx_v_logs, __pyx_v_log_pointer, __pyx_t_5, long, 1, __Pyx_PyInt_From_long, 1, 1, 1) < 0)) __PYX_ERR(0, 392, __pyx_L5_error)
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-        /* "runner.pyx":414
+        /* "runner.pyx":412
  *                 )
  * 
  *             log_pointer += 1             # <<<<<<<<<<<<<<
- *             if log_pointer == 1000:
+ *             if log_pointer == 10000:
  *                 log_pointer = 0
  */
         __pyx_v_log_pointer = (__pyx_v_log_pointer + 1);
 
-        /* "runner.pyx":415
+        /* "runner.pyx":413
  * 
  *             log_pointer += 1
- *             if log_pointer == 1000:             # <<<<<<<<<<<<<<
+ *             if log_pointer == 10000:             # <<<<<<<<<<<<<<
  *                 log_pointer = 0
  * 
  */
-        __pyx_t_12 = ((__pyx_v_log_pointer == 0x3E8) != 0);
+        __pyx_t_12 = ((__pyx_v_log_pointer == 0x2710) != 0);
         if (__pyx_t_12) {
 
-          /* "runner.pyx":416
+          /* "runner.pyx":414
  *             log_pointer += 1
- *             if log_pointer == 1000:
+ *             if log_pointer == 10000:
  *                 log_pointer = 0             # <<<<<<<<<<<<<<
  * 
  *             ###############################################################
  */
           __pyx_v_log_pointer = 0;
 
-          /* "runner.pyx":415
+          /* "runner.pyx":413
  * 
  *             log_pointer += 1
- *             if log_pointer == 1000:             # <<<<<<<<<<<<<<
+ *             if log_pointer == 10000:             # <<<<<<<<<<<<<<
  *                 log_pointer = 0
  * 
  */
         }
 
-        /* "runner.pyx":423
+        /* "runner.pyx":421
  *             #while ((clock() - t_loop_start) < (loop_time_sec - 0.014)): # clock()sleepwhilesleep()
  *             #    sleep(0.0001)
  *             sleep(max(loop_time_sec - (float(clock()) - t_loop_start), 0.002))             # <<<<<<<<<<<<<<
  * 
  *     except Exception as exception:
  */
-        __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_sleep); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 423, __pyx_L5_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_sleep); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 421, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_4);
         __pyx_t_11 = 0.002;
-        __Pyx_GetModuleGlobalName(__pyx_t_29, __pyx_n_s_clock); if (unlikely(!__pyx_t_29)) __PYX_ERR(0, 423, __pyx_L5_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_29, __pyx_n_s_clock); if (unlikely(!__pyx_t_29)) __PYX_ERR(0, 421, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_29);
         __pyx_t_28 = NULL;
         if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_29))) {
@@ -5435,10 +5439,10 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
         }
         __pyx_t_31 = (__pyx_t_28) ? __Pyx_PyObject_CallOneArg(__pyx_t_29, __pyx_t_28) : __Pyx_PyObject_CallNoArg(__pyx_t_29);
         __Pyx_XDECREF(__pyx_t_28); __pyx_t_28 = 0;
-        if (unlikely(!__pyx_t_31)) __PYX_ERR(0, 423, __pyx_L5_error)
+        if (unlikely(!__pyx_t_31)) __PYX_ERR(0, 421, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_31);
         __Pyx_DECREF(__pyx_t_29); __pyx_t_29 = 0;
-        __pyx_t_32 = __Pyx_PyObject_AsDouble(__pyx_t_31); if (unlikely(__pyx_t_32 == ((double)((double)-1)) && PyErr_Occurred())) __PYX_ERR(0, 423, __pyx_L5_error)
+        __pyx_t_32 = __Pyx_PyObject_AsDouble(__pyx_t_31); if (unlikely(__pyx_t_32 == ((double)((double)-1)) && PyErr_Occurred())) __PYX_ERR(0, 421, __pyx_L5_error)
         __Pyx_DECREF(__pyx_t_31); __pyx_t_31 = 0;
         __pyx_t_33 = (__pyx_v_loop_time_sec - (__pyx_t_32 - __pyx_v_t_loop_start));
         if (((__pyx_t_11 > __pyx_t_33) != 0)) {
@@ -5446,7 +5450,7 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
         } else {
           __pyx_t_32 = __pyx_t_33;
         }
-        __pyx_t_31 = PyFloat_FromDouble(__pyx_t_32); if (unlikely(!__pyx_t_31)) __PYX_ERR(0, 423, __pyx_L5_error)
+        __pyx_t_31 = PyFloat_FromDouble(__pyx_t_32); if (unlikely(!__pyx_t_31)) __PYX_ERR(0, 421, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_31);
         __pyx_t_29 = NULL;
         if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_4))) {
@@ -5461,7 +5465,7 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
         __pyx_t_5 = (__pyx_t_29) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_29, __pyx_t_31) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_31);
         __Pyx_XDECREF(__pyx_t_29); __pyx_t_29 = 0;
         __Pyx_DECREF(__pyx_t_31); __pyx_t_31 = 0;
-        if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 423, __pyx_L5_error)
+        if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 421, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -5502,7 +5506,7 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-    /* "runner.pyx":425
+    /* "runner.pyx":423
  *             sleep(max(loop_time_sec - (float(clock()) - t_loop_start), 0.002))
  * 
  *     except Exception as exception:             # <<<<<<<<<<<<<<
@@ -5512,31 +5516,31 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
     __pyx_t_6 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])));
     if (__pyx_t_6) {
       __Pyx_AddTraceback("runner.runner", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_5, &__pyx_t_4, &__pyx_t_31) < 0) __PYX_ERR(0, 425, __pyx_L7_except_error)
+      if (__Pyx_GetException(&__pyx_t_5, &__pyx_t_4, &__pyx_t_31) < 0) __PYX_ERR(0, 423, __pyx_L7_except_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_GOTREF(__pyx_t_31);
       __Pyx_INCREF(__pyx_t_4);
       __pyx_v_exception = __pyx_t_4;
 
-      /* "runner.pyx":426
+      /* "runner.pyx":424
  * 
  *     except Exception as exception:
  *         print("It's a Runner Exception")             # <<<<<<<<<<<<<<
  *         g_log.exception(exception)
  *         shutdown_child()
  */
-      if (__Pyx_PrintOne(0, __pyx_kp_s_It_s_a_Runner_Exception) < 0) __PYX_ERR(0, 426, __pyx_L7_except_error)
+      if (__Pyx_PrintOne(0, __pyx_kp_s_It_s_a_Runner_Exception) < 0) __PYX_ERR(0, 424, __pyx_L7_except_error)
 
-      /* "runner.pyx":427
+      /* "runner.pyx":425
  *     except Exception as exception:
  *         print("It's a Runner Exception")
  *         g_log.exception(exception)             # <<<<<<<<<<<<<<
  *         shutdown_child()
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_28, __pyx_n_s_g_log); if (unlikely(!__pyx_t_28)) __PYX_ERR(0, 427, __pyx_L7_except_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_28, __pyx_n_s_g_log); if (unlikely(!__pyx_t_28)) __PYX_ERR(0, 425, __pyx_L7_except_error)
       __Pyx_GOTREF(__pyx_t_28);
-      __pyx_t_27 = __Pyx_PyObject_GetAttrStr(__pyx_t_28, __pyx_n_s_exception); if (unlikely(!__pyx_t_27)) __PYX_ERR(0, 427, __pyx_L7_except_error)
+      __pyx_t_27 = __Pyx_PyObject_GetAttrStr(__pyx_t_28, __pyx_n_s_exception); if (unlikely(!__pyx_t_27)) __PYX_ERR(0, 425, __pyx_L7_except_error)
       __Pyx_GOTREF(__pyx_t_27);
       __Pyx_DECREF(__pyx_t_28); __pyx_t_28 = 0;
       __pyx_t_28 = NULL;
@@ -5551,17 +5555,17 @@ static PyObject *__pyx_pf_6runner_runner(CYTHON_UNUSED PyObject *__pyx_self, PyO
       }
       __pyx_t_29 = (__pyx_t_28) ? __Pyx_PyObject_Call2Args(__pyx_t_27, __pyx_t_28, __pyx_v_exception) : __Pyx_PyObject_CallOneArg(__pyx_t_27, __pyx_v_exception);
       __Pyx_XDECREF(__pyx_t_28); __pyx_t_28 = 0;
-      if (unlikely(!__pyx_t_29)) __PYX_ERR(0, 427, __pyx_L7_except_error)
+      if (unlikely(!__pyx_t_29)) __PYX_ERR(0, 425, __pyx_L7_except_error)
       __Pyx_GOTREF(__pyx_t_29);
       __Pyx_DECREF(__pyx_t_27); __pyx_t_27 = 0;
       __Pyx_DECREF(__pyx_t_29); __pyx_t_29 = 0;
 
-      /* "runner.pyx":428
+      /* "runner.pyx":426
  *         print("It's a Runner Exception")
  *         g_log.exception(exception)
  *         shutdown_child()             # <<<<<<<<<<<<<<
  */
-      __pyx_t_29 = __Pyx_PyObject_CallNoArg(__pyx_v_shutdown_child); if (unlikely(!__pyx_t_29)) __PYX_ERR(0, 428, __pyx_L7_except_error)
+      __pyx_t_29 = __Pyx_PyObject_CallNoArg(__pyx_v_shutdown_child); if (unlikely(!__pyx_t_29)) __PYX_ERR(0, 426, __pyx_L7_except_error)
       __Pyx_GOTREF(__pyx_t_29);
       __Pyx_DECREF(__pyx_t_29); __pyx_t_29 = 0;
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -6070,14 +6074,14 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  */
   __pyx_codeobj__6 = (PyObject*)__Pyx_PyCode_New(0, 0, 0, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_runner_pyx, __pyx_n_s_wait_for_input, 75, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__6)) __PYX_ERR(0, 75, __pyx_L1_error)
 
-  /* "runner.pyx":308
+  /* "runner.pyx":319
  *             if gyro_rate > 5.0 or gyro_rate < -5.0:
  *                 # TODO:
  *                 raise Exception('I fell down!')             # <<<<<<<<<<<<<<
  * 
- *             ###############################################################
+ *             # (rad/sec)
  */
-  __pyx_tuple__8 = PyTuple_Pack(1, __pyx_kp_s_I_fell_down); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(0, 308, __pyx_L1_error)
+  __pyx_tuple__8 = PyTuple_Pack(1, __pyx_kp_s_I_fell_down); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(0, 319, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__8);
   __Pyx_GIVEREF(__pyx_tuple__8);
 
@@ -6105,11 +6109,11 @@ static CYTHON_SMALL_CODE int __Pyx_InitGlobals(void) {
   __pyx_float_0_01 = PyFloat_FromDouble(0.01); if (unlikely(!__pyx_float_0_01)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_float_0_15 = PyFloat_FromDouble(0.15); if (unlikely(!__pyx_float_0_15)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_float_0_025 = PyFloat_FromDouble(0.025); if (unlikely(!__pyx_float_0_025)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __pyx_int_0 = PyInt_FromLong(0); if (unlikely(!__pyx_int_0)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_1 = PyInt_FromLong(1); if (unlikely(!__pyx_int_1)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_int_10 = PyInt_FromLong(10); if (unlikely(!__pyx_int_10)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_125 = PyInt_FromLong(125); if (unlikely(!__pyx_int_125)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_150 = PyInt_FromLong(150); if (unlikely(!__pyx_int_150)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __pyx_int_neg_600 = PyInt_FromLong(-600); if (unlikely(!__pyx_int_neg_600)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_int_neg_300 = PyInt_FromLong(-300); if (unlikely(!__pyx_int_neg_300)) __PYX_ERR(0, 1, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;

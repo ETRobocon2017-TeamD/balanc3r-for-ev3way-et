@@ -290,16 +290,27 @@ def runner(sh_mem, setting, log_datetime):
 
         while True:
 
-            ###############################################################
+            ###################################################################################
+            ## Input
+            
             ##  Loop info
-            ###############################################################
             t_loop_start = float(clock())
 
-            ###############################################################
             ##  Reading the Gyro.
-            ###############################################################
             gyro_rate_raw = read_device(gyro_sensor_devfd)
-            gyro_rate = (float(gyro_rate_raw) - gyro_offset) * rad_per_second_per_raw_gyro_unit # 躯体の角速度(rad/sec)。ジャイロから得た角速度をオフセット値で調整している
+
+            ##  Reading the Motor Position
+            motor_angle_left_raw = read_device(motor_encoder_left_devfd)
+            motor_angle_right_raw = read_device(motor_encoder_right_devfd)
+            # sh_mem.write_motor_encoder_left_mem(motor_angle_left_raw)
+            # sh_mem.write_motor_encoder_right_mem(motor_angle_right_raw)
+
+            ##  Reading the Voltage.
+            voltage_raw = read_device(battery_voltage_devfd) #バッテリー電圧(μV)
+
+            speed_reference = sh_mem.read_speed_mem()
+            steering = sh_mem.read_steering_mem()
+            ###################################################################################
 
             # 倒れた時のログを確認したところ、倒れた時点の角速度が4以上だった。
             # TODO: 高速走行中にジャイロ値が4.0を超えるケースがあるようだ。グラフで確認すること。
@@ -307,13 +318,8 @@ def runner(sh_mem, setting, log_datetime):
                 # TODO: 倒れた時用の例外クラスをつくること
                 raise Exception('I fell down!')
 
-            ###############################################################
-            ##  Reading the Motor Position
-            ###############################################################
-            motor_angle_left_raw = read_device(motor_encoder_left_devfd)
-            motor_angle_right_raw = read_device(motor_encoder_right_devfd)
-            # sh_mem.write_motor_encoder_left_mem(motor_angle_left_raw)
-            # sh_mem.write_motor_encoder_right_mem(motor_angle_right_raw)
+            # 躯体の角速度(rad/sec)。ジャイロから得た角速度をオフセット値で調整している
+            gyro_rate = (float(gyro_rate_raw) - gyro_offset) * rad_per_second_per_raw_gyro_unit 
 
             # バックラッシュキャンセル
             if enable_back_slash_cancel:
@@ -331,8 +337,6 @@ def runner(sh_mem, setting, log_datetime):
             motor_angle_raw = float(motor_angle_left_raw + motor_angle_right_raw) * 0.5
             motor_angle = (motor_angle_raw * radians_per_raw_motor_unit) + gyro_estimated_angle # 左右モーターの現在の平均回転角度(rad) + 躯体の(推定)回転角度
 
-            speed_reference = sh_mem.read_speed_mem()
-
             # K_THETA_DOT: 最大モーター角速度だと思われる値。 speed_reference(モータ最大角速度を100%とする、目標割合)にかけ合わせて
             motor_angular_speed_reference_next = (float(speed_reference) / 100.0) * k_theta_dot
             motor_angular_speed_reference = ((1.0 - a_r) * motor_angular_speed_reference_next) + (a_r * motor_angular_speed_reference)
@@ -347,35 +351,17 @@ def runner(sh_mem, setting, log_datetime):
             motor_angular_speed_error = motor_angular_speed - motor_angular_speed_reference # 左右モーターの現在の平均回転角速度と目標平均回転角速度との誤差(rad/sec)
 
             ###############################################################
-            ##  Reading the Voltage.
-            ###############################################################
-            voltage_raw = read_device(battery_voltage_devfd) #バッテリー電圧(μV)
-
-            ###############################################################
             ##  Computing the motor duty cycle value
             ###############################################################
             voltage_target = ((gain_gyro_angle  * gyro_estimated_angle)
-               + (gain_gyro_rate   * gyro_rate)
-               + (gain_motor_angle * float(motor_angle_error))
-               + (gain_motor_angular_speed * motor_angular_speed_error)
-               + (gain_motor_angle_error_accumulated * motor_angle_error_accumulated))
+                + (gain_gyro_rate   * gyro_rate)
+                + (gain_motor_angle * float(motor_angle_error))
+                + (gain_motor_angular_speed * motor_angular_speed_error)
+                + (gain_motor_angle_error_accumulated * motor_angle_error_accumulated))
             voltage_estimate_max_left = (battery_gain_left * float(voltage_raw) / 1000) - battery_offset_left
             voltage_estimate_max_right = (battery_gain_right * float(voltage_raw) / 1000) - battery_offset_right
             motor_duty_cycle_left = (voltage_target / voltage_estimate_max_left) * 100
             motor_duty_cycle_right = (voltage_target / voltage_estimate_max_right) * 100
-
-            ###############################################################
-            ##  Apply the signal to the motor, and add steering
-            ###############################################################
-            steering = sh_mem.read_steering_mem()
-            duty_right = float(set_duty(motor_duty_cycle_right_devfd, motor_duty_cycle_right + steering))
-            duty_left  = float(set_duty(motor_duty_cycle_left_devfd, motor_duty_cycle_left - steering)) # 右車輪のモーター出力が弱いので、左車輪のPWM値を3つ目の引数で調節(%)してる。まだ偏ってるので調節必要
-
-            ###############################################################
-            ##  ここでしっぽモーターを上げる
-            ###############################################################
-            if gyro_estimated_angle == 0:
-                tail_motor.run_to_abs_pos(position_sp=10, stop_action='hold', speed_sp=-300) # しっぽモーター上に上げる
 
             ###############################################################
             ##  Update angle estimate and Gyro Offset Estimate
@@ -388,6 +374,18 @@ def runner(sh_mem, setting, log_datetime):
             ##  Update Accumulated Motor Error
             ###############################################################
             motor_angle_error_accumulated += (float(motor_angle_error) * loop_time_sec) # モーター角度誤差累積(rad*t) もしかして積分？ 前回の累積に、今回の目標平均回転角度との誤差を周期でかけたものを足している
+
+            ###############################################################
+            ##  Apply the signal to the motor, and add steering
+            ###############################################################
+            duty_right = float(set_duty(motor_duty_cycle_right_devfd, motor_duty_cycle_right + steering))
+            duty_left  = float(set_duty(motor_duty_cycle_left_devfd, motor_duty_cycle_left - steering)) # 右車輪のモーター出力が弱いので、左車輪のPWM値を3つ目の引数で調節(%)してる。まだ偏ってるので調節必要
+
+            ###############################################################
+            ##  HACK: ここでしっぽモーターを上げる
+            ###############################################################
+            if log_pointer == 0:
+                tail_motor.run_to_abs_pos(position_sp=10, stop_action='hold', speed_sp=-300) # しっぽモーター上に上げる
 
             # 実行時間、PWM値(duty cycle value)に関わる値をログに出力
             t_loop_end = float(clock())
@@ -412,7 +410,7 @@ def runner(sh_mem, setting, log_datetime):
                 )
 
             log_pointer += 1
-            if log_pointer == 1000:
+            if log_pointer == 10000:
                 log_pointer = 0
 
             ###############################################################
