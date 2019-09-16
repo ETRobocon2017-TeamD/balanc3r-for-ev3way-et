@@ -129,6 +129,8 @@ def guide(sh_mem, setting, log_datetime):
                 # odometry_speed_reference
                 )
             log_pointer += 1
+            if log_pointer == 10000:
+                log_pointer = 0
 
             ###############################################################
             ##  Busy wait for the loop to complete
