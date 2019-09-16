@@ -17,6 +17,7 @@ scipy = "*"
 pandas = "*"
 control = "*"
 cython = ">=0.27"
+slycot = "*"
 
 [requires]
 python_version = "3.5.3"
