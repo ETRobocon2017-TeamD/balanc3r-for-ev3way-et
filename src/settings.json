@@ -1,15 +1,15 @@
 {
     "gain_all": 1,
+    "gain_motor_angle"                  :  0.11124097478732278 ,
+    "gain_gyro_angle"                   :  19.587626309542298 ,
+    "gain_motor_angular_speed"          :  1.0071435171918373 ,
+    "gain_gyro_rate"                    :  1.6979824067261 ,
+    "gain_motor_angle_error_accumulated":  0.012557130322982888 ,
 
-    "gain_motor_angle"                  :  0.7263814678586831 ,
-    "gain_gyro_angle"                   :  22.619636099434423 ,
-    "gain_motor_angular_speed"          :  1.187379154665731 ,
-    "gain_gyro_rate"                    :  1.9915549806969939 ,
-    "gain_motor_angle_error_accumulated":  0.39174253878232124 ,
-    
-    "enable_back_slash_cancel": true,
+    "use_fifo": true,
+    "enable_back_slash_cancel": false,
     "loop_time_millisec": 16,
-    "a_d": 0.2,
+    "a_d": 0.25,
     "a_r": 0.996,
     "a_b": 0.8,
     "k_theta_dot" : 6.0,

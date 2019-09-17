@@ -32,23 +32,29 @@ def runner(sh_mem, setting, log_datetime):
             sleep(0.2)
 
             log_file = codecs.open('./log/log_%s_runner.csv' % log_datetime,'w', 'utf-8')
-            log_file.write("id"\
+            log_file.write(\
+                "id"\
                 ",時刻(sec)"\
                 ",処理時間(sec)"\
                 ",ジャイロ角速度生値(deg/sec)"\
+                ",モーター角度生値右(deg)"\
+                ",モーター角度生値左(deg)"\
                 ",モーター角度生値(deg)"\
+                ",モーター角度(rad)"\
                 ",ジャイロ推定角度(rad)"\
                 ",ジャイロ推定角速度(rad/sec)"\
                 ",モーター角度誤差(rad)"\
+                ",モーター角速度"\
+                ",モーター角速度目標"\
                 ",モーター角速度誤差(rad/sec)"\
                 ",モーター角度誤差累積値(rad??)"\
-                ",モーターデューティー比左"\
-                ",モーターデューティー比右"\
+                ",モーターPWM値目標左"\
+                ",モーターPWM値目標右"\
                 ",モーター電圧生値"\
                 ",推定最大入力可能電圧左"\
                 ",推定最大入力可能電圧右"\
-                ",モーター印加電圧比左"\
-                ",モーター印加電圧比右"\
+                ",モーターPWM値左"\
+                ",モーターPWM値右"\
                 "\n"
             )
 
@@ -289,7 +295,7 @@ def runner(sh_mem, setting, log_datetime):
         print("GO!")
         print("-----------------------------------")
 
-        tail_motor.run_timed(time_sp=150, speed_sp=125) # しっぽモーター下に少し下げる
+        tail_motor.run_timed(time_sp=150, speed_sp=155) # しっぽモーター下に少し下げる
         sleep(0.15)
 
         # 倒立振子スタート時の時間取得
@@ -416,24 +422,29 @@ def runner(sh_mem, setting, log_datetime):
 
             # 実行時間、PWM値(duty cycle value)に関わる値をログに出力
             t_loop_end = float(clock())
-            logs[log_pointer] = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}".format(
+            logs[log_pointer] = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}".format(
                 log_pointer,
                 t_loop_end - t_balancer_start,
                 t_loop_end - t_loop_start,
                 gyro_rate_raw,
+                motor_angle_left_raw,
+                motor_angle_right_raw,
                 motor_angle_raw,
+                motor_angle,
                 gyro_estimated_angle,
                 gyro_rate,
                 motor_angle_error,
+                motor_angular_speed,
+                motor_angular_speed_reference,
                 motor_angular_speed_error,
                 motor_angle_error_accumulated,
-                duty_left,
-                duty_right,
+                motor_duty_cycle_left,
+                motor_duty_cycle_right,
                 voltage_raw,
                 voltage_estimate_max_left,
                 voltage_estimate_max_right,
-                motor_duty_cycle_left,
-                motor_duty_cycle_right,
+                duty_left,
+                duty_right,
                 )
 
             log_pointer += 1

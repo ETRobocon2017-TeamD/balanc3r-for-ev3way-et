@@ -120,9 +120,10 @@ def main():
 
         if runner_pid == 0:
             # スケジューラー設定
-            priority = os.sched_get_priority_min(os.SCHED_FIFO)
-            sched_params = os.sched_param(priority)
-            os.sched_setscheduler(runner_pid, os.SCHED_FIFO, sched_params)
+            if setting['use_fifo']:
+                priority = os.sched_get_priority_min(os.SCHED_FIFO)
+                sched_params = os.sched_param(priority)
+                os.sched_setscheduler(runner_pid, os.SCHED_FIFO, sched_params)
             # NOTE: 倒立振子ライブラリを使う場合はrunner()を、ライントレーサー開発等で倒立振子ライブラリを使いたくない場合はrunner_stub()を使用すること
             runner(sh_mem, setting, log_datetime)
             print('Runner Done')
