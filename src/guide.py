@@ -1,6 +1,7 @@
 import sys
 import logging
 import signal
+import codecs
 from time import sleep, clock, strftime
 from shared_memory import SharedMemory
 from line_tracer import LineTracer
@@ -20,7 +21,28 @@ def guide(sh_mem, setting, log_datetime):
         try:
             sleep(0.2)
 
-            log_file = open("./log/log_{}_guide.csv".format(log_datetime), 'w')
+            log_file = codecs.open('./log/log_%s_guide.csv' % log_datetime, 'w', 'utf-8')
+            log_file.write(\
+                "id"\
+                ",時刻(sec)"\
+                ",処理時間(sec)"\
+                ",速度目標"\
+                ",方向目標"\
+                ",ラインセンサー生値"\
+                ",ライン追跡ターゲット"\
+                ",ライン-ターゲット偏差"\
+                ",ライントレースP値"\
+                ",ライントレースI値"\
+                ",ライントレースD値"\
+                ",モーター角度生値左(deg)"\
+                ",モーター角度生値右(deg)"\
+                "\n"
+            )
+            # ",オドメトリ位置X"\
+            # ",オドメトリ位置Y"\
+            # ",オドメトリ方向"\
+            # ",オドメトリ速度"\
+
             for log in logs:
                 if log != "":
                     log_file.write("{}\n".format(log))
@@ -46,7 +68,7 @@ def guide(sh_mem, setting, log_datetime):
     try:
         # ここで変数定義などの事前準備を行う
         # Time of each loop, measured in miliseconds.
-        loop_time_millisec = 18
+        loop_time_millisec = float(setting['loop_time_millisec'])
         # Time of each loop, measured in seconds.
         loop_time_sec = loop_time_millisec / 1000.0
 
@@ -90,6 +112,9 @@ def guide(sh_mem, setting, log_datetime):
 
             # ここでライントレースする
             speed_reference, direction, refrection_raw = line_tracer.line_tracing()
+            log_direction = direction
+            # NOTE: ライン左端を基準に走行させるために、旋回方向を - で反転している
+            direction = -direction
 
             # 角度を算出してオドメトリーを使用
             angle_l = sh_mem.read_motor_encoder_left_mem()
@@ -108,12 +133,12 @@ def guide(sh_mem, setting, log_datetime):
 
             # 実行時間、PID制御に関わる値をログに出力
             t_loop_end = clock()
-            # logs[log_pointer] = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}".format(
-            logs[log_pointer] = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}".format(
+            logs[log_pointer] = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}".format(
+                log_pointer,
                 t_loop_end - t_line_trace_start,
                 t_loop_end - t_loop_start,
                 speed_reference,
-                direction,
+                log_direction,
                 refrection_raw,
                 line_tracer.refrection_target,
                 line_tracer.e_b,
@@ -121,7 +146,7 @@ def guide(sh_mem, setting, log_datetime):
                 line_tracer.i_b,
                 line_tracer.d_b,
                 angle_l,
-                angle_r
+                angle_r,
                 # ,
                 # odometry.pre_pos_x,
                 # odometry.pre_pos_y,

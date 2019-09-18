@@ -109,6 +109,9 @@ def runner(sh_mem, setting, log_datetime):
         ## Definitions and Initialization variables
         ########################################################################
 
+        kick_start_time_sp = float(setting['kick_start_time_sp'])
+        kick_start_speed_sp = float(setting['kick_start_speed_sp'])
+
         # Timing settings for the program
         ## Time of each loop, measured in miliseconds.
         loop_time_millisec = float(setting['loop_time_millisec'])
@@ -295,8 +298,8 @@ def runner(sh_mem, setting, log_datetime):
         print("GO!")
         print("-----------------------------------")
 
-        tail_motor.run_timed(time_sp=150, speed_sp=155) # しっぽモーター下に少し下げる
-        sleep(0.15)
+        tail_motor.run_timed(time_sp=kick_start_time_sp, speed_sp=kick_start_speed_sp) # しっぽモーター下に少し下げる
+        sleep(kick_start_time_sp / 1000.)
 
         # 倒立振子スタート時の時間取得
         t_balancer_start = float(clock())
@@ -385,16 +388,6 @@ def runner(sh_mem, setting, log_datetime):
             motor_duty_cycle_left = voltage_target / voltage_estimate_max * 100
             motor_angle_diff = gain_motor_sync * (motor_angle_left_raw - motor_angle_right_raw)
             motor_duty_cycle_right = motor_duty_cycle_left - motor_angle_diff
-
-            # if motor_duty_cycle_left > 100.:
-            #     motor_duty_cycle_left = 100.
-            # elif motor_duty_cycle_left < -100.:
-            #     motor_duty_cycle_left = -100.
-            
-            # if motor_duty_cycle_right > 100.:
-            #     motor_duty_cycle_right = 100.
-            # elif motor_duty_cycle_right < -100.:
-            #     motor_duty_cycle_right = -100.
 
             ###############################################################
             ##  Update angle estimate and Gyro Offset Estimate

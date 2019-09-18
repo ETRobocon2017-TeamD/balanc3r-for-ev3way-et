@@ -13,7 +13,7 @@ class LineTracer:
         # target_v 目標値
         # delta_t 周回時間
         self.refrection_target = 0.0
-        self.delta_t = 0.025 # 10msec
+        self.delta_t = float(setting['loop_time_millisec'])
         # TODO: P係数(要調整)
         # 8.5V - 0.31
         # 8.2V - 0.30
@@ -22,7 +22,7 @@ class LineTracer:
         # TODO: I係数(要調整)
         self.k_i = 0.1
         # TODO: D係数(要調整)
-        self.k_d = 0.05
+        self.k_d = 0.0
         # 前回偏差
         self.e_b = 0.0
         # 前回までの偏差値
@@ -120,8 +120,10 @@ class LineTracer:
             # NOTE: できるだけ上げたい値。90でちょうどよさそう。7.5Vの時。
             speed = 82
 
-        # NOTE: ライン左端を基準に走行させるために、旋回方向を - で反転している
-        return speed, -direction, refrection_raw
+        speed = 20
+
+        return 0, 0, refrection_raw
+        # return speed, direction, refrection_raw
 
     def shutdown(self):
         self.color_reflection_fd.close()

@@ -14,7 +14,7 @@
     "a_r": 0.996,
     "a_b": 0.8,
     "k_theta_dot" : 6.0,
-    "lineWhiteLuminance": 440.0,
+    "lineWhiteLuminance": 502.0,
     "lineBlackLuminance": 647.0,
     "lineLuminanceRate": 0.75,
 
@@ -30,5 +30,8 @@
     "battery_gain_right": 0.001089,
     "battery_gain_right_adjust": 1.0,
     "battery_offset_right": 0.625,
-    "battery_offset_right_adjust": 1.0
+    "battery_offset_right_adjust": 1.0,
+
+    "kick_start_time_sp": 160,
+    "kick_start_speed_sp": 160
 }
