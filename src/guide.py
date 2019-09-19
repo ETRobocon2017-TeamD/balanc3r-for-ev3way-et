@@ -71,6 +71,7 @@ def guide(sh_mem, setting, log_datetime):
         loop_time_millisec = float(setting['loop_time_millisec'])
         # Time of each loop, measured in seconds.
         loop_time_sec = loop_time_millisec / 1000.0
+        kick_start_time_sp = float(setting['kick_start_time_sp'])
 
         # ログ記録用
         logs = ["" for _ in range(10000)]
@@ -100,6 +101,9 @@ def guide(sh_mem, setting, log_datetime):
 
         angle_l = 0
         angle_r = 0
+
+        # しっぽモーター下に少し下げる分だけ待つ
+        sleep(kick_start_time_sp / 1000.)
 
         # スタート時の時間取得
         t_line_trace_start = clock()

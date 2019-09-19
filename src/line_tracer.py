@@ -122,8 +122,8 @@ class LineTracer:
 
         speed = 20
 
-        return 0, 0, refrection_raw
-        # return speed, direction, refrection_raw
+        # return 0, 0, refrection_raw
+        return speed, direction, refrection_raw
 
     def shutdown(self):
         self.color_reflection_fd.close()

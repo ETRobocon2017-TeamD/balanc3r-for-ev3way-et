@@ -55,6 +55,8 @@ def runner(sh_mem, setting, log_datetime):
                 ",推定最大入力可能電圧右"\
                 ",モーターPWM値左"\
                 ",モーターPWM値右"\
+                ",ガイド旋回PWM値"\
+                ",ガイド目標角速度"\
                 "\n"
             )
 
@@ -415,7 +417,7 @@ def runner(sh_mem, setting, log_datetime):
 
             # 実行時間、PWM値(duty cycle value)に関わる値をログに出力
             t_loop_end = float(clock())
-            logs[log_pointer] = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}".format(
+            logs[log_pointer] = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}".format(
                 log_pointer,
                 t_loop_end - t_balancer_start,
                 t_loop_end - t_loop_start,
@@ -438,6 +440,8 @@ def runner(sh_mem, setting, log_datetime):
                 voltage_estimate_max_right,
                 duty_left,
                 duty_right,
+                steering,
+                speed_reference
                 )
 
             log_pointer += 1
