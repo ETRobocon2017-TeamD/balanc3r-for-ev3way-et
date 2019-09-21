@@ -48,6 +48,11 @@ def runner(sh_mem, setting, log_datetime):
                 ",モーター角速度目標"\
                 ",モーター角速度誤差(rad/sec)"\
                 ",モーター角度誤差累積値(rad??)"\
+                ",入力電圧-ジャイロ角度成分"\
+                ",入力電圧-ジャイロ角速度成分"\
+                ",入力電圧-モーター角度成分"\
+                ",入力電圧-モーター角速度成分"\
+                ",入力電圧-モーター角度誤差累積値成分"\
                 ",モーターPWM値目標左"\
                 ",モーターPWM値目標右"\
                 ",モーター電圧生値"\
@@ -253,6 +258,13 @@ def runner(sh_mem, setting, log_datetime):
         motor_duty_cycle_left_devfd = open(left_motor._path + "/duty_cycle_sp", "w")
         motor_duty_cycle_right_devfd = open(right_motor._path + "/duty_cycle_sp", "w")
 
+        # 入力電圧の成分
+        voltage_feedback_gyro_angle = 0.
+        voltage_feedback_gyro_rate = 0.
+        voltage_feedback_motor_angle = 0.
+        voltage_feedback_motor_angular_speed = 0.
+        voltage_feedback_motor_angule_error_accumulated = 0.
+
         # バッテリー電圧
         voltage_raw = read_device(battery_voltage_devfd) # 単位(μV)
         voltage_current = voltage_raw
@@ -372,11 +384,16 @@ def runner(sh_mem, setting, log_datetime):
             ###############################################################
             ##  Computing the motor duty cycle value
             ###############################################################
-            voltage_target = ((gain_gyro_angle  * gyro_estimated_angle)
-                + (gain_gyro_rate   * gyro_rate)
-                + (gain_motor_angle * float(motor_angle_error))
-                + (gain_motor_angular_speed * motor_angular_speed_error)
-                + (gain_motor_angle_error_accumulated * motor_angle_error_accumulated))
+            voltage_feedback_gyro_angle = gain_gyro_angle  * gyro_estimated_angle
+            voltage_feedback_gyro_rate = gain_gyro_rate   * gyro_rate
+            voltage_feedback_motor_angle = gain_motor_angle * float(motor_angle_error)
+            voltage_feedback_motor_angular_speed = gain_motor_angular_speed * motor_angular_speed_error
+            voltage_feedback_motor_angule_error_accumulated = gain_motor_angle_error_accumulated * motor_angle_error_accumulated
+            voltage_target = (voltage_feedback_gyro_angle
+                + voltage_feedback_gyro_rate
+                + voltage_feedback_motor_angle
+                + voltage_feedback_motor_angular_speed
+                + voltage_feedback_motor_angule_error_accumulated)
 
             ###############################################################
             ##  Cal PWM
@@ -421,7 +438,7 @@ def runner(sh_mem, setting, log_datetime):
 
             # 実行時間、PWM値(duty cycle value)に関わる値をログに出力
             t_loop_end = float(clock())
-            logs[log_pointer] = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}".format(
+            logs[log_pointer] = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}".format(
                 log_pointer,
                 t_loop_end - t_balancer_start,
                 t_loop_end - t_loop_start,
@@ -437,6 +454,11 @@ def runner(sh_mem, setting, log_datetime):
                 motor_angular_speed_reference,
                 motor_angular_speed_error,
                 motor_angle_error_accumulated,
+                voltage_feedback_gyro_angle,
+                voltage_feedback_gyro_rate,
+                voltage_feedback_motor_angle,
+                voltage_feedback_motor_angular_speed,
+                voltage_feedback_motor_angule_error_accumulated,
                 motor_duty_cycle_left,
                 motor_duty_cycle_right,
                 voltage_raw,
