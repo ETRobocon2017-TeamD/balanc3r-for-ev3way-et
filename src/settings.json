@@ -20,7 +20,7 @@
 
     "battery_gain": 0.001089,
     "battery_offset": 0.625,
-    "gain_motor_sync": 0.0,
+    "gain_motor_sync": 1.25,
 
     "battery_gain_left": 0.001089,
     "battery_gain_left_adjust": 1.0,

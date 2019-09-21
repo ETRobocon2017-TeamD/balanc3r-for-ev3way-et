@@ -388,8 +388,12 @@ def runner(sh_mem, setting, log_datetime):
             
             voltage_estimate_max = (battery_gain * float(voltage_current) / 1000) - battery_offset
             motor_duty_cycle_left = voltage_target / voltage_estimate_max * 100
+
+            # 実機調整
+            # 右モーターエンコーダは左モーターエンコーダーより大きな角度を出力するが、実際には左モーターの方が角度が大きく回転する
+            # そこで、直線走行テストをすることで実機合わせできる付け焼き刃の調整処理を下に追加した。
             motor_angle_diff = gain_motor_sync * (motor_angle_left_raw - motor_angle_right_raw)
-            motor_duty_cycle_right = motor_duty_cycle_left - motor_angle_diff
+            motor_duty_cycle_right = motor_duty_cycle_left + motor_angle_diff
 
             ###############################################################
             ##  Update angle estimate and Gyro Offset Estimate
